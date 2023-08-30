@@ -95,7 +95,7 @@ class StartNW8997(jmri.jmrit.automat.AbstractAutomaton):
         print("Shutting down engine and closing staging")
         self.throttle.setF9(False)
         self.throttle.setF9(True)
-        self.waitMsec(25000)
+        self.waitMsec(30000)
         self.closeNWStaging()
         memories.provideMemory("Train Done").setValue("Yes")
         #trainDone = memories.provideMemory("Train Done").getValue()
