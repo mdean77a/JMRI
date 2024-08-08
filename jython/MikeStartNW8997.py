@@ -13,7 +13,7 @@ class StartNW8997(jmri.jmrit.automat.AbstractAutomaton):
 # Start up routines are unique for each train
     def startUpRoutines(self):
         print("Executing startup routine")
-        self.throttle = self.getThrottle(5327, True)
+        self.throttle = self.getThrottle(8997, True)
         self.throttle.setF0(True)
         self.throttle.setSpeedSetting(0.01)
         self.waitMsec(200)

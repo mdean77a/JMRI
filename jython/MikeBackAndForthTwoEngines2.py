@@ -16,7 +16,7 @@ class BackAndForth2(jmri.jmrit.automat.AbstractAutomaton) :
 		# get the sensors
 		self.fwdSensor = sensors.provideSensor("Block 6")
 		self.revSensor = sensors.provideSensor("Block 1")
-		self.throttle = self.getThrottle(5542, True)
+		self.throttle = self.getThrottle(5327, True)
 		self.throttle.setIsForward(True)
 		self.throttle.setSpeedSetting(0.15)
 		return

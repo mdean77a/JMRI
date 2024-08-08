@@ -18,7 +18,7 @@
     </classPreferences>
     <comboBoxLastValue xmlns="http://jmri.org/xml/schema/auxiliary-configuration/combobox-4-3-5.xsd">
         <comboBox xmlns="" lastSelected="NCE USB" name="NCE"/>
-        <comboBox xmlns="" lastSelected="19,200 baud" name="jmri.jmrix.nce.usbdriver.UsbDriverAdapter.baud"/>
+        <comboBox xmlns="" lastSelected="19,200 bps" name="jmri.jmrix.nce.usbdriver.UsbDriverAdapter.baud"/>
         <comboBox xmlns="" lastSelected="python" name="jmri.jmrit.jython.InputWindow.language"/>
     </comboBoxLastValue>
     <settings xmlns="http://jmri.org/xml/schema/auxiliary-configuration/settings-4-3-5.xsd">
@@ -28,40 +28,10 @@
     </settings>
     <tableDetails xmlns="http://jmri.org/xml/schema/auxiliary-configuration/table-details-4-3-5.xsd"/>
     <windowDetails xmlns="http://jmri.org/xml/schema/auxiliary-configuration/window-details-4-3-5.xsd">
-        <window xmlns="" class="apps.gui3.dp3.DecoderPro3Window:DecoderPro" height="600.0" locX="182.0" locY="85.0" width="1024.0">
-            <properties>
-                <property>
-                    <key>selectedProgrammer</key>
-                    <value class="java.lang.String">service</value>
-                </property>
-            </properties>
-        </window>
-        <window xmlns="" class="jmri.jmrit.roster.swing.RosterFrame$4:3548" height="553.0" locX="141.0" locY="73.0" width="985.0"/>
-        <window xmlns="" class="jmri.jmrit.roster.swing.RosterFrame$4:GE ES44AC &quot;GEVO&quot;" height="719.0" locX="46.0" locY="23.0" width="865.0"/>
-        <window xmlns="" class="jmri.jmrix.nce.ncemon.NceMonPanel.FilterField">
-            <properties>
-                <property>
-                    <key>jmri.jmrix.nce.ncemon.NceMonPanel.FilterField</key>
-                    <value class="java.lang.String"/>
-                </property>
-            </properties>
-        </window>
-        <window xmlns="" class="Script Output:1" height="765.0" locX="426.0" locY="39.0" width="623.0"/>
-        <window xmlns="" class="jmri.jmrit.symbolicprog.tabbedframe.PaneServiceProgFrame:GE ES44AC &quot;GEVO&quot;" height="595.0" locX="69.0" locY="23.0" width="1049.0"/>
-        <window xmlns="" class="jmri.jmrit.symbolicprog.tabbedframe.PaneServiceProgFrame:RG 5327 SD45" height="854.0" locX="69.0" locY="23.0" width="1052.0"/>
-        <window xmlns="" class="Script Output" height="600.0" locX="878.0" locY="455.0" width="1248.0"/>
-        <window xmlns="" class="jmri.jmrit.throttle.ThrottleWindow" height="484.0" locX="606.0" locY="107.0" width="554.0"/>
         <window xmlns="" class="jmri.jmrit.throttle.ThrottleWindow:1" height="484.0" locX="687.0" locY="213.0" width="554.0"/>
-        <window xmlns="" class="jmri.jmrit.roster.swing.RosterFrame:Roster" height="600.0" locX="47.0" locY="23.0" width="1024.0">
-            <properties>
-                <property>
-                    <key>selectedProgrammer</key>
-                    <value class="java.lang.String">service</value>
-                </property>
-            </properties>
-        </window>
-        <window xmlns="" class="Create New Loco" height="581.0" locX="151.0" locY="28.0" width="804.0"/>
-        <window xmlns="" class="apps.gui3.TabbedPreferencesFrame:Preferences" height="464.0" locX="120.0" locY="156.0" width="937.0"/>
+        <window xmlns="" class="Script Output:1" height="765.0" locX="50.0" locY="48.0" width="623.0"/>
+        <window xmlns="" class="Script Entry:1" height="638.0" locX="784.0" locY="235.0" width="602.0"/>
+        <window xmlns="" class="jmri.jmrit.roster.swing.RosterFrame$4:GE ES44AC &quot;GEVO&quot;" height="719.0" locX="46.0" locY="23.0" width="865.0"/>
         <window xmlns="" class="jmri.jmrit.display.layoutEditor.LayoutEditor:My Layout" locX="47.0" locY="23.0">
             <properties>
                 <property>
@@ -106,12 +76,47 @@
                 </property>
             </properties>
         </window>
-        <window xmlns="" class="Script Entry:1" height="640.0" locX="789.0" locY="237.0" width="607.0"/>
+        <window xmlns="" class="apps.gui3.tabbedpreferences.TabbedPreferencesFrame:Preferences" height="850.0" locX="50.0" locY="25.0" width="1001.0"/>
+        <window xmlns="" class="jmri.jmrit.throttle.ThrottleWindow" height="484.0" locX="715.0" locY="394.0" width="880.0"/>
+        <window xmlns="" class="jmri.jmrit.roster.swing.RosterFrame:Roster" height="600.0" locX="47.0" locY="23.0" width="1024.0">
+            <properties>
+                <property>
+                    <key>selectedProgrammer</key>
+                    <value class="java.lang.String">service</value>
+                </property>
+            </properties>
+        </window>
+        <window xmlns="" class="Create New Loco" height="581.0" locX="151.0" locY="28.0" width="804.0"/>
+        <window xmlns="" class="PanelPro" height="231.0" locX="226.0" locY="669.0" width="487.0"/>
+        <window xmlns="" class="jmri.jmrit.roster.swing.RosterFrame$4:3548" height="553.0" locX="141.0" locY="73.0" width="985.0"/>
+        <window xmlns="" class="jmri.jmrit.automat.monitor.AutomatTableFrame:1" height="448.0" locX="467.0" locY="498.0" width="454.0"/>
+        <window xmlns="" class="jmri.jmrit.symbolicprog.tabbedframe.PaneServiceProgFrame:Programming: RG 5327 SD45" height="865.0" locX="50.0" locY="25.0" width="1052.0"/>
         <window xmlns="" class="jmri.jmrit.roster.Roster"/>
-        <window xmlns="" class="PanelPro" height="231.0" locX="476.0" locY="334.0" width="487.0"/>
-        <window xmlns="" class="Local JMRI throttles" height="222.0" locX="47.0" locY="23.0" width="320.0"/>
-        <window xmlns="" class="jmri.jmrit.automat.monitor.AutomatTableFrame" height="184.0" locX="672.0" locY="512.0" width="570.0"/>
-        <window xmlns="" class="Script Entry" height="554.0" locX="965.0" locY="65.0" width="798.0"/>
+        <window xmlns="" class="jmri.jmrit.symbolicprog.tabbedframe.PaneOpsProgFrame:Programming: RG 5327 SD45" height="865.0" locX="50.0" locY="25.0" width="1052.0"/>
         <window xmlns="" class="jmri.jmrit.symbolicprog.tabbedframe.PaneServiceProgFrame:3548 WP" height="685.0" locX="159.0" locY="23.0" width="1052.0"/>
+        <window xmlns="" class="apps.gui3.dp3.DecoderPro3Window:DecoderPro" height="600.0" locX="182.0" locY="85.0" width="1024.0">
+            <properties>
+                <property>
+                    <key>selectedProgrammer</key>
+                    <value class="java.lang.String">service</value>
+                </property>
+            </properties>
+        </window>
+        <window xmlns="" class="jmri.jmrit.symbolicprog.tabbedframe.PaneServiceProgFrame:GE ES44AC &quot;GEVO&quot;" height="595.0" locX="69.0" locY="23.0" width="1049.0"/>
+        <window xmlns="" class="jmri.jmrit.symbolicprog.tabbedframe.PaneServiceProgFrame:RG 5327 SD45" height="854.0" locX="69.0" locY="23.0" width="1052.0"/>
+        <window xmlns="" class="Script Entry" height="554.0" locX="800.0" locY="68.0" width="563.0"/>
+        <window xmlns="" class="Local JMRI throttles" height="222.0" locX="50.0" locY="25.0" width="320.0"/>
+        <window xmlns="" class="jmri.jmrit.automat.monitor.AutomatTableFrame" height="184.0" locX="758.0" locY="716.0" width="570.0"/>
+        <window xmlns="" class="apps.gui3.TabbedPreferencesFrame:Preferences" height="464.0" locX="120.0" locY="156.0" width="937.0"/>
+        <window xmlns="" class="jmri.jmrit.symbolicprog.tabbedframe.PaneServiceProgFrame:Programming: WP GP40-2 3549" height="697.0" locX="50.0" locY="25.0" width="1052.0"/>
+        <window xmlns="" class="jmri.jmrix.nce.ncemon.NceMonPanel.FilterField">
+            <properties>
+                <property>
+                    <key>jmri.jmrix.nce.ncemon.NceMonPanel.FilterField</key>
+                    <value class="java.lang.String"/>
+                </property>
+            </properties>
+        </window>
+        <window xmlns="" class="Script Output" height="600.0" locX="38.0" locY="51.0" width="745.0"/>
     </windowDetails>
 </auxiliary-configuration>

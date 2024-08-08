@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet href="/xml/XSLT/locomotive.xsl" type="text/xsl"?>
 <locomotive-config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://jmri.org/xml/schema/locomotive-config.xsd">
-  <!--Written by JMRI version 4.26+R381c8dfc32 on Mon Mar 21 14:34:20 MDT 2022-->
+  <!--Written by JMRI version 5.4+R9005ecb4ac on Sun Dec 03 12:33:23 MST 2023-->
   <locomotive id="CN GMD-1 1044 Black" fileName="CN_GMD_1_1044_Black.xml" roadNumber="1044" roadName="Canadian National" mfg="Rapido" owner="Mike Dean from Nate" model="70012" dccAddress="1044" comment="" developerID="-1" manufacturerID="129" productID="" maxSpeed="100" imageFilePath="" iconFilePath="" URL="" IsShuntingOn="">
-    <dateUpdated>2022-03-21T20:34:20.050+0000</dateUpdated>
+    <dateUpdated>2023-12-03T19:33:23.770+00:00</dateUpdated>
     <decoder model="DN136D" family="Series 6 with FX3, silent, improved BEMF" comment="" maxFnNum="28" />
     <locoaddress>
       <dcclocoaddress number="1044" longaddress="yes" />
