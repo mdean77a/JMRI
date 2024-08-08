@@ -64,6 +64,42 @@
                     <value>track/signalmast/</value>
                 </option>
                 <option>
+                    <name>16.3</name>
+                    <value>cab/{0}/throttle</value>
+                </option>
+                <option>
+                    <name>16.5</name>
+                    <value>cab/{0}/throttle</value>
+                </option>
+                <option>
+                    <name>17.3</name>
+                    <value>cab/{0}/direction</value>
+                </option>
+                <option>
+                    <name>17.5</name>
+                    <value>cab/{0}/direction</value>
+                </option>
+                <option>
+                    <name>18.3</name>
+                    <value>cab/{0}/function/{1}</value>
+                </option>
+                <option>
+                    <name>18.5</name>
+                    <value>cab/{0}/function/{1}</value>
+                </option>
+                <option>
+                    <name>19.3</name>
+                    <value>cab/{0}/consist</value>
+                </option>
+                <option>
+                    <name>20.3</name>
+                    <value>track/power</value>
+                </option>
+                <option>
+                    <name>20.5</name>
+                    <value>track/power</value>
+                </option>
+                <option>
                     <name>LastWillMessage</name>
                     <value>lost</value>
                 </option>
@@ -75,14 +111,14 @@
         </connection>
     </connections>
     <startup xmlns="http://jmri.org/xml/schema/auxiliary-configuration/startup-4-3-5.xsd">
-        <perform xmlns="" class="jmri.util.startup.configurexml.PerformActionModelXml" name="apps.SystemConsoleAction" type="Action">
+        <perform xmlns="" class="jmri.util.startup.configurexml.PerformActionModelXml" enabled="yes" name="apps.SystemConsoleAction" type="Action">
             <property name="systemPrefix" value=""/>
         </perform>
-        <perform xmlns="" class="jmri.util.startup.configurexml.PerformFileModelXml" name="preference:October2022Settings.xml" type="XmlFile"/>
-        <perform xmlns="" class="jmri.util.startup.configurexml.PerformActionModelXml" name="jmri.jmrit.withrottle.WiThrottleCreationAction" type="Action">
+        <perform xmlns="" class="jmri.util.startup.configurexml.PerformFileModelXml" enabled="yes" name="preference:October2022Settings.xml" type="XmlFile"/>
+        <perform xmlns="" class="jmri.util.startup.configurexml.PerformActionModelXml" enabled="yes" name="jmri.jmrit.withrottle.WiThrottleCreationAction" type="Action">
             <property name="systemPrefix" value=""/>
         </perform>
-        <perform xmlns="" class="jmri.util.startup.configurexml.PerformActionModelXml" name="jmri.web.server.WebServerAction" type="Action">
+        <perform xmlns="" class="jmri.util.startup.configurexml.PerformActionModelXml" enabled="yes" name="jmri.web.server.WebServerAction" type="Action">
             <property name="systemPrefix" value=""/>
         </perform>
     </startup>

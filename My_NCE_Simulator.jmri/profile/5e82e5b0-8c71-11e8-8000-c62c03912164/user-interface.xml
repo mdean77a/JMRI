@@ -1,40 +1,237 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <auxiliary-configuration xmlns="http://www.netbeans.org/ns/auxiliary-configuration/1">
     <classPreferences xmlns="http://jmri.org/xml/schema/auxiliary-configuration/class-preferences-4-3-5.xsd">
-        <preferences xmlns="" class="jmri.jmrit.beantable.SignalMastTableAction"/>
-        <preferences xmlns="" class="jmri.jmrit.beantable.LogixTableAction"/>
-        <preferences xmlns="" class="jmri.jmrit.display.EditorManager"/>
-        <preferences xmlns="" class="jmri.jmrit.beantable.TurnoutTableAction"/>
-        <preferences xmlns="" class="jmri.jmrit.beantable.LRouteTableAction"/>
         <preferences xmlns="" class="jmri.managers.JmriUserPreferencesManager"/>
-        <preferences xmlns="" class="jmri.jmrit.beantable.SensorTableAction"/>
-        <preferences xmlns="" class="jmri.jmrit.beantable.SignalHeadTableAction"/>
-        <preferences xmlns="" class="jmri.jmrit.beantable.BlockTableAction"/>
-        <preferences xmlns="" class="jmri.jmrit.beantable.AudioTableAction"/>
-        <preferences xmlns="" class="jmri.jmrit.beantable.SignalGroupTableAction"/>
-        <preferences xmlns="" class="jmri.jmrit.beantable.LightTableAction"/>
-        <preferences xmlns="" class="jmri.jmrit.beantable.TransitTableAction"/>
-        <preferences xmlns="" class="jmri.jmrit.beantable.ReporterTableAction"/>
-        <preferences xmlns="" class="jmri.jmrit.beantable.RouteTableAction"/>
-        <preferences xmlns="" class="jmri.jmrit.beantable.MemoryTableAction"/>
     </classPreferences>
     <settings xmlns="http://jmri.org/xml/schema/auxiliary-configuration/settings-4-3-5.xsd">
         <setting xmlns="">jmri.jmrit.display.layoutEditor.LayoutEditor:Mike Dean's Basement Layout.antialiasingOn</setting>
         <setting xmlns="">jmri.jmrit.display.layoutEditor.LayoutEditor:Mike Dean's Basement Layout.toolBarThin</setting>
         <setting xmlns="">jmri.jmrit.roster.swing.RosterFrame.hideGroups</setting>
     </settings>
-    <tableDetails xmlns="http://jmri.org/xml/schema/auxiliary-configuration/table-details-4-3-5.xsd"/>
+    <tableDetails xmlns="http://jmri.org/xml/schema/auxiliary-configuration/table-details-4-3-5.xsd">
+        <table xmlns="" name="jmri.jmrit.beantable.SensorTableAction:Internal">
+            <columns/>
+        </table>
+        <table xmlns="" name="jmri.jmrit.beantable.TurnoutTableAction:NCE">
+            <columns/>
+        </table>
+        <table xmlns="" name="jmri.jmrit.beantable.ReporterTableAction:Internal">
+            <columns/>
+        </table>
+        <table xmlns="" name="jmri.jmrit.beantable.BlockTableAction:Blocks">
+            <columns>
+                <column hidden="false" name="Comment" order="3" width="190"/>
+                <column hidden="false" name="Speed" order="14" width="94"/>
+                <column hidden="false" name="User Name" order="1" width="190"/>
+                <column hidden="false" name="Reporter" order="11" width="106"/>
+                <column hidden="false" name="Permissive" order="13" width="94"/>
+                <column hidden="false" name="Column4" order="4" width="88"/>
+                <column hidden="false" name="Edit" order="5" width="94"/>
+                <column hidden="false" name="Direction" order="6" width="94"/>
+                <column hidden="false" name="Length" order="7" width="94"/>
+                <column hidden="false" name="State" order="9" width="106"/>
+                <column hidden="false" name="Use Current" order="12" width="94"/>
+                <column hidden="false" name="Value" order="2" width="51"/>
+                <column hidden="false" name="System Name" order="0" width="177"/>
+                <column hidden="false" name="Curvature" order="8" width="106"/>
+                <column hidden="false" name="Sensor" order="10" width="106"/>
+            </columns>
+            <sortOrder>
+                <sortKey column="1" sortOrder="ASCENDING"/>
+            </sortOrder>
+        </table>
+        <table xmlns="" name="jmri.jmrit.beantable.TransitTableAction:Transits">
+            <columns/>
+        </table>
+        <table xmlns="" name="jmri.jmrit.beantable.LRouteTableAction:LRoutes">
+            <columns/>
+        </table>
+        <table xmlns="" name="jmri.jmrit.logixng.LogixNG_UserPreferences:LogixNGs">
+            <columns/>
+        </table>
+        <table xmlns="" name="jmri.jmrit.beantable.LightTableAction:All">
+            <columns/>
+        </table>
+        <table xmlns="" name="jmri.jmrit.beantable.ReporterTableAction:All">
+            <columns/>
+        </table>
+        <table xmlns="" name="jmri.jmrit.beantable.LogixTableAction:Logix">
+            <columns/>
+        </table>
+        <table xmlns="" name="jmri.jmrit.beantable.MemoryTableDataModel:Memory Variables">
+            <columns>
+                <column hidden="false" name="Comment" order="3" width="190"/>
+                <column hidden="false" name="User Name" order="1" width="190"/>
+                <column hidden="false" name="Value" order="2" width="51"/>
+                <column hidden="false" name="Column4" order="4" width="88"/>
+                <column hidden="false" name="System Name" order="0" width="131"/>
+            </columns>
+            <sortOrder>
+                <sortKey column="1" sortOrder="ASCENDING"/>
+            </sortOrder>
+        </table>
+        <table xmlns="" name="jmri.jmrit.logixng.LogixNG_UserPreferences:LogixNG Global Variables">
+            <columns/>
+        </table>
+        <table xmlns="" name="jmri.jmrit.beantable.SignalGroupTableAction:Signal Groups">
+            <columns/>
+        </table>
+        <table xmlns="" name="jmri.jmrit.beantable.SignalMastLogicTableAction:Signal Mast Logic">
+            <columns/>
+        </table>
+        <table xmlns="" name="jmri.jmrit.logixng.LogixNG_UserPreferences:LogixNG Modules">
+            <columns/>
+        </table>
+        <table xmlns="" name="jmri.jmrit.beantable.TurnoutTableAction:All">
+            <columns/>
+        </table>
+        <table xmlns="" name="jmri.jmrit.beantable.AudioTableAction">
+            <columns>
+                <column hidden="false" name="Comment" order="3" width="190"/>
+                <column hidden="false" name="Description" order="2" width="610"/>
+                <column hidden="false" name="User Name" order="1" width="190"/>
+                <column hidden="false" name="Column4" order="4" width="88"/>
+                <column hidden="false" name="Column5" order="5" width="79"/>
+                <column hidden="false" name="System Name" order="0" width="70"/>
+            </columns>
+            <sortOrder>
+                <sortKey column="0" sortOrder="ASCENDING"/>
+            </sortOrder>
+        </table>
+        <table xmlns="" name="jmri.jmrit.beantable.TurnoutTableAction:Internal">
+            <columns/>
+        </table>
+        <table xmlns="" name="jmri.jmrit.beantable.LightTableAction:Internal">
+            <columns/>
+        </table>
+        <table xmlns="" name="jmri.jmrit.beantable.RailComTableAction:RailCom IDs">
+            <columns/>
+        </table>
+        <table xmlns="" name="jmri.jmrit.beantable.SignalMastTableAction:Signal Masts">
+            <columns>
+                <column hidden="false" name="Comment" order="3" width="190"/>
+                <column hidden="false" name="Column6" order="6" width="130"/>
+                <column hidden="false" name="User Name" order="1" width="353"/>
+                <column hidden="false" name="Lit" order="7" width="46"/>
+                <column hidden="false" name="Held" order="8" width="58"/>
+                <column hidden="false" name="Column4" order="4" width="88"/>
+                <column hidden="false" name="Column5" order="5" width="58"/>
+                <column hidden="false" name="System Name" order="0" width="285"/>
+                <column hidden="false" name="Aspect" order="2" width="175"/>
+            </columns>
+            <sortOrder>
+                <sortKey column="1" sortOrder="ASCENDING"/>
+            </sortOrder>
+        </table>
+        <table xmlns="" name="jmri.jmrit.beantable.IdTagTableAction:Internal">
+            <columns/>
+        </table>
+        <table xmlns="" name="jmri.jmrit.beantable.SensorTableAction:NCE">
+            <columns/>
+        </table>
+        <table xmlns="" name="jmri.jmrit.beantable.IdTagTableAction:All">
+            <columns/>
+        </table>
+        <table xmlns="" name="jmri.jmrit.logixng.LogixNG_UserPreferences:LogixNG Tables">
+            <columns/>
+        </table>
+        <table xmlns="" name="jmri.jmrit.beantable.RouteTableDataModel:Routes">
+            <columns/>
+        </table>
+        <table xmlns="" name="jmri.jmrit.beantable.SectionTableAction:Sections">
+            <columns/>
+        </table>
+        <table xmlns="" name="jmri.jmrit.beantable.LightTableAction:NCE">
+            <columns/>
+        </table>
+        <table xmlns="" name="jmri.jmrit.beantable.IdTagTableAction:RailCom">
+            <columns/>
+        </table>
+        <table xmlns="" name="jmri.jmrit.beantable.SensorTableAction:All">
+            <columns/>
+        </table>
+        <table xmlns="" name="jmri.jmrit.beantable.SignalHeadTableAction:Signal Heads">
+            <columns>
+                <column hidden="false" name="Comment" order="3" width="190"/>
+                <column hidden="false" name="User Name" order="1" width="190"/>
+                <column hidden="false" name="Column7" order="7" width="94"/>
+                <column hidden="false" name="Lit" order="5" width="58"/>
+                <column hidden="false" name="Held" order="6" width="58"/>
+                <column hidden="false" name="Column4" order="4" width="88"/>
+                <column hidden="false" name="System Name" order="0" width="159"/>
+                <column hidden="false" name="Appearance" order="2" width="170"/>
+            </columns>
+            <sortOrder>
+                <sortKey column="1" sortOrder="ASCENDING"/>
+            </sortOrder>
+        </table>
+    </tableDetails>
     <windowDetails xmlns="http://jmri.org/xml/schema/auxiliary-configuration/window-details-4-3-5.xsd">
+        <window xmlns="" class="jmri.jmrit.beantable.ListedTableFrame:Signal Mast Logic" height="850.0" locX="50.0" locY="25.0" width="1340.0"/>
+        <window xmlns="" class="jmri.jmrit.display.layoutEditor.LayoutEditor:Mike Dean's Basement Layout" height="836.0" locX="51.0" locY="64.0" width="1389.0"/>
+        <window xmlns="" class="jmri.jmrit.beantable.ListedTableFrame:Turnouts:1" height="850.0" locX="50.0" locY="25.0" width="1340.0"/>
+        <window xmlns="" class="jmri.jmrit.beantable.ListedTableFrame:Signal Heads" height="850.0" locX="50.0" locY="25.0" width="1340.0"/>
         <window xmlns="" class="apps.gui3.tabbedpreferences.TabbedPreferencesFrame:Preferences" height="854.0" locX="51.0" locY="23.0" width="1017.0"/>
         <window xmlns="" class="jmri.jmrit.roster.Roster"/>
+        <window xmlns="" class="jmri.jmrit.beantable.ListedTableFrame:Turnouts" height="850.0" locX="50.0" locY="25.0" width="1340.0"/>
+        <window xmlns="" class="jmri.jmrit.beantable.ListedTableFrame:LRoutes" height="850.0" locX="50.0" locY="25.0" width="1340.0"/>
+        <window xmlns="" class="jmri.jmrit.beantable.signalmast.AddSignalMastJFrame:Add/Edit Signal Mast" locX="78.0" locY="26.0"/>
+        <window xmlns="" class="jmri.jmrit.beantable.ListedTableFrame:Memory Variables" height="850.0" locX="50.0" locY="25.0" width="1340.0"/>
+        <window xmlns="" class="Edit Signal Head" locX="78.0" locY="26.0"/>
+        <window xmlns="" class="Add New Signal Head" locX="78.0" locY="26.0"/>
+        <window xmlns="" class="jmri.jmrit.beantable.ListedTableFrame:LogixNG Modules" height="850.0" locX="50.0" locY="25.0" width="1340.0"/>
+        <window xmlns="" class="jmri.jmrit.beantable.ListedTableFrame:Signal Groups" height="850.0" locX="50.0" locY="25.0" width="1340.0"/>
+        <window xmlns="" class="jmri.jmrit.beantable.ListedTableFrame:RailCom IDs" height="850.0" locX="50.0" locY="25.0" width="1340.0"/>
         <window xmlns="" class="PanelPro" height="231.0" locX="464.0" locY="334.0" width="512.0"/>
-        <window xmlns="" class="jmri.jmrit.display.layoutEditor.LayoutEditor:Mike Dean's Basement Layout" height="836.0" locX="51.0" locY="64.0" width="1389.0"/>
+        <window xmlns="" class="jmri.jmrit.beantable.ListedTableFrame:Reporters" height="850.0" locX="50.0" locY="25.0" width="1340.0"/>
+        <window xmlns="" class="jmri.jmrit.signalling.SignallingFrame" locX="78.0" locY="26.0"/>
+        <window xmlns="" class="jmri.jmrit.beantable.LogixTableAction">
+            <properties>
+                <property>
+                    <key>Edit Mode</key>
+                    <value class="java.lang.String">LISTEDIT</value>
+                </property>
+                <property>
+                    <key>Selection Mode</key>
+                    <value class="java.lang.String">USEMULTI</value>
+                </property>
+            </properties>
+        </window>
         <window xmlns="" class="Local JMRI throttles" height="222.0" locX="73.0" locY="24.0" width="320.0"/>
+        <window xmlns="" class="jmri.jmrit.beantable.ListedTableFrame:Signal Heads:1" height="850.0" locX="50.0" locY="25.0" width="1340.0"/>
+        <window xmlns="" class="jmri.jmrit.beantable.ListedTableFrame:Routes" height="850.0" locX="50.0" locY="25.0" width="1340.0"/>
+        <window xmlns="" class="jmri.jmrit.beantable.ListedTableFrame">
+            <properties>
+                <property>
+                    <key>dividerLocation</key>
+                    <value class="java.lang.Integer">168</value>
+                </property>
+            </properties>
+        </window>
+        <window xmlns="" class="jmri.jmrit.beantable.ListedTableFrame:Signal Masts" height="850.0" locX="50.0" locY="25.0" width="1340.0"/>
         <window xmlns="" class="jmri.jmrit.roster.swing.RosterFrame:Roster" height="600.0" locX="51.0" locY="25.0" width="1024.0">
             <properties>
                 <property>
                     <key>selectedProgrammer</key>
                     <value class="java.lang.String">service</value>
+                </property>
+            </properties>
+        </window>
+        <window xmlns="" class="jmri.jmrit.beantable.beanedit.TurnoutEditAction">
+            <properties>
+                <property>
+                    <key>selectedTabIndex</key>
+                    <value class="java.lang.Integer">5</value>
+                </property>
+            </properties>
+        </window>
+        <window xmlns="" class="jmri.jmrit.beantable.ListedTableFrame:LogixNG Global Variables" height="850.0" locX="50.0" locY="25.0" width="1340.0"/>
+        <window xmlns="" class="jmri.jmrit.beantable.ListedTableFrame:Routes:1" height="850.0" locX="50.0" locY="25.0" width="1340.0"/>
+        <window xmlns="" class="jmri.jmrit.beantable.beanedit.BlockEditAction">
+            <properties>
+                <property>
+                    <key>selectedTabIndex</key>
+                    <value class="java.lang.Integer">5</value>
                 </property>
             </properties>
         </window>

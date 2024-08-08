@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet href="/xml/XSLT/roster2array.xsl" type="text/xsl"?>
 <roster-config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://jmri.org/xml/schema/roster.xsd">
-  <!--Written by JMRI version 5.4+R9005ecb4ac on Thu Aug 01 10:51:28 MDT 2024-->
+  <!--Written by JMRI version 5.8+Rbc21ce2ce7 on Thu Aug 08 10:56:46 MDT 2024-->
   <roster>
     <locomotive id="1029 NW2 Switcher" fileName="1029_NW2_Switcher.xml" roadNumber="1029" roadName="Union Pacific" mfg="Kato" owner="Mike Dean" model="176-4374" dccAddress="1029" comment="$92 plus decoder" developerID="" manufacturerID="" productID="" maxSpeed="100" imageFilePath="" iconFilePath="" URL="" IsShuntingOn="">
       <dateUpdated>2015-08-15T14:58:45.000+00:00</dateUpdated>
@@ -156,6 +156,16 @@
       </locoaddress>
       <functionlabels />
       <soundlabels />
+      <attributepairs>
+        <keyvaluepair>
+          <key>LastOperated</key>
+          <value>2024-08-08T16:47:26.433+00:00</value>
+        </keyvaluepair>
+        <keyvaluepair>
+          <key>OperatingDuration</key>
+          <value>0</value>
+        </keyvaluepair>
+      </attributepairs>
     </locomotive>
     <locomotive id="ALCO PA 605" fileName="ALCO_PA_605.xml" roadNumber="605" roadName="Union Pacific" mfg="Broadway Limited" owner="Mike Dean" model="3104" dccAddress="605" comment="$159" developerID="" manufacturerID="" productID="" maxSpeed="100" imageFilePath="" iconFilePath="" URL="" IsShuntingOn="">
       <dateUpdated>2016-06-10T22:56:16.000+00:00</dateUpdated>
@@ -196,7 +206,7 @@
       <attributepairs>
         <keyvaluepair>
           <key>LastOperated</key>
-          <value>2021-07-03T22:37:59.580+0000</value>
+          <value>2024-08-08T16:47:22.122+00:00</value>
         </keyvaluepair>
         <keyvaluepair>
           <key>OperatingDuration</key>
@@ -495,7 +505,7 @@
       </attributepairs>
     </locomotive>
     <locomotive id="EMD SD40-2 UP 8094" fileName="EMD_SD40_2_UP_8094.xml" roadNumber="8094" roadName="Union Pacific" mfg="Scale Trains" owner="Mike Dean" model="" dccAddress="8094" comment="" developerID="" manufacturerID="" productID="" maxSpeed="100" imageFilePath="" iconFilePath="" URL="" IsShuntingOn="">
-      <dateUpdated>2024-08-01T16:51:28.780+00:00</dateUpdated>
+      <dateUpdated>2024-08-01T16:51:44.635+00:00</dateUpdated>
       <decoder model="LokSound 5 nano DCC" family="ESU LokSound 5" comment="" maxFnNum="31" />
       <locoaddress>
         <dcclocoaddress number="8094" longaddress="yes" />
@@ -513,7 +523,7 @@
       </soundlabels>
     </locomotive>
     <locomotive id="EMD SD40-2 UP 8099" fileName="EMD_SD40_2_UP_8099.xml" roadNumber="8099" roadName="Union Pacific" mfg="Scale Trains" owner="Mike Dean" model="" dccAddress="8099" comment="" developerID="-1" manufacturerID="151" productID="16777404" maxSpeed="100" imageFilePath="" iconFilePath="" URL="" IsShuntingOn="">
-      <dateUpdated>2024-08-01T16:51:28.780+00:00</dateUpdated>
+      <dateUpdated>2024-08-01T16:51:44.635+00:00</dateUpdated>
       <decoder model="LokSound 5 nano DCC" family="ESU LokSound 5" comment="" maxFnNum="31" />
       <locoaddress>
         <dcclocoaddress number="8099" longaddress="yes" />
@@ -737,11 +747,11 @@
         </keyvaluepair>
         <keyvaluepair>
           <key>LastOperated</key>
-          <value>2022-11-03T21:11:22.970+00:00</value>
+          <value>2024-08-08T16:40:00.168+00:00</value>
         </keyvaluepair>
         <keyvaluepair>
           <key>OperatingDuration</key>
-          <value>578</value>
+          <value>715</value>
         </keyvaluepair>
       </attributepairs>
     </locomotive>
