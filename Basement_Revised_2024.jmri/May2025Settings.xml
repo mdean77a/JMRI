@@ -1117,7 +1117,7 @@
     <memory>
       <systemName>IM:AUTO:0007</systemName>
     </memory>
-    <memory value="4:16 PM">
+    <memory value="4:17 PM">
       <systemName>IMCURRENTTIME</systemName>
     </memory>
     <memory value="1.0">
@@ -2152,7 +2152,6 @@
       <userName>MNT</userName>
       <permissive>no</permissive>
       <occupancysensor>Mountain</occupancysensor>
-      <path todir="64" fromdir="128" block="IB:AUTO:0023" />
       <path todir="32" fromdir="16" block="IB:AUTO:0031" />
     </block>
     <block systemName="IB:AUTO:0008" length="1981.2" curve="0">
@@ -2321,11 +2320,6 @@
       <userName>SZ2</userName>
       <permissive>no</permissive>
       <occupancysensor>South Zone 2</occupancysensor>
-      <path todir="128" fromdir="64" block="IB:AUTO:0007">
-        <beansetting setting="2">
-          <turnout systemName="South Turnout 106" />
-        </beansetting>
-      </path>
     </block>
     <block systemName="IB:AUTO:0024" length="0.0" curve="0">
       <systemName>IB:AUTO:0024</systemName>
@@ -2971,8 +2965,6 @@
       <userName>Route 1C Initialize Layout</userName>
       <conditionalStateVariable operator="4" negated="no" type="5" systemName="IX:RTXINITIALIZER1T" dataString="" num1="0" num2="0" triggersCalc="yes" />
       <conditionalStateVariable operator="5" negated="no" type="1" systemName="IS4" dataString="" num1="0" num2="0" triggersCalc="yes" />
-      <conditionalAction option="1" type="2" systemName="South Turnout 105" data="2" delay="0" string="" />
-      <conditionalAction option="1" type="2" systemName="South Turnout 106" data="2" delay="0" string="" />
       <conditionalAction option="1" type="2" systemName="East Turnout 201" data="2" delay="0" string="" />
       <conditionalAction option="1" type="2" systemName="East Turnout 202" data="2" delay="0" string="" />
       <conditionalAction option="1" type="2" systemName="East Turnout 203" data="2" delay="0" string="" />
@@ -3021,10 +3013,6 @@
       <conditionalAction option="1" type="9" systemName="SW Staging Track 4" data="4" delay="0" string="" />
       <conditionalAction option="1" type="9" systemName="SW Close Staging Track 4" data="4" delay="0" string="" />
       <conditionalAction option="1" type="10" systemName="IS4" data="4" delay="3" string="3" />
-      <conditionalAction option="1" type="2" systemName="NT115" data="2" delay="0" string="" />
-      <conditionalAction option="1" type="2" systemName="NT116" data="2" delay="0" string="" />
-      <conditionalAction option="1" type="2" systemName="NT118" data="2" delay="0" string="" />
-      <conditionalAction option="1" type="2" systemName="South Turnout 100" data="2" delay="0" string="" />
     </conditional>
     <conditional systemName="IX:RTXINITIALIZER1T" userName="Route 1C Startup Turnout Init" antecedent="R1 and R2" logicType="2" triggerOnChange="no">
       <systemName>IX:RTXINITIALIZER1T</systemName>
@@ -3202,7 +3190,7 @@
     </conditional>
   </conditionals>
   <timebase class="jmri.jmrit.simpleclock.configurexml.SimpleTimebaseXml" time="Sun Nov 29 11:15:51 MST 2020" rate="1.0" startrate="1.0" run="yes" master="yes" sync="no" correct="no" display="no" startstopped="no" startrunning="yes" startsettime="no" startclockoption="0" showbutton="no" startsetrate="yes" />
-  <LayoutEditor class="jmri.jmrit.display.layoutEditor.configurexml.LayoutEditorXml" name="Mike Dean's Basement Layout" x="32" y="40" windowheight="1314" windowwidth="2453" panelheight="1740" panelwidth="1439" sliders="yes" scrollable="both" editable="yes" positionable="yes" controlling="yes" animating="yes" showhelpbar="no" drawgrid="no" snaponadd="no" snaponmove="no" antialiasing="yes" turnoutcircles="yes" tooltipsnotedit="yes" tooltipsinedit="yes" mainlinetrackwidth="4" xscale="1.0" yscale="1.0" sidetrackwidth="2" defaulttrackcolor="black" defaultoccupiedtrackcolor="red" defaultalternativetrackcolor="cyan" defaulttextcolor="black" turnoutcirclecolor="blue" turnoutcirclethrowncolor="red" turnoutcirclesize="2" turnoutdrawunselectedleg="no" turnoutbx="20.0" turnoutcx="20.0" turnoutwid="10.0" xoverlong="30.0" xoverhwid="10.0" xovershort="10.0" autoblkgenerate="no" gridSize="10" gridSize2nd="10" openDispatcher="no" useDirectTurnoutControl="no">
+  <LayoutEditor class="jmri.jmrit.display.layoutEditor.configurexml.LayoutEditorXml" name="Mike Dean's Basement Layout" x="21" y="25" windowheight="1314" windowwidth="2453" panelheight="1740" panelwidth="1439" sliders="yes" scrollable="both" editable="yes" positionable="yes" controlling="yes" animating="yes" showhelpbar="no" drawgrid="no" snaponadd="no" snaponmove="no" antialiasing="yes" turnoutcircles="yes" tooltipsnotedit="yes" tooltipsinedit="yes" mainlinetrackwidth="4" xscale="1.0" yscale="1.0" sidetrackwidth="2" defaulttrackcolor="black" defaultoccupiedtrackcolor="red" defaultalternativetrackcolor="cyan" defaulttextcolor="black" turnoutcirclecolor="blue" turnoutcirclethrowncolor="red" turnoutcirclesize="2" turnoutdrawunselectedleg="no" turnoutbx="20.0" turnoutcx="20.0" turnoutwid="10.0" xoverlong="30.0" xoverhwid="10.0" xovershort="10.0" autoblkgenerate="no" gridSize="10" gridSize2nd="10" openDispatcher="no" useDirectTurnoutControl="no">
     <layoutTrackDrawingOptions name="Mike Dean's Basement Layout" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutTrackDrawingOptionsXml">
       <mainBallastColor>#000000</mainBallastColor>
       <mainBallastWidth>0</mainBallastWidth>
@@ -3561,14 +3549,27 @@
     <signalmasticon signalmast="VirtualDummy6-NZ10" x="668" y="1117" level="9" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="83" clickmode="0" litmode="false" scale="1.0" imageset="default" class="jmri.jmrit.display.configurexml.SignalMastIconXml" />
     <signalmasticon signalmast="Virtual Dummy1-WestNW" x="110" y="870" level="9" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="180" clickmode="0" litmode="false" scale="1.0" imageset="default" class="jmri.jmrit.display.configurexml.SignalMastIconXml" />
     <signalmasticon signalmast="VirtualDummy2-WestNW" x="133" y="811" level="9" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="193" clickmode="0" litmode="false" scale="1.0" imageset="default" class="jmri.jmrit.display.configurexml.SignalMastIconXml" />
-    <positionablelabel x="320" y="1332" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT100" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="518" y="1316" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT105" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="591" y="1254" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT106" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="768" y="1248" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT115" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="856" y="1321" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT116" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="994" y="1325" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT118" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <layoutturnout ident="TO1" type="LH_TURNOUT" hidden="no" disabled="no" disableWhenOccupied="no" continuing="2" xcen="316.32244873046875" ycen="1305.5797119140625" xa="286.310791015625" ya="1305.5936279296875" xb="346.3341064453125" yb="1305.5657958984375" xc="346.33038330078125" yc="1297.66357421875" xd="286.310791015625" yd="1305.5936279296875" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutLHTurnoutXml" turnoutname="South Turnout 100" blockname="SZ1" connectaname="T13" connectbname="T6" connectcname="T3" />
-    <layoutturnout ident="TO2" type="LH_TURNOUT" hidden="no" disabled="no" disableWhenOccupied="no" continuing="2" xcen="1017.2344360351562" ycen="1302.2562255859375" xa="1047.24609375" ya="1301.2421875" xb="987.2227783203125" yb="1303.270263671875" xc="987.2191162109375" yc="1292.3680419921875" xd="1047.24609375" yd="1301.2421875" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutLHTurnoutXml" turnoutname="South Turnout 118" blockname="SZ5" connectaname="T9" connectbname="T6" connectcname="T12" />
+    <positionablelabel x="312" y="1315" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT100" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="467" y="1311" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT105" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="510" y="1262" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT106" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="803" y="1258" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT115" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="857" y="1310" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT116" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="991" y="1311" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT118" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="961" y="1278" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT117" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="356" y="1147" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT101" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="399" y="1178" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT102" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="394" y="1222" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT103" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="479" y="1243" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT104" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="481" y="1201" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT107" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="644" y="1201" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT108" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="599" y="1279" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT109" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="638" y="1244" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT110" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="685" y="1244" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT111" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="721" y="1280" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT112" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="780" y="1243" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT113" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="837" y="1222" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT114" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <layoutturnout ident="TO1" type="LH_TURNOUT" hidden="no" disabled="no" disableWhenOccupied="no" continuing="2" xcen="316.32244873046875" ycen="1305.5797119140625" xa="286.310791015625" ya="1305.5936279296875" xb="346.3341064453125" yb="1305.5657958984375" xc="346.33038330078125" yc="1297.66357421875" xd="286.310791015625" yd="1305.5936279296875" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutLHTurnoutXml" turnoutname="South Turnout 100" blockname="SZ1" connectaname="T13" connectbname="T6" connectcname="T12" />
+    <layoutturnout ident="TO2" type="LH_TURNOUT" hidden="no" disabled="no" disableWhenOccupied="no" continuing="2" xcen="1017.2344360351562" ycen="1302.2562255859375" xa="1047.24609375" ya="1301.2421875" xb="987.2227783203125" yb="1303.270263671875" xc="987.2191162109375" yc="1292.3680419921875" xd="1047.24609375" yd="1301.2421875" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutLHTurnoutXml" turnoutname="South Turnout 118" blockname="SZ5" connectaname="T9" connectbname="T6" connectcname="T48" />
     <layoutturnout ident="TO3" type="LH_TURNOUT" hidden="no" disabled="no" disableWhenOccupied="no" continuing="2" xcen="751.2760009765625" ycen="1103.26123046875" xa="722.2643432617188" ya="1102.2752685546875" xb="780.2876586914062" yb="1104.2471923828125" xc="780.283935546875" yc="1093.344970703125" xd="722.2643432617188" yd="1102.2752685546875" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutLHTurnoutXml" turnoutname="North Turnout 308" blockname="NZ8" connectaname="T106" connectbname="T19" connectcname="T103">
       <signalBMast>Virtual nz6-nz8</signalBMast>
       <signalCMast>Virtual NZ5-NZ8</signalCMast>
@@ -3629,10 +3630,6 @@
     <layoutturnout ident="TO22" type="LH_TURNOUT" hidden="no" disabled="no" disableWhenOccupied="no" continuing="2" xcen="720.7206420898438" ycen="1132.128662109375" xa="748.7322387695312" ya="1131.11474609375" xb="692.7090454101562" yb="1133.142578125" xc="684.7053833007812" yc="1118.2403564453125" xd="748.7322387695312" yd="1131.11474609375" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutLHTurnoutXml" turnoutname="North Turnout 307" blockname="NZ10" connectaname="T108" connectbname="T105" connectcname="T18">
       <signalBMast>VirtualDummy6-NZ10</signalBMast>
     </layoutturnout>
-    <layoutturnout ident="TO24" type="LH_TURNOUT" hidden="no" disabled="no" disableWhenOccupied="no" continuing="2" xcen="858.324462890625" ycen="1292.146240234375" xa="891.3360595703125" ya="1292.13232421875" xb="825.3128662109375" yb="1292.16015625" xc="828.3092041015625" yc="1284.258056640625" xd="891.3360595703125" yd="1292.13232421875" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutLHTurnoutXml" turnoutname="South Turnout 116" blockname="SZ3" connectaname="T12" connectbname="T48" connectcname="T47" />
-    <layoutturnout ident="TO25" type="RH_TURNOUT" hidden="no" disabled="no" disableWhenOccupied="no" continuing="2" xcen="777.2939453125" ycen="1274.3697509765625" xa="744.2823486328125" ya="1274.3837890625" xb="810.3055419921875" yb="1274.355712890625" xc="807.3092041015625" yc="1282.258056640625" xd="744.2823486328125" yd="1274.3837890625" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutRHTurnoutXml" turnoutname="South Turnout 115" blockname="SZ2" connectaname="T4" connectbname="T7" connectcname="T47" />
-    <layoutturnout ident="TO26" type="LH_TURNOUT" hidden="no" disabled="no" disableWhenOccupied="no" continuing="2" xcen="518.5863037109375" ycen="1296.2935791015625" xa="486.57470703125" ya="1296.3074951171875" xb="550.597900390625" yb="1296.2796630859375" xc="534.59423828125" yc="1288.37744140625" xd="486.57470703125" yd="1296.3074951171875" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutLHTurnoutXml" turnoutname="South Turnout 105" blockname="SZ3" connectaname="T3" connectbname="T48" connectcname="T8" />
-    <layoutturnout ident="TO27" type="LH_TURNOUT" hidden="no" disabled="no" disableWhenOccupied="no" continuing="2" xcen="578.6021728515625" ycen="1276.4613037109375" xa="594.61376953125" ya="1276.447265625" xb="562.590576171875" yb="1276.475341796875" xc="547.59423828125" yc="1283.37744140625" xd="594.61376953125" yd="1276.447265625" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutLHTurnoutXml" turnoutname="South Turnout 106" blockname="SZ2" connectaname="T4" connectbname="T225" connectcname="T8" />
     <layoutturnout ident="TO38" type="RH_TURNOUT" hidden="no" disabled="no" disableWhenOccupied="no" continuing="2" xcen="105.9935302734375" ycen="921.20654296875" xa="106.0074462890625" ya="951.2181396484375" xb="105.9796142578125" yb="891.1949462890625" xc="113.8818359375" yc="891.1912841796875" xd="106.0074462890625" yd="951.2181396484375" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutRHTurnoutXml" turnoutname="Staging NW Turnout 400" blockname="WEST NW" connectaname="T65" connectbname="T51" connectcname="T253">
       <signalBMast>Virtual Dummy1-WestNW</signalBMast>
     </layoutturnout>
@@ -3650,6 +3647,19 @@
     <layoutturnout ident="TO50" type="RH_TURNOUT" hidden="no" disabled="no" disableWhenOccupied="no" continuing="2" xcen="122.6358642578125" ycen="853.1986694335938" xa="117.8817138671875" ya="876.1912841796875" xb="127.3900146484375" yb="830.2060546875" xc="138.02392578125" yc="826.2477416992188" xd="117.8817138671875" yd="876.1912841796875" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutRHTurnoutXml" turnoutname="Staging NW Turnout 403" blockname="WEST NW" connectaname="T253" connectbname="T232" connectcname="T44">
       <signalBMast>VirtualDummy2-WestNW</signalBMast>
     </layoutturnout>
+    <layoutturnout ident="TO23" type="RH_TURNOUT" hidden="no" disabled="no" disableWhenOccupied="no" showtooltip="yes" continuing="2" xcen="988.0" ycen="1274.0" xa="1008.0" ya="1274.0" xb="968.0" yb="1274.0" xc="968.0" yc="1264.0" xd="1008.0" yd="1274.0" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutRHTurnoutXml" turnoutname="South Turnout 117" connectaname="T64" connectbname="T8" connectcname="T86" />
+    <layoutturnout ident="TO24" type="RH_XOVER" hidden="no" disabled="no" disableWhenOccupied="no" showtooltip="yes" continuing="2" xcen="869.0" ycen="1284.0" xa="839.0" ya="1274.0" xb="879.0" yb="1274.0" xc="899.0" yc="1294.0" xd="859.0" yd="1294.0" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutRHXOverXml" turnoutname="South Turnout 115" secondturnoutname="South Turnout 116" connectaname="T4" connectbname="T8" connectcname="T48" connectdname="T47" />
+    <layoutturnout ident="TO25" type="RH_XOVER" hidden="no" disabled="no" disableWhenOccupied="no" showtooltip="yes" continuing="2" xcen="709.0" ycen="1266.0" xa="679.0" ya="1256.0" xb="719.0" yb="1256.0" xc="739.0" yc="1276.0" xd="699.0" yd="1276.0" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutRHXOverXml" turnoutname="South Turnout 111" secondturnoutname="South Turnout 112" connectaname="T73" connectbname="T84" connectcname="T4" connectdname="T7" />
+    <layoutturnout ident="TO26" type="LH_XOVER" hidden="no" disabled="no" disableWhenOccupied="no" showtooltip="yes" continuing="2" xcen="506.0" ycen="1287.0" xa="496.0" ya="1277.0" xb="536.0" yb="1277.0" xc="516.0" yc="1297.0" xd="476.0" yd="1297.0" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutLHXOverXml" turnoutname="South Turnout 105" secondturnoutname="South Turnout 106" connectaname="T70" connectbname="T5" connectcname="T47" connectdname="T12" />
+    <layoutturnout ident="TO27" type="LH_XOVER" hidden="no" disabled="no" disableWhenOccupied="no" showtooltip="yes" continuing="2" xcen="629.0" ycen="1266.0" xa="618.020590360487" ya="1255.932461977578" xb="662.0" yb="1256.0" xc="639.979409639513" yc="1276.067538022422" xd="596.0" yd="1276.0" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutLHXOverXml" turnoutname="South Turnout 109" secondturnoutname="South Turnout 110" connectaname="T87" connectbname="T73" connectcname="T7" connectdname="T5" />
+    <layoutturnout ident="TO28" type="RH_XOVER" hidden="no" disabled="no" disableWhenOccupied="no" showtooltip="yes" continuing="2" xcen="516.0" ycen="1246.0" xa="486.0" ya="1236.0" xb="526.0" yb="1236.0" xc="546.0" yc="1256.0" xd="506.0" yd="1256.0" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutRHXOverXml" turnoutname="South Turnout 104" connectaname="T88" connectbname="T114" connectcname="T87" connectdname="T123" />
+    <layoutturnout ident="TO29" type="RH_XOVER" hidden="no" disabled="no" disableWhenOccupied="no" showtooltip="yes" continuing="2" xcen="633.0" ycen="1206.0" xa="599.0" ya="1196.0" xb="644.333322" yb="1196.0" xc="667.0" yc="1216.0" xd="621.666678" yd="1216.0" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutRHXOverXml" turnoutname="South Turnout 108" connectaname="T111" connectbname="T124" connectcname="T115" connectdname="T113" />
+    <layoutturnout ident="TO30" type="RH_XOVER" hidden="no" disabled="no" disableWhenOccupied="no" showtooltip="yes" continuing="2" xcen="431.0" ycen="1226.0" xa="401.0" ya="1216.0" xb="441.0" yb="1216.0" xc="461.0" yc="1236.0" xd="421.0" yd="1236.0" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutRHXOverXml" turnoutname="South Turnout 103" connectaname="T121" connectbname="T104" connectcname="T88" connectdname="T122" />
+    <layoutturnout ident="TO31" type="LH_XOVER" hidden="no" disabled="no" disableWhenOccupied="no" showtooltip="yes" continuing="2" xcen="520.0" ycen="1206.0" xa="510.0" ya="1196.0" xb="550.0" yb="1196.0" xc="530.0" yc="1216.0" xd="490.0" yd="1216.0" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutLHXOverXml" turnoutname="South Turnout 107" connectaname="T116" connectbname="T111" connectcname="T113" connectdname="T104" />
+    <layoutturnout ident="TO32" type="LH_XOVER" hidden="no" disabled="no" disableWhenOccupied="no" showtooltip="yes" continuing="2" xcen="844.0" ycen="1226.0" xa="834.0" ya="1216.0" xb="874.0" yb="1216.0" xc="854.0" yc="1236.0" xd="814.0" yd="1236.0" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutLHXOverXml" turnoutname="South Turnout 114" connectaname="T115" connectbname="T125" connectcname="T126" connectdname="T85" />
+    <layoutturnout ident="TO33" type="LH_XOVER" hidden="no" disabled="no" disableWhenOccupied="no" showtooltip="yes" continuing="2" xcen="784.0" ycen="1246.0" xa="774.0" ya="1236.0" xb="814.0" yb="1236.0" xc="794.0" yc="1256.0" xd="754.0" yd="1256.0" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutLHXOverXml" turnoutname="South Turnout 113" connectaname="T114" connectbname="T85" connectcname="T86" connectdname="T84" />
+    <layoutturnout ident="TO35" type="RH_TURNOUT" hidden="no" disabled="no" disableWhenOccupied="no" showtooltip="yes" continuing="2" xcen="406.0" ycen="1197.0" xa="426.0" ya="1197.0" xb="386.0" yb="1197.0" xc="386.0" yc="1187.0" xd="426.0" yd="1197.0" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutRHTurnoutXml" turnoutname="South Turnout 102" connectaname="T116" connectbname="T120" connectcname="T117" />
+    <layoutturnout ident="TO36" type="WYE_TURNOUT" hidden="no" disabled="no" disableWhenOccupied="no" showtooltip="yes" continuing="2" xcen="347.0" ycen="1153.0" xa="361.14213562373095" ya="1167.1421356237308" xb="336.39339828220176" yb="1135.3223304703363" xc="329.3223304703363" yc="1142.3933982822018" xd="357.60660171779824" yd="1170.6776695296637" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutWyeXml" turnoutname="South Turnout 101" connectaname="T117" connectbname="T118" connectcname="T119" />
     <tracksegment ident="T9" blockname="SZ5" connect1name="A8" type1="POS_POINT" connect2name="TO2" type2="TURNOUT_A" dashed="no" mainline="yes" hidden="no" arc="yes" flip="no" circle="yes" angle="30.0" hideConLines="yes" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
     <tracksegment ident="T10" blockname="EZ1" connect1name="A9" type1="POS_POINT" connect2name="A8" type2="POS_POINT" dashed="no" mainline="yes" hidden="no" arc="yes" flip="no" circle="yes" angle="30.0" hideConLines="yes" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
     <tracksegment ident="T11" blockname="EZ1" connect1name="TO7" type1="TURNOUT_A" connect2name="A9" type2="POS_POINT" dashed="no" mainline="yes" hidden="no" arc="yes" flip="no" circle="yes" angle="30.0" hideConLines="yes" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
@@ -3715,7 +3725,7 @@
     <tracksegment ident="T61" blockname="EZ4" connect1name="TO12" type1="TURNOUT_B" connect2name="A47" type2="POS_POINT" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
     <tracksegment ident="T62" blockname="EZ2" connect1name="TO12" type1="TURNOUT_A" connect2name="A48" type2="POS_POINT" dashed="no" mainline="yes" hidden="no" arc="yes" flip="no" circle="yes" angle="29.768599524941887" hideConLines="yes" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
     <tracksegment ident="T63" blockname="EZ2" connect1name="A48" type1="POS_POINT" connect2name="A49" type2="POS_POINT" dashed="no" mainline="yes" hidden="no" arc="yes" flip="no" circle="yes" angle="30.0" hideConLines="yes" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
-    <tracksegment ident="T64" blockname="SZ6" connect1name="A49" type1="POS_POINT" connect2name="A38" type2="POS_POINT" dashed="no" mainline="yes" hidden="no" arc="yes" flip="no" circle="yes" angle="30.0" hideConLines="yes" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
+    <tracksegment ident="T64" blockname="SZ6" connect1name="A49" type1="POS_POINT" connect2name="TO23" type2="TURNOUT_A" dashed="no" mainline="yes" hidden="no" arc="yes" flip="no" circle="yes" angle="30.0" hideConLines="yes" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
     <tracksegment ident="T66" blockname="EZ3" connect1name="TO12" type1="TURNOUT_C" connect2name="TO13" type2="TURNOUT_A" dashed="no" mainline="yes" hidden="no" bezier="yes" hideConLines="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml">
       <controlpoints>
         <controlpoint index="0" x="1112.7" y="1068.4" />
@@ -3853,7 +3863,6 @@
     <tracksegment ident="T221" connect1name="TO46" type1="TURNOUT_A" connect2name="A194" type2="POS_POINT" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
     <tracksegment ident="T223" blockname="MNT" connect1name="A64" type1="POS_POINT" connect2name="A83" type2="POS_POINT" dashed="no" mainline="yes" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
     <tracksegment ident="T224" blockname="MNT" connect1name="A198" type1="POS_POINT" connect2name="A199" type2="POS_POINT" dashed="no" mainline="yes" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
-    <tracksegment ident="T225" blockname="SZ2" connect1name="TO27" type1="TURNOUT_B" connect2name="A6" type2="POS_POINT" dashed="no" mainline="yes" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
     <tracksegment ident="T232" blockname="Dummy2" connect1name="TO50" type1="TURNOUT_B" connect2name="TO44" type2="TURNOUT_B" dashed="no" mainline="no" hidden="no" bezier="yes" hideConLines="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml">
       <controlpoints>
         <controlpoint index="0" x="153.6" y="753.4" />
@@ -3956,14 +3965,42 @@
     <tracksegment ident="T54" connect1name="TO47" type1="TURNOUT_A" connect2name="TO46" type2="TURNOUT_C" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
     <tracksegment ident="T55" connect1name="TO47" type1="TURNOUT_B" connect2name="TO48" type2="TURNOUT_A" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
     <tracksegment ident="T65" blockname="WEST NW" connect1name="A10" type1="POS_POINT" connect2name="TO38" type2="TURNOUT_A" dashed="no" mainline="yes" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
-    <tracksegment ident="T3" connect1name="TO1" type1="TURNOUT_C" connect2name="TO26" type2="TURNOUT_A" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
-    <tracksegment ident="T4" connect1name="TO27" type1="TURNOUT_A" connect2name="TO25" type2="TURNOUT_A" dashed="no" mainline="yes" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
     <tracksegment ident="T6" connect1name="TO1" type1="TURNOUT_B" connect2name="TO2" type2="TURNOUT_B" dashed="no" mainline="yes" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
-    <tracksegment ident="T7" connect1name="TO25" type1="TURNOUT_B" connect2name="A38" type2="POS_POINT" dashed="no" mainline="yes" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
-    <tracksegment ident="T8" connect1name="TO26" type1="TURNOUT_C" connect2name="TO27" type2="TURNOUT_C" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
-    <tracksegment ident="T12" connect1name="TO24" type1="TURNOUT_A" connect2name="TO2" type2="TURNOUT_C" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
-    <tracksegment ident="T47" connect1name="TO25" type1="TURNOUT_C" connect2name="TO24" type2="TURNOUT_C" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
-    <tracksegment ident="T48" connect1name="TO24" type1="TURNOUT_B" connect2name="TO26" type2="TURNOUT_B" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
+    <tracksegment ident="T4" connect1name="TO25" type1="TURNOUT_C" connect2name="TO24" type2="TURNOUT_A" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
+    <tracksegment ident="T5" connect1name="TO27" type1="TURNOUT_D" connect2name="TO26" type2="TURNOUT_B" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
+    <tracksegment ident="T7" connect1name="TO27" type1="TURNOUT_C" connect2name="TO25" type2="TURNOUT_D" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
+    <tracksegment ident="T8" connect1name="TO24" type1="TURNOUT_B" connect2name="TO23" type2="TURNOUT_B" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
+    <tracksegment ident="T12" connect1name="TO1" type1="TURNOUT_C" connect2name="TO26" type2="TURNOUT_D" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
+    <tracksegment ident="T47" connect1name="TO26" type1="TURNOUT_C" connect2name="TO24" type2="TURNOUT_D" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
+    <tracksegment ident="T48" connect1name="TO24" type1="TURNOUT_C" connect2name="TO2" type2="TURNOUT_C" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
+    <tracksegment ident="T70" connect1name="A6" type1="POS_POINT" connect2name="TO26" type2="TURNOUT_A" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
+    <tracksegment ident="T73" connect1name="TO25" type1="TURNOUT_A" connect2name="TO27" type2="TURNOUT_B" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
+    <tracksegment ident="T84" connect1name="TO33" type1="TURNOUT_D" connect2name="TO25" type2="TURNOUT_B" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
+    <tracksegment ident="T85" connect1name="TO32" type1="TURNOUT_D" connect2name="TO33" type2="TURNOUT_B" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
+    <tracksegment ident="T86" connect1name="TO23" type1="TURNOUT_C" connect2name="TO33" type2="TURNOUT_C" dashed="no" mainline="no" hidden="no" bezier="yes" hideConLines="yes" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml">
+      <controlpoints>
+        <controlpoint index="0" x="940.33" y="1250.0" />
+        <controlpoint index="1" x="770.67" y="1260.0" />
+      </controlpoints>
+    </tracksegment>
+    <tracksegment ident="T87" connect1name="TO28" type1="TURNOUT_C" connect2name="TO27" type2="TURNOUT_A" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
+    <tracksegment ident="T88" connect1name="TO30" type1="TURNOUT_C" connect2name="TO28" type2="TURNOUT_A" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
+    <tracksegment ident="T104" connect1name="TO31" type1="TURNOUT_D" connect2name="TO30" type2="TURNOUT_B" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
+    <tracksegment ident="T111" connect1name="TO29" type1="TURNOUT_A" connect2name="TO31" type2="TURNOUT_B" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
+    <tracksegment ident="T113" connect1name="TO31" type1="TURNOUT_C" connect2name="TO29" type2="TURNOUT_D" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
+    <tracksegment ident="T114" connect1name="TO28" type1="TURNOUT_B" connect2name="TO33" type2="TURNOUT_A" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
+    <tracksegment ident="T115" connect1name="TO29" type1="TURNOUT_C" connect2name="TO32" type2="TURNOUT_A" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
+    <tracksegment ident="T116" connect1name="TO35" type1="TURNOUT_A" connect2name="TO31" type2="TURNOUT_A" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
+    <tracksegment ident="T117" connect1name="TO36" type1="TURNOUT_A" connect2name="TO35" type2="TURNOUT_C" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
+    <tracksegment ident="T118" connect1name="A7" type1="POS_POINT" connect2name="TO36" type2="TURNOUT_B" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
+    <tracksegment ident="T119" connect1name="A14" type1="POS_POINT" connect2name="TO36" type2="TURNOUT_C" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
+    <tracksegment ident="T120" connect1name="A36" type1="POS_POINT" connect2name="TO35" type2="TURNOUT_B" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
+    <tracksegment ident="T121" connect1name="A37" type1="POS_POINT" connect2name="TO30" type2="TURNOUT_A" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
+    <tracksegment ident="T122" connect1name="A38" type1="POS_POINT" connect2name="TO30" type2="TURNOUT_D" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
+    <tracksegment ident="T123" connect1name="A39" type1="POS_POINT" connect2name="TO28" type2="TURNOUT_D" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
+    <tracksegment ident="T124" connect1name="TO29" type1="TURNOUT_B" connect2name="A40" type2="POS_POINT" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
+    <tracksegment ident="T125" connect1name="TO32" type1="TURNOUT_B" connect2name="A41" type2="POS_POINT" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
+    <tracksegment ident="T126" connect1name="TO32" type1="TURNOUT_C" connect2name="A42" type2="POS_POINT" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
     <positionablepoint ident="A8" type="ANCHOR" x="1109.156494140625" y="1285.1171875" connect1name="T10" connect2name="T9" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
     <positionablepoint ident="A9" type="ANCHOR" x="1154.164794921875" y="1240.0579833984375" connect1name="T11" connect2name="T10" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
     <positionablepoint ident="A11" type="ANCHOR" x="155.634521484375" y="1273.7532958984375" connect1name="T14" connect2name="T13" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
@@ -4062,112 +4099,120 @@
     <positionablepoint ident="A1" type="ANCHOR" x="310.2393798828125" y="1278.0333251953125" connect1name="T46" connect2name="T1" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
     <positionablepoint ident="A2" type="ANCHOR" x="607.16650390625" y="1143.6937255859375" connect1name="T105" connect2name="T2" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
     <positionablepoint ident="A5" type="ANCHOR" x="1106.810791015625" y="535.7982177734375" connect1name="T164" connect2name="T45" eastboundsignalmast="ez9-mnt" westboundsignalmast="mnt-ez9" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
-    <positionablepoint ident="A6" type="ANCHOR" x="422.0" y="1278.0" connect1name="T225" connect2name="T46" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
+    <positionablepoint ident="A6" type="ANCHOR" x="422.0" y="1278.0" connect1name="T46" connect2name="T70" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
     <positionablepoint ident="A10" type="ANCHOR" x="106.25335693359375" y="986.94970703125" connect1name="T17" connect2name="T65" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
-    <positionablepoint ident="A38" type="ANCHOR" x="1008.915283203125" y="1273.3443603515625" connect1name="T64" connect2name="T7" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
+    <positionablepoint ident="A7" type="ANCHOR" x="218.0" y="995.0" connect1name="T118" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
+    <positionablepoint ident="A14" type="ANCHOR" x="193.0" y="1016.0" connect1name="T119" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
+    <positionablepoint ident="A36" type="ANCHOR" x="188.0" y="1195.0" connect1name="T120" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
+    <positionablepoint ident="A37" type="ANCHOR" x="187.0" y="1215.0" connect1name="T121" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
+    <positionablepoint ident="A38" type="ANCHOR" x="204.0" y="1234.0" connect1name="T122" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
+    <positionablepoint ident="A39" type="ANCHOR" x="236.0" y="1255.0" connect1name="T123" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
+    <positionablepoint ident="A40" type="ANCHOR" x="1087.0" y="1194.0" connect1name="T124" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
+    <positionablepoint ident="A41" type="ANCHOR" x="1086.0" y="1215.0" connect1name="T125" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
+    <positionablepoint ident="A42" type="ANCHOR" x="1071.0" y="1236.0" connect1name="T126" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
     <levelxing ident="X1" blocknameac="EZ8" blocknamebd="EZ11" connectaname="T239" connectbname="T240" connectcname="T67" connectdname="T241" xcen="1140.3004150390625" ycen="806.3511962890625" xa="1148.1885986328125" ya="777.3358764648438" xb="1140.286376953125" yb="776.339599609375" class="jmri.jmrit.display.layoutEditor.configurexml.LevelXingXml" />
   </LayoutEditor>
   <filehistory>
     <operation>
       <type>app</type>
-      <date>Mon May 12 15:57:52 MDT 2025</date>
+      <date>Tue May 13 14:49:31 MDT 2025</date>
       <filename>PanelPro (v5.10.0)</filename>
     </operation>
     <operation>
       <type>Load OK</type>
-      <date>Mon May 12 15:57:59 MDT 2025</date>
+      <date>Tue May 13 14:49:39 MDT 2025</date>
       <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/May2025Settings.xml</filename>
       <filehistory>
         <operation>
           <type>app</type>
-          <date>Mon May 12 15:28:34 MDT 2025</date>
+          <date>Mon May 12 15:57:52 MDT 2025</date>
           <filename>PanelPro (v5.10.0)</filename>
         </operation>
         <operation>
           <type>Load OK</type>
-          <date>Mon May 12 15:28:41 MDT 2025</date>
-          <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/April2025Settings.xml</filename>
+          <date>Mon May 12 15:57:59 MDT 2025</date>
+          <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/May2025Settings.xml</filename>
           <filehistory>
             <operation>
               <type>app</type>
-              <date>Tue Apr 15 16:14:55 MDT 2025</date>
+              <date>Mon May 12 15:28:34 MDT 2025</date>
               <filename>PanelPro (v5.10.0)</filename>
             </operation>
             <operation>
               <type>Load OK</type>
-              <date>Tue Apr 15 16:15:01 MDT 2025</date>
+              <date>Mon May 12 15:28:41 MDT 2025</date>
               <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/April2025Settings.xml</filename>
               <filehistory>
                 <operation>
                   <type>app</type>
-                  <date>Tue Apr 15 15:33:15 MDT 2025</date>
-                  <filename>PanelPro (v5.8.0)</filename>
+                  <date>Tue Apr 15 16:14:55 MDT 2025</date>
+                  <filename>PanelPro (v5.10.0)</filename>
                 </operation>
                 <operation>
                   <type>Load OK</type>
-                  <date>Tue Apr 15 15:33:22 MDT 2025</date>
+                  <date>Tue Apr 15 16:15:01 MDT 2025</date>
                   <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/April2025Settings.xml</filename>
                   <filehistory>
                     <operation>
                       <type>app</type>
-                      <date>Tue Apr 15 15:29:48 MDT 2025</date>
+                      <date>Tue Apr 15 15:33:15 MDT 2025</date>
                       <filename>PanelPro (v5.8.0)</filename>
                     </operation>
                     <operation>
                       <type>Load OK</type>
-                      <date>Tue Apr 15 15:29:56 MDT 2025</date>
+                      <date>Tue Apr 15 15:33:22 MDT 2025</date>
                       <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/April2025Settings.xml</filename>
                       <filehistory>
                         <operation>
                           <type>app</type>
-                          <date>Mon Apr 14 17:15:38 MDT 2025</date>
+                          <date>Tue Apr 15 15:29:48 MDT 2025</date>
                           <filename>PanelPro (v5.8.0)</filename>
                         </operation>
                         <operation>
                           <type>Load OK</type>
-                          <date>Mon Apr 14 17:15:46 MDT 2025</date>
+                          <date>Tue Apr 15 15:29:56 MDT 2025</date>
                           <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/April2025Settings.xml</filename>
                         </operation>
                         <operation>
                           <type>Store</type>
-                          <date>Mon Apr 14 17:16:54 MDT 2025</date>
+                          <date>Tue Apr 15 15:32:00 MDT 2025</date>
                           <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/April2025Settings.xml</filename>
                         </operation>
                       </filehistory>
                     </operation>
                     <operation>
                       <type>Store</type>
-                      <date>Tue Apr 15 15:32:00 MDT 2025</date>
+                      <date>Tue Apr 15 16:09:09 MDT 2025</date>
                       <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/April2025Settings.xml</filename>
                     </operation>
                   </filehistory>
                 </operation>
                 <operation>
                   <type>Store</type>
-                  <date>Tue Apr 15 16:09:09 MDT 2025</date>
+                  <date>Tue Apr 15 16:41:36 MDT 2025</date>
                   <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/April2025Settings.xml</filename>
                 </operation>
               </filehistory>
             </operation>
             <operation>
               <type>Store</type>
-              <date>Tue Apr 15 16:41:36 MDT 2025</date>
-              <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/April2025Settings.xml</filename>
+              <date>Mon May 12 15:57:17 MDT 2025</date>
+              <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/May2025Settings.xml</filename>
             </operation>
           </filehistory>
         </operation>
         <operation>
           <type>Store</type>
-          <date>Mon May 12 15:57:17 MDT 2025</date>
+          <date>Mon May 12 16:16:06 MDT 2025</date>
           <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/May2025Settings.xml</filename>
         </operation>
       </filehistory>
     </operation>
     <operation>
       <type>Store</type>
-      <date>Mon May 12 16:16:06 MDT 2025</date>
+      <date>Tue May 13 16:18:00 MDT 2025</date>
       <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/May2025Settings.xml</filename>
     </operation>
   </filehistory>
-  <!--Written by JMRI version 5.10+Rca461bd266 on Mon May 12 16:16:06 MDT 2025-->
+  <!--Written by JMRI version 5.10+Rca461bd266 on Tue May 13 16:18:00 MDT 2025-->
 </layout-config>
