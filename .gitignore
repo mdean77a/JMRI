@@ -9,7 +9,13 @@ profile.xml.1.bak
 profile.xml.2.bak
 profile.xml.3.bak
 profile.xml.4.bak
-
+**/user-interface.xml
+**/profile.properties
+**/WarrantPreferences.xml
+**/ThrottlesPreferences.xml
+**/WiThrottlePreferences.xml
+**/blockvalues.xml
+**/.DS_STORE
 Mike_Basement_Layout/backupPanels/*.xml
 
 
