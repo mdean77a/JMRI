@@ -509,7 +509,7 @@
     <memory>
       <systemName>IM:AUTO:0007</systemName>
     </memory>
-    <memory value="3:56 PM">
+    <memory value="4:52 PM">
       <systemName>IMCURRENTTIME</systemName>
     </memory>
     <memory value="1.0">
@@ -926,6 +926,68 @@
       </aspect>
     </signalhead>
   </signalheads>
+  <signalmasts class="jmri.managers.configurexml.DefaultSignalMastManagerXml">
+    <signalmast class="jmri.implementation.configurexml.SignalHeadSignalMastXml">
+      <systemName>IF$shsm:basic:one-searchlight(E-MNT)</systemName>
+      <userName>E-MNT</userName>
+      <unlit allowed="no" />
+    </signalmast>
+    <signalmast class="jmri.implementation.configurexml.SignalHeadSignalMastXml">
+      <systemName>IF$shsm:basic:one-searchlight(E-NZ1)</systemName>
+      <userName>E-NZ1</userName>
+      <unlit allowed="no" />
+    </signalmast>
+    <signalmast class="jmri.implementation.configurexml.SignalHeadSignalMastXml">
+      <systemName>IF$shsm:basic:one-searchlight(EZ1)</systemName>
+      <userName>EZ1</userName>
+      <unlit allowed="no" />
+    </signalmast>
+    <signalmast class="jmri.implementation.configurexml.SignalHeadSignalMastXml">
+      <systemName>IF$shsm:basic:one-searchlight(EZ2)</systemName>
+      <userName>EZ2</userName>
+      <unlit allowed="no" />
+    </signalmast>
+    <signalmast class="jmri.implementation.configurexml.SignalHeadSignalMastXml">
+      <systemName>IF$shsm:basic:one-searchlight(EZ9)</systemName>
+      <userName>EZ9</userName>
+      <unlit allowed="no" />
+    </signalmast>
+    <signalmast class="jmri.implementation.configurexml.SignalHeadSignalMastXml">
+      <systemName>IF$shsm:basic:one-searchlight(N-NZ1)</systemName>
+      <userName>N-NZ1</userName>
+      <unlit allowed="no" />
+    </signalmast>
+    <signalmast class="jmri.implementation.configurexml.SignalHeadSignalMastXml">
+      <systemName>IF$shsm:basic:one-searchlight(S-MNT)</systemName>
+      <userName>S-MNT</userName>
+      <unlit allowed="no" />
+    </signalmast>
+    <signalmast class="jmri.implementation.configurexml.SignalHeadSignalMastXml">
+      <systemName>IF$shsm:basic:one-searchlight(SZ2)</systemName>
+      <userName>SZ2</userName>
+      <unlit allowed="no" />
+    </signalmast>
+    <signalmast class="jmri.implementation.configurexml.SignalHeadSignalMastXml">
+      <systemName>IF$shsm:basic:one-searchlight(SZ5)</systemName>
+      <userName>SZ5</userName>
+      <unlit allowed="no" />
+    </signalmast>
+    <signalmast class="jmri.implementation.configurexml.SignalHeadSignalMastXml">
+      <systemName>IF$shsm:basic:one-searchlight(SZ6)</systemName>
+      <userName>SZ6</userName>
+      <unlit allowed="no" />
+    </signalmast>
+    <signalmast class="jmri.implementation.configurexml.SignalHeadSignalMastXml">
+      <systemName>IF$shsm:basic:one-searchlight(West-NW)</systemName>
+      <userName>West-NW</userName>
+      <unlit allowed="no" />
+    </signalmast>
+    <signalmast class="jmri.implementation.configurexml.SignalHeadSignalMastXml">
+      <systemName>IF$shsm:basic:one-searchlight(West-SW)</systemName>
+      <userName>West-SW</userName>
+      <unlit allowed="no" />
+    </signalmast>
+  </signalmasts>
   <blocks class="jmri.configurexml.BlockManagerXml">
     <defaultspeed>Normal</defaultspeed>
     <block systemName="IB1">
@@ -1852,10 +1914,6 @@
       <systemName>ILB30</systemName>
       <userName>WEST NW</userName>
     </layoutblock>
-    <layoutblock systemName="ILB32" occupancysensor="South Zone 6" occupiedsense="2" trackcolor="black" occupiedcolor="red" extracolor="cyan">
-      <systemName>ILB32</systemName>
-      <userName>SZ6</userName>
-    </layoutblock>
     <layoutblock systemName="ILB35" occupancysensor="East Zone 12" occupiedsense="2" trackcolor="black" occupiedcolor="red" extracolor="cyan">
       <systemName>ILB35</systemName>
       <userName>EZ12</userName>
@@ -2333,7 +2391,7 @@
     </conditional>
   </conditionals>
   <timebase class="jmri.jmrit.simpleclock.configurexml.SimpleTimebaseXml" time="Sun Nov 29 11:15:51 MST 2020" rate="1.0" startrate="1.0" run="yes" master="yes" sync="no" correct="no" display="no" startstopped="no" startrunning="yes" startsettime="no" startclockoption="0" showbutton="no" startsetrate="yes" />
-  <LayoutEditor class="jmri.jmrit.display.layoutEditor.configurexml.LayoutEditorXml" name="Mike Dean's Basement Layout" x="218" y="80" windowheight="1311" windowwidth="1512" panelheight="1740" panelwidth="1439" sliders="yes" scrollable="both" editable="yes" positionable="yes" controlling="yes" animating="yes" showhelpbar="no" drawgrid="no" snaponadd="no" snaponmove="no" antialiasing="yes" turnoutcircles="yes" tooltipsnotedit="yes" tooltipsinedit="yes" mainlinetrackwidth="4" xscale="1.0" yscale="1.0" sidetrackwidth="2" defaulttrackcolor="black" defaultoccupiedtrackcolor="red" defaultalternativetrackcolor="cyan" defaulttextcolor="black" turnoutcirclecolor="blue" turnoutcirclethrowncolor="red" turnoutcirclesize="2" turnoutdrawunselectedleg="no" turnoutbx="20.0" turnoutcx="20.0" turnoutwid="10.0" xoverlong="30.0" xoverhwid="10.0" xovershort="10.0" autoblkgenerate="no" gridSize="10" gridSize2nd="10" openDispatcher="no" useDirectTurnoutControl="no">
+  <LayoutEditor class="jmri.jmrit.display.layoutEditor.configurexml.LayoutEditorXml" name="Mike Dean's Basement Layout" x="0" y="0" windowheight="900" windowwidth="1440" panelheight="1740" panelwidth="1439" sliders="yes" scrollable="both" editable="yes" positionable="yes" controlling="yes" animating="yes" showhelpbar="no" drawgrid="no" snaponadd="no" snaponmove="no" antialiasing="yes" turnoutcircles="yes" tooltipsnotedit="yes" tooltipsinedit="yes" mainlinetrackwidth="4" xscale="1.0" yscale="1.0" sidetrackwidth="2" defaulttrackcolor="black" defaultoccupiedtrackcolor="red" defaultalternativetrackcolor="cyan" defaulttextcolor="black" turnoutcirclecolor="blue" turnoutcirclethrowncolor="red" turnoutcirclesize="2" turnoutdrawunselectedleg="no" turnoutbx="20.0" turnoutcx="20.0" turnoutwid="10.0" xoverlong="30.0" xoverhwid="10.0" xovershort="10.0" autoblkgenerate="no" gridSize="10" gridSize2nd="10" openDispatcher="no" useDirectTurnoutControl="no">
     <layoutTrackDrawingOptions name="Mike Dean's Basement Layout" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutTrackDrawingOptionsXml">
       <mainBallastColor>#000000</mainBallastColor>
       <mainBallastWidth>0</mainBallastWidth>
@@ -2680,6 +2738,7 @@
     <positionablelabel x="721" y="1280" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT112" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
     <positionablelabel x="780" y="1243" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT113" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
     <positionablelabel x="837" y="1222" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT114" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <signalmasticon signalmast="SZ2" x="390" y="1090" level="9" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" clickmode="0" litmode="false" degrees="0" scale="1.0" imageset="default" class="jmri.jmrit.display.configurexml.SignalMastIconXml" />
     <layoutturnout ident="TO1" type="LH_TURNOUT" hidden="no" disabled="no" disableWhenOccupied="no" continuing="2" xcen="316.32244873046875" ycen="1305.5797119140625" xa="286.310791015625" ya="1305.5936279296875" xb="346.3341064453125" yb="1305.5657958984375" xc="346.33038330078125" yc="1297.66357421875" xd="286.310791015625" yd="1305.5936279296875" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutLHTurnoutXml" turnoutname="South Turnout 100" blockname="SZ1" connectaname="T13" connectbname="T6" connectcname="T12" />
     <layoutturnout ident="TO2" type="LH_TURNOUT" hidden="no" disabled="no" disableWhenOccupied="no" continuing="2" xcen="1017.2344360351562" ycen="1302.2562255859375" xa="1047.24609375" ya="1301.2421875" xb="987.2227783203125" yb="1303.270263671875" xc="987.2191162109375" yc="1292.3680419921875" xd="1047.24609375" yd="1301.2421875" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutLHTurnoutXml" turnoutname="South Turnout 118" blockname="EZ1" connectaname="T9" connectbname="T6" connectcname="T48" />
     <layoutturnout ident="TO3" type="LH_TURNOUT" hidden="no" disabled="no" disableWhenOccupied="no" continuing="2" xcen="751.2760009765625" ycen="1103.26123046875" xa="722.2643432617188" ya="1102.2752685546875" xb="780.2876586914062" yb="1104.2471923828125" xc="780.283935546875" yc="1093.344970703125" xd="722.2643432617188" yd="1102.2752685546875" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutLHTurnoutXml" turnoutname="North Turnout 308" blockname="NZ8" connectaname="T106" connectbname="T19" connectcname="T103" />
@@ -3167,7 +3226,7 @@
     <positionablepoint ident="A1" type="ANCHOR" x="310.2393798828125" y="1278.0333251953125" connect1name="T46" connect2name="T1" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
     <positionablepoint ident="A2" type="ANCHOR" x="607.16650390625" y="1143.6937255859375" connect1name="T105" connect2name="T2" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
     <positionablepoint ident="A5" type="ANCHOR" x="1106.810791015625" y="535.7982177734375" connect1name="T164" connect2name="T45" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
-    <positionablepoint ident="A6" type="ANCHOR" x="422.0" y="1278.0" connect1name="T46" connect2name="T70" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
+    <positionablepoint ident="A6" type="ANCHOR" x="422.0" y="1278.0" connect1name="T46" connect2name="T70" eastboundsignal="SZ2" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
     <positionablepoint ident="A10" type="ANCHOR" x="106.25335693359375" y="986.94970703125" connect1name="T17" connect2name="T65" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
     <positionablepoint ident="A7" type="ANCHOR" x="218.0" y="995.0" connect1name="T118" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
     <positionablepoint ident="A14" type="ANCHOR" x="193.0" y="1016.0" connect1name="T119" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
@@ -3183,104 +3242,104 @@
   <filehistory>
     <operation>
       <type>app</type>
-      <date>Thu Mar 12 11:17:13 MDT 2026</date>
+      <date>Sun Mar 22 16:07:57 MDT 2026</date>
       <filename>PanelPro (v5.14.0)</filename>
     </operation>
     <operation>
       <type>Load OK</type>
-      <date>Thu Mar 12 11:17:20 MDT 2026</date>
-      <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+      <date>Sun Mar 22 16:08:02 MDT 2026</date>
+      <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
       <filehistory>
         <operation>
           <type>app</type>
-          <date>Thu Mar 12 10:09:12 MDT 2026</date>
+          <date>Tue Mar 17 18:23:45 MDT 2026</date>
           <filename>PanelPro (v5.14.0)</filename>
         </operation>
         <operation>
           <type>Load OK</type>
-          <date>Thu Mar 12 10:09:19 MDT 2026</date>
-          <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+          <date>Tue Mar 17 18:23:51 MDT 2026</date>
+          <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
           <filehistory>
             <operation>
               <type>app</type>
-              <date>Thu Mar 12 09:52:07 MDT 2026</date>
+              <date>Thu Mar 12 16:00:53 MDT 2026</date>
               <filename>PanelPro (v5.14.0)</filename>
             </operation>
             <operation>
               <type>Load OK</type>
-              <date>Thu Mar 12 09:52:15 MDT 2026</date>
-              <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+              <date>Thu Mar 12 16:00:58 MDT 2026</date>
+              <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
               <filehistory>
                 <operation>
                   <type>app</type>
-                  <date>Wed Mar 11 15:16:55 MDT 2026</date>
+                  <date>Thu Mar 12 11:17:13 MDT 2026</date>
                   <filename>PanelPro (v5.14.0)</filename>
                 </operation>
                 <operation>
                   <type>Load OK</type>
-                  <date>Wed Mar 11 15:17:04 MDT 2026</date>
-                  <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/May2025Settings.xml</filename>
+                  <date>Thu Mar 12 11:17:20 MDT 2026</date>
+                  <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
                   <filehistory>
                     <operation>
                       <type>app</type>
-                      <date>Sun May 18 16:26:00 MDT 2025</date>
-                      <filename>PanelPro (v5.10.0)</filename>
+                      <date>Thu Mar 12 10:09:12 MDT 2026</date>
+                      <filename>PanelPro (v5.14.0)</filename>
                     </operation>
                     <operation>
                       <type>Load OK</type>
-                      <date>Sun May 18 16:26:08 MDT 2025</date>
-                      <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/May2025Settings.xml</filename>
+                      <date>Thu Mar 12 10:09:19 MDT 2026</date>
+                      <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
                       <filehistory>
                         <operation>
                           <type>app</type>
-                          <date>Sun May 18 15:58:38 MDT 2025</date>
-                          <filename>PanelPro (v5.10.0)</filename>
+                          <date>Thu Mar 12 09:52:07 MDT 2026</date>
+                          <filename>PanelPro (v5.14.0)</filename>
                         </operation>
                         <operation>
                           <type>Load OK</type>
-                          <date>Sun May 18 15:58:45 MDT 2025</date>
-                          <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/May2025Settings.xml</filename>
+                          <date>Thu Mar 12 09:52:15 MDT 2026</date>
+                          <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
                         </operation>
                         <operation>
                           <type>Store</type>
-                          <date>Sun May 18 16:24:49 MDT 2025</date>
-                          <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/May2025Settings.xml</filename>
+                          <date>Thu Mar 12 10:08:33 MDT 2026</date>
+                          <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
                         </operation>
                       </filehistory>
                     </operation>
                     <operation>
                       <type>Store</type>
-                      <date>Sun May 18 16:27:28 MDT 2025</date>
-                      <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/May2025Settings.xml</filename>
+                      <date>Thu Mar 12 10:43:51 MDT 2026</date>
+                      <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
                     </operation>
                   </filehistory>
                 </operation>
                 <operation>
                   <type>Store</type>
-                  <date>Wed Mar 11 16:44:47 MDT 2026</date>
+                  <date>Thu Mar 12 15:56:46 MDT 2026</date>
                   <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
                 </operation>
               </filehistory>
             </operation>
             <operation>
               <type>Store</type>
-              <date>Thu Mar 12 10:08:33 MDT 2026</date>
-              <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+              <date>Thu Mar 12 16:01:50 MDT 2026</date>
+              <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
             </operation>
           </filehistory>
         </operation>
         <operation>
           <type>Store</type>
-          <date>Thu Mar 12 10:43:51 MDT 2026</date>
-          <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+          <date>Sun Mar 22 16:07:09 MDT 2026</date>
+          <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
         </operation>
       </filehistory>
     </operation>
     <operation>
       <type>Store</type>
-      <date>Thu Mar 12 15:56:46 MDT 2026</date>
-      <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+      <date>Sun Mar 22 16:52:46 MDT 2026</date>
+      <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
     </operation>
   </filehistory>
-  <!--Written by JMRI version 5.14+Rdea51dcccf on Thu Mar 12 15:56:46 MDT 2026-->
+  <!--Written by JMRI version 5.14+Rdea51dcccf on Sun Mar 22 16:52:46 MDT 2026-->
 </layout-config>
