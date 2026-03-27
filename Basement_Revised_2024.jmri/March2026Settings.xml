@@ -509,7 +509,7 @@
     <memory>
       <systemName>IM:AUTO:0007</systemName>
     </memory>
-    <memory value="4:52 PM">
+    <memory value="4:55 PM">
       <systemName>IMCURRENTTIME</systemName>
     </memory>
     <memory value="1.0">
@@ -1959,6 +1959,9 @@
       <userName>EZ10</userName>
     </layoutblock>
   </layoutblocks>
+  <signalelements class="jmri.jmrit.blockboss.configurexml.BlockBossLogicProviderXml">
+    <signalelement signal="SZ6" mode="0" limitspeed1="false" limitspeed2="false" useflashyellow="false" distantsignal="false" />
+  </signalelements>
   <routes class="jmri.managers.configurexml.DefaultRouteManagerXml">
     <route userName="NW Staging Close">
       <systemName>IO:AUTO:0001</systemName>
@@ -2070,6 +2073,25 @@
   </routes>
   <signalmastlogics class="jmri.managers.configurexml.DefaultSignalMastLogicManagerXml">
     <logicDelay>500</logicDelay>
+    <signalmastlogic source="West-SW">
+      <sourceSignalMast>West-SW</sourceSignalMast>
+      <destinationMast destination="West-NW">
+        <destinationSignalMast>West-NW</destinationSignalMast>
+        <comment />
+        <enabled>yes</enabled>
+        <allowAutoMaticSignalMastGeneration>no</allowAutoMaticSignalMastGeneration>
+        <useLayoutEditor>no</useLayoutEditor>
+        <useLayoutEditorTurnouts>no</useLayoutEditorTurnouts>
+        <useLayoutEditorBlocks>no</useLayoutEditorBlocks>
+        <lockTurnouts>no</lockTurnouts>
+        <sensors>
+          <sensor>
+            <sensorName>West / SW</sensorName>
+            <sensorState>active</sensorState>
+          </sensor>
+        </sensors>
+      </destinationMast>
+    </signalmastlogic>
   </signalmastlogics>
   <logixs class="jmri.managers.configurexml.DefaultLogixManagerXml">
     <logix userName="Initialize Layout" enabled="yes">
@@ -2391,7 +2413,323 @@
     </conditional>
   </conditionals>
   <timebase class="jmri.jmrit.simpleclock.configurexml.SimpleTimebaseXml" time="Sun Nov 29 11:15:51 MST 2020" rate="1.0" startrate="1.0" run="yes" master="yes" sync="no" correct="no" display="no" startstopped="no" startrunning="yes" startsettime="no" startclockoption="0" showbutton="no" startsetrate="yes" />
-  <LayoutEditor class="jmri.jmrit.display.layoutEditor.configurexml.LayoutEditorXml" name="Mike Dean's Basement Layout" x="0" y="0" windowheight="900" windowwidth="1440" panelheight="1740" panelwidth="1439" sliders="yes" scrollable="both" editable="yes" positionable="yes" controlling="yes" animating="yes" showhelpbar="no" drawgrid="no" snaponadd="no" snaponmove="no" antialiasing="yes" turnoutcircles="yes" tooltipsnotedit="yes" tooltipsinedit="yes" mainlinetrackwidth="4" xscale="1.0" yscale="1.0" sidetrackwidth="2" defaulttrackcolor="black" defaultoccupiedtrackcolor="red" defaultalternativetrackcolor="cyan" defaulttextcolor="black" turnoutcirclecolor="blue" turnoutcirclethrowncolor="red" turnoutcirclesize="2" turnoutdrawunselectedleg="no" turnoutbx="20.0" turnoutcx="20.0" turnoutwid="10.0" xoverlong="30.0" xoverhwid="10.0" xovershort="10.0" autoblkgenerate="no" gridSize="10" gridSize2nd="10" openDispatcher="no" useDirectTurnoutControl="no">
+  <LogixNGs class="jmri.jmrit.logixng.implementation.configurexml.DefaultLogixNGManagerXml">
+    <Thread>
+      <id>0</id>
+      <name>LogixNG thread</name>
+    </Thread>
+    <Thread>
+      <id>1</id>
+      <name>Debug thread</name>
+    </Thread>
+    <LogixNG enabled="yes" inline="no">
+      <systemName>IQ:AUTO:0001</systemName>
+      <userName>LNG_Signal_NH$1101</userName>
+      <ConditionalNGs>
+        <systemName>IQC:AUTO:0001</systemName>
+      </ConditionalNGs>
+    </LogixNG>
+    <InitializationTable />
+    <Clipboard>
+      <Many class="jmri.jmrit.logixng.implementation.configurexml.ClipboardManyXml">
+        <Socket>
+          <socketName>X1</socketName>
+        </Socket>
+      </Many>
+    </Clipboard>
+  </LogixNGs>
+  <LogixNGConditionalNGs class="jmri.jmrit.logixng.implementation.configurexml.DefaultConditionalNGManagerXml">
+    <ConditionalNG enabled="yes">
+      <systemName>IQC:AUTO:0001</systemName>
+      <userName>NH$1101_Aspect_Control</userName>
+      <thread>0</thread>
+      <Socket>
+        <socketName>A</socketName>
+        <systemName>IQDA:AUTO:0001</systemName>
+      </Socket>
+    </ConditionalNG>
+  </LogixNGConditionalNGs>
+  <LogixNGDigitalExpressions class="jmri.jmrit.logixng.implementation.configurexml.DefaultDigitalExpressionManagerXml">
+    <Or class="jmri.jmrit.logixng.expressions.configurexml.OrXml" type="EvaluateAll">
+      <systemName>IQDE:AUTO:0001</systemName>
+      <Expressions>
+        <Socket>
+          <socketName>E1</socketName>
+          <systemName>IQDE:AUTO:0002</systemName>
+        </Socket>
+        <Socket>
+          <socketName>E2</socketName>
+          <systemName>IQDE:AUTO:0003</systemName>
+        </Socket>
+        <Socket>
+          <socketName>E3</socketName>
+          <systemName>IQDE:AUTO:0004</systemName>
+        </Socket>
+      </Expressions>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalExpressionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalExpressionSocketXml" DefaultMaleDigitalExpressionSocketListen="yes">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </Or>
+    <ExpressionSensor class="jmri.jmrit.logixng.expressions.configurexml.ExpressionSensorXml">
+      <systemName>IQDE:AUTO:0002</systemName>
+      <namedBean>
+        <addressing>Direct</addressing>
+        <name>South Zone 1</name>
+        <listenToMemory>no</listenToMemory>
+      </namedBean>
+      <is_isNot>Is</is_isNot>
+      <state>
+        <addressing>Direct</addressing>
+        <enum>Active</enum>
+        <listenToMemory>no</listenToMemory>
+      </state>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalExpressionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalExpressionSocketXml" DefaultMaleDigitalExpressionSocketListen="yes">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </ExpressionSensor>
+    <ExpressionSensor class="jmri.jmrit.logixng.expressions.configurexml.ExpressionSensorXml">
+      <systemName>IQDE:AUTO:0003</systemName>
+      <namedBean>
+        <addressing>Direct</addressing>
+        <name>West / SW</name>
+        <listenToMemory>no</listenToMemory>
+      </namedBean>
+      <is_isNot>Is</is_isNot>
+      <state>
+        <addressing>Direct</addressing>
+        <enum>Active</enum>
+        <listenToMemory>no</listenToMemory>
+      </state>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalExpressionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalExpressionSocketXml" DefaultMaleDigitalExpressionSocketListen="yes">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </ExpressionSensor>
+    <ExpressionTurnout class="jmri.jmrit.logixng.expressions.configurexml.ExpressionTurnoutXml">
+      <systemName>IQDE:AUTO:0004</systemName>
+      <namedBean>
+        <addressing>Direct</addressing>
+        <name>Staging SW Turnout 500</name>
+        <listenToMemory>no</listenToMemory>
+      </namedBean>
+      <is_isNot>Is</is_isNot>
+      <stateAddressing>Direct</stateAddressing>
+      <turnoutState>Thrown</turnoutState>
+      <stateReference />
+      <stateLocalVariable />
+      <stateFormula />
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalExpressionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalExpressionSocketXml" DefaultMaleDigitalExpressionSocketListen="yes">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </ExpressionTurnout>
+    <Or class="jmri.jmrit.logixng.expressions.configurexml.OrXml" type="EvaluateAll">
+      <systemName>IQDE:AUTO:0007</systemName>
+      <Expressions>
+        <Socket>
+          <socketName>E1</socketName>
+          <systemName>IQDE:AUTO:0008</systemName>
+        </Socket>
+        <Socket>
+          <socketName>E2</socketName>
+          <systemName>IQDE:AUTO:0009</systemName>
+        </Socket>
+      </Expressions>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalExpressionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalExpressionSocketXml" DefaultMaleDigitalExpressionSocketListen="yes">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </Or>
+    <ExpressionSensor class="jmri.jmrit.logixng.expressions.configurexml.ExpressionSensorXml">
+      <systemName>IQDE:AUTO:0008</systemName>
+      <namedBean>
+        <addressing>Direct</addressing>
+        <name>West / NW</name>
+        <listenToMemory>no</listenToMemory>
+      </namedBean>
+      <is_isNot>Is</is_isNot>
+      <state>
+        <addressing>Direct</addressing>
+        <enum>Active</enum>
+        <listenToMemory>no</listenToMemory>
+      </state>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalExpressionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalExpressionSocketXml" DefaultMaleDigitalExpressionSocketListen="yes">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </ExpressionSensor>
+    <ExpressionTurnout class="jmri.jmrit.logixng.expressions.configurexml.ExpressionTurnoutXml">
+      <systemName>IQDE:AUTO:0009</systemName>
+      <namedBean>
+        <addressing>Direct</addressing>
+        <name>Staging NW Turnout 400</name>
+        <listenToMemory>no</listenToMemory>
+      </namedBean>
+      <is_isNot>Is</is_isNot>
+      <stateAddressing>Direct</stateAddressing>
+      <turnoutState>Closed</turnoutState>
+      <stateReference />
+      <stateLocalVariable />
+      <stateFormula />
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalExpressionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalExpressionSocketXml" DefaultMaleDigitalExpressionSocketListen="yes">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </ExpressionTurnout>
+  </LogixNGDigitalExpressions>
+  <LogixNGDigitalActions class="jmri.jmrit.logixng.implementation.configurexml.DefaultDigitalActionManagerXml">
+    <IfThenElse class="jmri.jmrit.logixng.actions.configurexml.IfThenElseXml" executeType="AlwaysExecute" evaluateType="EvaluateAll">
+      <systemName>IQDA:AUTO:0001</systemName>
+      <Expressions>
+        <Socket>
+          <socketName>If</socketName>
+          <systemName>IQDE:AUTO:0001</systemName>
+        </Socket>
+      </Expressions>
+      <Actions>
+        <Socket>
+          <socketName>Then</socketName>
+          <systemName>IQDA:AUTO:0002</systemName>
+        </Socket>
+        <Socket>
+          <socketName>Else</socketName>
+          <systemName>IQDA:AUTO:0007</systemName>
+        </Socket>
+      </Actions>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalActionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalActionSocketXml">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </IfThenElse>
+    <ActionSignalHead class="jmri.jmrit.logixng.actions.configurexml.ActionSignalHeadXml">
+      <systemName>IQDA:AUTO:0002</systemName>
+      <namedBean>
+        <addressing>Direct</addressing>
+        <name>West-SW</name>
+        <listenToMemory>no</listenToMemory>
+      </namedBean>
+      <operationAddressing>Direct</operationAddressing>
+      <operationType>Appearance</operationType>
+      <operationReference />
+      <operationLocalVariable />
+      <operationFormula />
+      <appearanceAddressing>Direct</appearanceAddressing>
+      <appearance>1</appearance>
+      <appearanceReference />
+      <appearanceLocalVariable />
+      <appearanceFormula />
+      <exampleNamedBean>
+        <addressing>Direct</addressing>
+        <listenToMemory>no</listenToMemory>
+      </exampleNamedBean>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalActionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalActionSocketXml">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </ActionSignalHead>
+    <IfThenElse class="jmri.jmrit.logixng.actions.configurexml.IfThenElseXml" executeType="AlwaysExecute" evaluateType="EvaluateAll">
+      <systemName>IQDA:AUTO:0007</systemName>
+      <Expressions>
+        <Socket>
+          <socketName>If</socketName>
+          <systemName>IQDE:AUTO:0007</systemName>
+        </Socket>
+      </Expressions>
+      <Actions>
+        <Socket>
+          <socketName>Then</socketName>
+          <systemName>IQDA:AUTO:0008</systemName>
+        </Socket>
+        <Socket>
+          <socketName>Else</socketName>
+          <systemName>IQDA:AUTO:0009</systemName>
+        </Socket>
+      </Actions>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalActionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalActionSocketXml">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </IfThenElse>
+    <ActionSignalHead class="jmri.jmrit.logixng.actions.configurexml.ActionSignalHeadXml">
+      <systemName>IQDA:AUTO:0008</systemName>
+      <namedBean>
+        <addressing>Direct</addressing>
+        <name>West-SW</name>
+        <listenToMemory>no</listenToMemory>
+      </namedBean>
+      <operationAddressing>Direct</operationAddressing>
+      <operationType>Appearance</operationType>
+      <operationReference />
+      <operationLocalVariable />
+      <operationFormula />
+      <appearanceAddressing>Direct</appearanceAddressing>
+      <appearance>4</appearance>
+      <appearanceReference />
+      <appearanceLocalVariable />
+      <appearanceFormula />
+      <exampleNamedBean>
+        <addressing>Direct</addressing>
+        <listenToMemory>no</listenToMemory>
+      </exampleNamedBean>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalActionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalActionSocketXml">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </ActionSignalHead>
+    <ActionSignalHead class="jmri.jmrit.logixng.actions.configurexml.ActionSignalHeadXml">
+      <systemName>IQDA:AUTO:0009</systemName>
+      <namedBean>
+        <addressing>Direct</addressing>
+        <name>West-SW</name>
+        <listenToMemory>no</listenToMemory>
+      </namedBean>
+      <operationAddressing>Direct</operationAddressing>
+      <operationType>Appearance</operationType>
+      <operationReference />
+      <operationLocalVariable />
+      <operationFormula />
+      <appearanceAddressing>Direct</appearanceAddressing>
+      <appearance>16</appearance>
+      <appearanceReference />
+      <appearanceLocalVariable />
+      <appearanceFormula />
+      <exampleNamedBean>
+        <addressing>Direct</addressing>
+        <listenToMemory>no</listenToMemory>
+      </exampleNamedBean>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalActionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalActionSocketXml">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </ActionSignalHead>
+  </LogixNGDigitalActions>
+  <LayoutEditor class="jmri.jmrit.display.layoutEditor.configurexml.LayoutEditorXml" name="Mike Dean's Basement Layout" x="68" y="51" windowheight="1302" windowwidth="1484" panelheight="1740" panelwidth="1439" sliders="yes" scrollable="both" editable="yes" positionable="yes" controlling="yes" animating="yes" showhelpbar="no" drawgrid="no" snaponadd="no" snaponmove="no" antialiasing="yes" turnoutcircles="yes" tooltipsnotedit="yes" tooltipsinedit="yes" mainlinetrackwidth="4" xscale="1.0" yscale="1.0" sidetrackwidth="2" defaulttrackcolor="black" defaultoccupiedtrackcolor="red" defaultalternativetrackcolor="cyan" defaulttextcolor="black" turnoutcirclecolor="blue" turnoutcirclethrowncolor="red" turnoutcirclesize="2" turnoutdrawunselectedleg="no" turnoutbx="20.0" turnoutcx="20.0" turnoutwid="10.0" xoverlong="30.0" xoverhwid="10.0" xovershort="10.0" autoblkgenerate="no" gridSize="10" gridSize2nd="10" openDispatcher="no" useDirectTurnoutControl="no">
     <layoutTrackDrawingOptions name="Mike Dean's Basement Layout" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutTrackDrawingOptionsXml">
       <mainBallastColor>#000000</mainBallastColor>
       <mainBallastWidth>0</mainBallastWidth>
@@ -2738,7 +3076,6 @@
     <positionablelabel x="721" y="1280" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT112" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
     <positionablelabel x="780" y="1243" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT113" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
     <positionablelabel x="837" y="1222" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT114" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <signalmasticon signalmast="SZ2" x="390" y="1090" level="9" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" clickmode="0" litmode="false" degrees="0" scale="1.0" imageset="default" class="jmri.jmrit.display.configurexml.SignalMastIconXml" />
     <layoutturnout ident="TO1" type="LH_TURNOUT" hidden="no" disabled="no" disableWhenOccupied="no" continuing="2" xcen="316.32244873046875" ycen="1305.5797119140625" xa="286.310791015625" ya="1305.5936279296875" xb="346.3341064453125" yb="1305.5657958984375" xc="346.33038330078125" yc="1297.66357421875" xd="286.310791015625" yd="1305.5936279296875" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutLHTurnoutXml" turnoutname="South Turnout 100" blockname="SZ1" connectaname="T13" connectbname="T6" connectcname="T12" />
     <layoutturnout ident="TO2" type="LH_TURNOUT" hidden="no" disabled="no" disableWhenOccupied="no" continuing="2" xcen="1017.2344360351562" ycen="1302.2562255859375" xa="1047.24609375" ya="1301.2421875" xb="987.2227783203125" yb="1303.270263671875" xc="987.2191162109375" yc="1292.3680419921875" xd="1047.24609375" yd="1301.2421875" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutLHTurnoutXml" turnoutname="South Turnout 118" blockname="EZ1" connectaname="T9" connectbname="T6" connectcname="T48" />
     <layoutturnout ident="TO3" type="LH_TURNOUT" hidden="no" disabled="no" disableWhenOccupied="no" continuing="2" xcen="751.2760009765625" ycen="1103.26123046875" xa="722.2643432617188" ya="1102.2752685546875" xb="780.2876586914062" yb="1104.2471923828125" xc="780.283935546875" yc="1093.344970703125" xd="722.2643432617188" yd="1102.2752685546875" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutLHTurnoutXml" turnoutname="North Turnout 308" blockname="NZ8" connectaname="T106" connectbname="T19" connectcname="T103" />
@@ -3130,7 +3467,7 @@
     <tracksegment ident="T126" connect1name="TO32" type1="TURNOUT_C" connect2name="A42" type2="POS_POINT" dashed="no" mainline="no" hidden="no" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
     <positionablepoint ident="A8" type="ANCHOR" x="1109.156494140625" y="1285.1171875" connect1name="T10" connect2name="T9" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
     <positionablepoint ident="A9" type="ANCHOR" x="1154.164794921875" y="1240.0579833984375" connect1name="T11" connect2name="T10" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
-    <positionablepoint ident="A11" type="ANCHOR" x="155.634521484375" y="1273.7532958984375" connect1name="T14" connect2name="T13" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
+    <positionablepoint ident="A11" type="ANCHOR" x="155.634521484375" y="1273.7532958984375" connect1name="T14" connect2name="T13" eastboundsignal="West-SW" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
     <positionablepoint ident="A12" type="ANCHOR" x="121.6104736328125" y="1232.77099609375" connect1name="T15" connect2name="T14" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
     <positionablepoint ident="A13" type="ANCHOR" x="106.044677734375" y="1030.2490234375" connect1name="T17" connect2name="T16" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
     <positionablepoint ident="A15" type="ANCHOR" x="821.4594116210938" y="1097.939453125" connect1name="T20" connect2name="T19" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
@@ -3158,7 +3495,7 @@
     <positionablepoint ident="A46" type="ANCHOR" x="1126.7066650390625" y="937.2512817382812" connect1name="T60" connect2name="T59" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
     <positionablepoint ident="A47" type="ANCHOR" x="1126.743896484375" y="1017.2822265625" connect1name="T61" connect2name="T60" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
     <positionablepoint ident="A48" type="ANCHOR" x="1110.365234375" y="1218.8194580078125" connect1name="T63" connect2name="T62" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
-    <positionablepoint ident="A49" type="ANCHOR" x="1066.383056640625" y="1263.843505859375" connect1name="T64" connect2name="T63" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
+    <positionablepoint ident="A49" type="ANCHOR" x="1066.383056640625" y="1263.843505859375" connect1name="T64" connect2name="T63" eastboundsignal="SZ6" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
     <positionablepoint ident="A51" type="ANCHOR" x="1129.221435546875" y="655.285400390625" connect1name="T71" connect2name="T69" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
     <positionablepoint ident="EB11" type="END_BUMPER" x="1121.1563720703125" y="487.231201171875" connect1name="T71" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
     <positionablepoint ident="A54" type="ANCHOR" x="1094.775634765625" y="747.0750732421875" connect1name="T74" connect2name="T72" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
@@ -3188,7 +3525,7 @@
     <positionablepoint ident="A88" type="ANCHOR" x="858.888671875" y="1082.41552734375" connect1name="T109" connect2name="T20" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
     <positionablepoint ident="A89" type="ANCHOR" x="948.74267578125" y="1002.3764038085938" connect1name="T110" connect2name="T21" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
     <positionablepoint ident="A90" type="ANCHOR" x="906.3195190429688" y="1044.8388671875" connect1name="T110" connect2name="T109" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
-    <positionablepoint ident="A125" type="ANCHOR" x="205.1689453125" y="778.9423828125" connect1name="T152" connect2name="T44" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
+    <positionablepoint ident="A125" type="ANCHOR" x="205.1689453125" y="778.9423828125" connect1name="T152" connect2name="T44" eastboundsignal="West-NW" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
     <positionablepoint ident="A126" type="ANCHOR" x="290.390625" y="793.1217651367188" connect1name="T153" connect2name="T152" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
     <positionablepoint ident="A127" type="ANCHOR" x="330.74652099609375" y="844.2877197265625" connect1name="T154" connect2name="T153" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
     <positionablepoint ident="A128" type="ANCHOR" x="353.1212158203125" y="899.9348754882812" connect1name="T155" connect2name="T154" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
@@ -3226,7 +3563,7 @@
     <positionablepoint ident="A1" type="ANCHOR" x="310.2393798828125" y="1278.0333251953125" connect1name="T46" connect2name="T1" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
     <positionablepoint ident="A2" type="ANCHOR" x="607.16650390625" y="1143.6937255859375" connect1name="T105" connect2name="T2" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
     <positionablepoint ident="A5" type="ANCHOR" x="1106.810791015625" y="535.7982177734375" connect1name="T164" connect2name="T45" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
-    <positionablepoint ident="A6" type="ANCHOR" x="422.0" y="1278.0" connect1name="T46" connect2name="T70" eastboundsignal="SZ2" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
+    <positionablepoint ident="A6" type="ANCHOR" x="422.0" y="1278.0" connect1name="T46" connect2name="T70" eastboundsignal="S-MNT" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
     <positionablepoint ident="A10" type="ANCHOR" x="106.25335693359375" y="986.94970703125" connect1name="T17" connect2name="T65" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
     <positionablepoint ident="A7" type="ANCHOR" x="218.0" y="995.0" connect1name="T118" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
     <positionablepoint ident="A14" type="ANCHOR" x="193.0" y="1016.0" connect1name="T119" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
@@ -3242,104 +3579,104 @@
   <filehistory>
     <operation>
       <type>app</type>
-      <date>Sun Mar 22 16:07:57 MDT 2026</date>
+      <date>Fri Mar 27 15:55:28 MDT 2026</date>
       <filename>PanelPro (v5.14.0)</filename>
     </operation>
     <operation>
       <type>Load OK</type>
-      <date>Sun Mar 22 16:08:02 MDT 2026</date>
-      <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+      <date>Fri Mar 27 15:55:36 MDT 2026</date>
+      <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
       <filehistory>
         <operation>
           <type>app</type>
-          <date>Tue Mar 17 18:23:45 MDT 2026</date>
+          <date>Mon Mar 23 14:34:34 MDT 2026</date>
           <filename>PanelPro (v5.14.0)</filename>
         </operation>
         <operation>
           <type>Load OK</type>
-          <date>Tue Mar 17 18:23:51 MDT 2026</date>
-          <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+          <date>Mon Mar 23 14:34:42 MDT 2026</date>
+          <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
           <filehistory>
             <operation>
               <type>app</type>
-              <date>Thu Mar 12 16:00:53 MDT 2026</date>
+              <date>Sun Mar 22 16:07:57 MDT 2026</date>
               <filename>PanelPro (v5.14.0)</filename>
             </operation>
             <operation>
               <type>Load OK</type>
-              <date>Thu Mar 12 16:00:58 MDT 2026</date>
+              <date>Sun Mar 22 16:08:02 MDT 2026</date>
               <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
               <filehistory>
                 <operation>
                   <type>app</type>
-                  <date>Thu Mar 12 11:17:13 MDT 2026</date>
+                  <date>Tue Mar 17 18:23:45 MDT 2026</date>
                   <filename>PanelPro (v5.14.0)</filename>
                 </operation>
                 <operation>
                   <type>Load OK</type>
-                  <date>Thu Mar 12 11:17:20 MDT 2026</date>
-                  <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+                  <date>Tue Mar 17 18:23:51 MDT 2026</date>
+                  <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
                   <filehistory>
                     <operation>
                       <type>app</type>
-                      <date>Thu Mar 12 10:09:12 MDT 2026</date>
+                      <date>Thu Mar 12 16:00:53 MDT 2026</date>
                       <filename>PanelPro (v5.14.0)</filename>
                     </operation>
                     <operation>
                       <type>Load OK</type>
-                      <date>Thu Mar 12 10:09:19 MDT 2026</date>
-                      <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+                      <date>Thu Mar 12 16:00:58 MDT 2026</date>
+                      <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
                       <filehistory>
                         <operation>
                           <type>app</type>
-                          <date>Thu Mar 12 09:52:07 MDT 2026</date>
+                          <date>Thu Mar 12 11:17:13 MDT 2026</date>
                           <filename>PanelPro (v5.14.0)</filename>
                         </operation>
                         <operation>
                           <type>Load OK</type>
-                          <date>Thu Mar 12 09:52:15 MDT 2026</date>
+                          <date>Thu Mar 12 11:17:20 MDT 2026</date>
                           <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
                         </operation>
                         <operation>
                           <type>Store</type>
-                          <date>Thu Mar 12 10:08:33 MDT 2026</date>
+                          <date>Thu Mar 12 15:56:46 MDT 2026</date>
                           <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
                         </operation>
                       </filehistory>
                     </operation>
                     <operation>
                       <type>Store</type>
-                      <date>Thu Mar 12 10:43:51 MDT 2026</date>
-                      <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+                      <date>Thu Mar 12 16:01:50 MDT 2026</date>
+                      <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
                     </operation>
                   </filehistory>
                 </operation>
                 <operation>
                   <type>Store</type>
-                  <date>Thu Mar 12 15:56:46 MDT 2026</date>
-                  <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+                  <date>Sun Mar 22 16:07:09 MDT 2026</date>
+                  <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
                 </operation>
               </filehistory>
             </operation>
             <operation>
               <type>Store</type>
-              <date>Thu Mar 12 16:01:50 MDT 2026</date>
+              <date>Sun Mar 22 16:52:46 MDT 2026</date>
               <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
             </operation>
           </filehistory>
         </operation>
         <operation>
           <type>Store</type>
-          <date>Sun Mar 22 16:07:09 MDT 2026</date>
-          <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+          <date>Mon Mar 23 15:17:57 MDT 2026</date>
+          <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
         </operation>
       </filehistory>
     </operation>
     <operation>
       <type>Store</type>
-      <date>Sun Mar 22 16:52:46 MDT 2026</date>
-      <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+      <date>Fri Mar 27 16:55:26 MDT 2026</date>
+      <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
     </operation>
   </filehistory>
-  <!--Written by JMRI version 5.14+Rdea51dcccf on Sun Mar 22 16:52:46 MDT 2026-->
+  <!--Written by JMRI version 5.14+Rdea51dcccf on Fri Mar 27 16:55:26 MDT 2026-->
 </layout-config>
