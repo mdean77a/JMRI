@@ -1,6 +1,0 @@
-#JMRI Preferences version 4.12+Rb6a9bb1
-#Sun Dec 02 15:59:04 MST 2018
-jmri-implementation.scripts=home\:JMRI/jython/
-jmri-implementation.user-files=profile\:
-jmri-util-zeroconf.IPv4=true
-jmri-util-zeroconf.IPv6=true
