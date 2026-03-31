@@ -1,4 +1,4 @@
-*.bak
+**/*.bak
 *.xml.?.bak
 .DS_Store
 profile.properties.1.bak
