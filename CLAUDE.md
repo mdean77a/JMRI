@@ -4,26 +4,22 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Repository Is
 
-This is a JMRI (Java Model Railroad Interface) **user configuration repository** for Mike Dean's basement HO-scale model railroad. It is NOT the JMRI application source code. JMRI itself is installed separately. This repo version-controls layout profiles, locomotive roster data, and Jython automation scripts, and can be cloned to other machines (including Raspberry Pi boards).
+This is a JMRI (Java Model Railroad Interface) **user configuration repository** for Mike Dean's basement N-scale model railroad. It is NOT the JMRI application source code. JMRI itself is installed separately. This repo version-controls layout profiles, locomotive roster data, and Jython automation scripts, and can be cloned to other machines (including Raspberry Pi boards).
 
 ## Repository Layout
 
 ```
 ~/JMRI/                              # Git root
-├── Basement_Revised_2024.jmri/      # Revised layout profile (active development since Apr 2025)
+├── Basement_Revised_2024.jmri/      # Main layout profile (active development)
 │   └── March2026Settings.xml        # Latest panel file
-├── New_Mike_Basement_Layout.jmri/   # Original primary profile (NCE command station)
-│   └── December2024Settings.xml     # Main panel file (~5900 lines)
+├── Decoder_TestTrack.jmri/          # Decoder calibration testing profile
 ├── My_NCE_Simulator.jmri/          # Simulator profile (no hardware needed)
-├── Decoder_TestTrack/               # Decoder calibration testing profile
-├── Programming_Track/               # Programming track profile
-├── Mike_Basement_Layout/            # Older profile directory
+├── Programming_Track.jmri/          # Programming track profile
 ├── roster/                          # Shared locomotive roster (~45 locos + photos)
 │   └── consist/                     # Consist definitions
 ├── jython/                          # Shared Jython scripts (~250 .py files)
 ├── roster.xml                       # Master roster index
-├── blockvalues.xml                  # Persisted block occupancy values
-└── dispatcheroptions.xml            # Dispatcher config (signal mast based)
+└── roster.csv                       # CSV export of roster
 ```
 
 All profiles share a single `roster/` directory and a single `jython/` scripts directory. This is configured via `jmri-jmrit-roster.directory=home:JMRI/` in each profile's `profile.properties`.
