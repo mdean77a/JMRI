@@ -509,7 +509,7 @@
     <memory>
       <systemName>IM:AUTO:0007</systemName>
     </memory>
-    <memory value="12:49 PM">
+    <memory value="2:26 PM">
       <systemName>IMCURRENTTIME</systemName>
     </memory>
     <memory value="1.0">
@@ -2405,9 +2405,30 @@
     </Thread>
     <LogixNG enabled="yes" inline="no">
       <systemName>IQ:AUTO:0002</systemName>
-      <userName>LNG_Mast_NH$1101</userName>
+      <userName>LNG_Mast_West-SW</userName>
       <ConditionalNGs>
         <systemName>IQC:AUTO:0002</systemName>
+      </ConditionalNGs>
+    </LogixNG>
+    <LogixNG enabled="yes" inline="no">
+      <systemName>IQ:AUTO:0003</systemName>
+      <userName>LNG_Mast_S-MNT</userName>
+      <ConditionalNGs>
+        <systemName>IQC:AUTO:0003</systemName>
+      </ConditionalNGs>
+    </LogixNG>
+    <LogixNG enabled="yes" inline="no">
+      <systemName>IQ:AUTO:0004</systemName>
+      <userName>LNG_Mast_West-NW</userName>
+      <ConditionalNGs>
+        <systemName>IQC:AUTO:0004</systemName>
+      </ConditionalNGs>
+    </LogixNG>
+    <LogixNG enabled="yes" inline="no">
+      <systemName>IQ:AUTO:0005</systemName>
+      <userName>LNG_Mast_SZ2</userName>
+      <ConditionalNGs>
+        <systemName>IQC:AUTO:0005</systemName>
       </ConditionalNGs>
     </LogixNG>
     <InitializationTable />
@@ -2426,6 +2447,30 @@
       <Socket>
         <socketName>A</socketName>
         <systemName>IQDA:AUTO:0011</systemName>
+      </Socket>
+    </ConditionalNG>
+    <ConditionalNG enabled="yes">
+      <systemName>IQC:AUTO:0003</systemName>
+      <thread>0</thread>
+      <Socket>
+        <socketName>A</socketName>
+        <systemName>IQDA:AUTO:0016</systemName>
+      </Socket>
+    </ConditionalNG>
+    <ConditionalNG enabled="yes">
+      <systemName>IQC:AUTO:0004</systemName>
+      <thread>0</thread>
+      <Socket>
+        <socketName>A</socketName>
+        <systemName>IQDA:AUTO:0021</systemName>
+      </Socket>
+    </ConditionalNG>
+    <ConditionalNG enabled="yes">
+      <systemName>IQC:AUTO:0005</systemName>
+      <thread>0</thread>
+      <Socket>
+        <socketName>A</socketName>
+        <systemName>IQDA:AUTO:0026</systemName>
       </Socket>
     </ConditionalNG>
   </LogixNGConditionalNGs>
@@ -2582,6 +2627,384 @@
         </AbstractMaleSocket>
       </MaleSocket>
     </ExpressionTurnout>
+    <ExpressionSensor class="jmri.jmrit.logixng.expressions.configurexml.ExpressionSensorXml">
+      <systemName>IQDE:AUTO:0019</systemName>
+      <namedBean>
+        <addressing>Direct</addressing>
+        <name>Mountain</name>
+        <listenToMemory>no</listenToMemory>
+      </namedBean>
+      <is_isNot>Is</is_isNot>
+      <state>
+        <addressing>Direct</addressing>
+        <enum>Active</enum>
+        <listenToMemory>no</listenToMemory>
+      </state>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalExpressionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalExpressionSocketXml" DefaultMaleDigitalExpressionSocketListen="yes">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </ExpressionSensor>
+    <Or class="jmri.jmrit.logixng.expressions.configurexml.OrXml" type="EvaluateAll">
+      <systemName>IQDE:AUTO:0020</systemName>
+      <Expressions>
+        <Socket>
+          <socketName>E1</socketName>
+          <systemName>IQDE:AUTO:0021</systemName>
+        </Socket>
+        <Socket>
+          <socketName>E2</socketName>
+        </Socket>
+      </Expressions>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalExpressionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalExpressionSocketXml" DefaultMaleDigitalExpressionSocketListen="yes">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </Or>
+    <ExpressionSensor class="jmri.jmrit.logixng.expressions.configurexml.ExpressionSensorXml">
+      <systemName>IQDE:AUTO:0021</systemName>
+      <namedBean>
+        <addressing>Direct</addressing>
+        <name>East Zone 9</name>
+        <listenToMemory>no</listenToMemory>
+      </namedBean>
+      <is_isNot>Is</is_isNot>
+      <state>
+        <addressing>Direct</addressing>
+        <enum>Active</enum>
+        <listenToMemory>no</listenToMemory>
+      </state>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalExpressionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalExpressionSocketXml" DefaultMaleDigitalExpressionSocketListen="yes">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </ExpressionSensor>
+    <Or class="jmri.jmrit.logixng.expressions.configurexml.OrXml" type="EvaluateNeeded">
+      <systemName>IQDE:AUTO:0022</systemName>
+      <Expressions>
+        <Socket>
+          <socketName>E1</socketName>
+          <systemName>IQDE:AUTO:0023</systemName>
+        </Socket>
+        <Socket>
+          <socketName>E2</socketName>
+          <systemName>IQDE:AUTO:0024</systemName>
+        </Socket>
+        <Socket>
+          <socketName>E3</socketName>
+          <systemName>IQDE:AUTO:0025</systemName>
+        </Socket>
+        <Socket>
+          <socketName>E4</socketName>
+          <systemName>IQDE:AUTO:0026</systemName>
+        </Socket>
+        <Socket>
+          <socketName>E5</socketName>
+        </Socket>
+      </Expressions>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalExpressionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalExpressionSocketXml" DefaultMaleDigitalExpressionSocketListen="yes">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </Or>
+    <ExpressionSensor class="jmri.jmrit.logixng.expressions.configurexml.ExpressionSensorXml">
+      <systemName>IQDE:AUTO:0023</systemName>
+      <namedBean>
+        <addressing>Direct</addressing>
+        <name>North Zone 9</name>
+        <listenToMemory>no</listenToMemory>
+      </namedBean>
+      <is_isNot>Is</is_isNot>
+      <state>
+        <addressing>Direct</addressing>
+        <enum>Active</enum>
+        <listenToMemory>no</listenToMemory>
+      </state>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalExpressionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalExpressionSocketXml" DefaultMaleDigitalExpressionSocketListen="yes">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </ExpressionSensor>
+    <ExpressionTurnout class="jmri.jmrit.logixng.expressions.configurexml.ExpressionTurnoutXml">
+      <systemName>IQDE:AUTO:0024</systemName>
+      <namedBean>
+        <addressing>Direct</addressing>
+        <name>Staging NW Turnout 403</name>
+        <listenToMemory>no</listenToMemory>
+      </namedBean>
+      <is_isNot>Is</is_isNot>
+      <stateAddressing>Direct</stateAddressing>
+      <turnoutState>Closed</turnoutState>
+      <stateReference />
+      <stateLocalVariable />
+      <stateFormula />
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalExpressionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalExpressionSocketXml" DefaultMaleDigitalExpressionSocketListen="yes">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </ExpressionTurnout>
+    <ExpressionTurnout class="jmri.jmrit.logixng.expressions.configurexml.ExpressionTurnoutXml">
+      <systemName>IQDE:AUTO:0025</systemName>
+      <namedBean>
+        <addressing>Direct</addressing>
+        <name>Staging NW Turnout 400</name>
+        <listenToMemory>no</listenToMemory>
+      </namedBean>
+      <is_isNot>Is</is_isNot>
+      <stateAddressing>Direct</stateAddressing>
+      <turnoutState>Closed</turnoutState>
+      <stateReference />
+      <stateLocalVariable />
+      <stateFormula />
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalExpressionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalExpressionSocketXml" DefaultMaleDigitalExpressionSocketListen="yes">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </ExpressionTurnout>
+    <ExpressionSensor class="jmri.jmrit.logixng.expressions.configurexml.ExpressionSensorXml">
+      <systemName>IQDE:AUTO:0026</systemName>
+      <namedBean>
+        <addressing>Direct</addressing>
+        <name>West / NW</name>
+        <listenToMemory>no</listenToMemory>
+      </namedBean>
+      <is_isNot>Is</is_isNot>
+      <state>
+        <addressing>Direct</addressing>
+        <enum>Active</enum>
+        <listenToMemory>no</listenToMemory>
+      </state>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalExpressionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalExpressionSocketXml" DefaultMaleDigitalExpressionSocketListen="yes">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </ExpressionSensor>
+    <Or class="jmri.jmrit.logixng.expressions.configurexml.OrXml" type="EvaluateNeeded">
+      <systemName>IQDE:AUTO:0027</systemName>
+      <Expressions>
+        <Socket>
+          <socketName>E1</socketName>
+          <systemName>IQDE:AUTO:0028</systemName>
+        </Socket>
+        <Socket>
+          <socketName>E2</socketName>
+          <systemName>IQDE:AUTO:0029</systemName>
+        </Socket>
+        <Socket>
+          <socketName>E3</socketName>
+        </Socket>
+      </Expressions>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalExpressionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalExpressionSocketXml" DefaultMaleDigitalExpressionSocketListen="yes">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </Or>
+    <ExpressionSensor class="jmri.jmrit.logixng.expressions.configurexml.ExpressionSensorXml">
+      <systemName>IQDE:AUTO:0028</systemName>
+      <namedBean>
+        <addressing>Direct</addressing>
+        <name>West / SW</name>
+        <listenToMemory>no</listenToMemory>
+      </namedBean>
+      <is_isNot>Is</is_isNot>
+      <state>
+        <addressing>Direct</addressing>
+        <enum>Active</enum>
+        <listenToMemory>no</listenToMemory>
+      </state>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalExpressionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalExpressionSocketXml" DefaultMaleDigitalExpressionSocketListen="yes">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </ExpressionSensor>
+    <ExpressionTurnout class="jmri.jmrit.logixng.expressions.configurexml.ExpressionTurnoutXml">
+      <systemName>IQDE:AUTO:0029</systemName>
+      <namedBean>
+        <addressing>Direct</addressing>
+        <name>Staging SW Turnout 500</name>
+        <listenToMemory>no</listenToMemory>
+      </namedBean>
+      <is_isNot>Is</is_isNot>
+      <stateAddressing>Direct</stateAddressing>
+      <turnoutState>Thrown</turnoutState>
+      <stateReference />
+      <stateLocalVariable />
+      <stateFormula />
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalExpressionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalExpressionSocketXml" DefaultMaleDigitalExpressionSocketListen="yes">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </ExpressionTurnout>
+    <Or class="jmri.jmrit.logixng.expressions.configurexml.OrXml" type="EvaluateNeeded">
+      <systemName>IQDE:AUTO:0030</systemName>
+      <Expressions>
+        <Socket>
+          <socketName>E1</socketName>
+          <systemName>IQDE:AUTO:0031</systemName>
+        </Socket>
+        <Socket>
+          <socketName>E2</socketName>
+          <systemName>IQDE:AUTO:0032</systemName>
+        </Socket>
+        <Socket>
+          <socketName>E3</socketName>
+        </Socket>
+      </Expressions>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalExpressionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalExpressionSocketXml" DefaultMaleDigitalExpressionSocketListen="yes">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </Or>
+    <ExpressionSensor class="jmri.jmrit.logixng.expressions.configurexml.ExpressionSensorXml">
+      <systemName>IQDE:AUTO:0031</systemName>
+      <namedBean>
+        <addressing>Direct</addressing>
+        <name>South Zone 2</name>
+        <listenToMemory>no</listenToMemory>
+      </namedBean>
+      <is_isNot>Is</is_isNot>
+      <state>
+        <addressing>Direct</addressing>
+        <enum>Active</enum>
+        <listenToMemory>no</listenToMemory>
+      </state>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalExpressionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalExpressionSocketXml" DefaultMaleDigitalExpressionSocketListen="yes">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </ExpressionSensor>
+    <ExpressionTurnout class="jmri.jmrit.logixng.expressions.configurexml.ExpressionTurnoutXml">
+      <systemName>IQDE:AUTO:0032</systemName>
+      <namedBean>
+        <addressing>Direct</addressing>
+        <name>South Turnout 106</name>
+        <listenToMemory>no</listenToMemory>
+      </namedBean>
+      <is_isNot>Is</is_isNot>
+      <stateAddressing>Direct</stateAddressing>
+      <turnoutState>Thrown</turnoutState>
+      <stateReference />
+      <stateLocalVariable />
+      <stateFormula />
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalExpressionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalExpressionSocketXml" DefaultMaleDigitalExpressionSocketListen="yes">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </ExpressionTurnout>
+    <Or class="jmri.jmrit.logixng.expressions.configurexml.OrXml" type="EvaluateNeeded">
+      <systemName>IQDE:AUTO:0033</systemName>
+      <Expressions>
+        <Socket>
+          <socketName>E1</socketName>
+          <systemName>IQDE:AUTO:0034</systemName>
+        </Socket>
+        <Socket>
+          <socketName>E2</socketName>
+          <systemName>IQDE:AUTO:0037</systemName>
+        </Socket>
+        <Socket>
+          <socketName>E3</socketName>
+          <systemName>IQDE:AUTO:0036</systemName>
+        </Socket>
+        <Socket>
+          <socketName>E4</socketName>
+        </Socket>
+      </Expressions>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalExpressionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalExpressionSocketXml" DefaultMaleDigitalExpressionSocketListen="yes">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </Or>
+    <ExpressionSensor class="jmri.jmrit.logixng.expressions.configurexml.ExpressionSensorXml">
+      <systemName>IQDE:AUTO:0034</systemName>
+      <namedBean>
+        <addressing>Direct</addressing>
+        <name>South Zone 5</name>
+        <listenToMemory>no</listenToMemory>
+      </namedBean>
+      <is_isNot>Is</is_isNot>
+      <state>
+        <addressing>Direct</addressing>
+        <enum>Active</enum>
+        <listenToMemory>no</listenToMemory>
+      </state>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalExpressionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalExpressionSocketXml" DefaultMaleDigitalExpressionSocketListen="yes">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </ExpressionSensor>
+    <ExpressionTurnout class="jmri.jmrit.logixng.expressions.configurexml.ExpressionTurnoutXml">
+      <systemName>IQDE:AUTO:0036</systemName>
+      <namedBean>
+        <addressing>Direct</addressing>
+        <name>South Turnout 112</name>
+        <listenToMemory>no</listenToMemory>
+      </namedBean>
+      <is_isNot>Is</is_isNot>
+      <stateAddressing>Direct</stateAddressing>
+      <turnoutState>Thrown</turnoutState>
+      <stateReference />
+      <stateLocalVariable />
+      <stateFormula />
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalExpressionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalExpressionSocketXml" DefaultMaleDigitalExpressionSocketListen="yes">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </ExpressionTurnout>
+    <ExpressionTurnout class="jmri.jmrit.logixng.expressions.configurexml.ExpressionTurnoutXml">
+      <systemName>IQDE:AUTO:0037</systemName>
+      <namedBean>
+        <addressing>Direct</addressing>
+        <name>South Turnout 117</name>
+        <listenToMemory>no</listenToMemory>
+      </namedBean>
+      <is_isNot>Is</is_isNot>
+      <stateAddressing>Direct</stateAddressing>
+      <turnoutState>Thrown</turnoutState>
+      <stateReference />
+      <stateLocalVariable />
+      <stateFormula />
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalExpressionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalExpressionSocketXml" DefaultMaleDigitalExpressionSocketListen="yes">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </ExpressionTurnout>
   </LogixNGDigitalExpressions>
   <LogixNGDigitalActions class="jmri.jmrit.logixng.implementation.configurexml.DefaultDigitalActionManagerXml">
     <IfThenElse class="jmri.jmrit.logixng.actions.configurexml.IfThenElseXml" executeType="AlwaysExecute" evaluateType="EvaluateAll">
@@ -2722,8 +3145,410 @@
         </AbstractMaleSocket>
       </MaleSocket>
     </ActionSignalMast>
+    <IfThenElse class="jmri.jmrit.logixng.actions.configurexml.IfThenElseXml" executeType="AlwaysExecute" evaluateType="EvaluateAll">
+      <systemName>IQDA:AUTO:0016</systemName>
+      <Expressions>
+        <Socket>
+          <socketName>If</socketName>
+          <systemName>IQDE:AUTO:0019</systemName>
+        </Socket>
+      </Expressions>
+      <Actions>
+        <Socket>
+          <socketName>Then</socketName>
+          <systemName>IQDA:AUTO:0017</systemName>
+        </Socket>
+        <Socket>
+          <socketName>Else</socketName>
+          <systemName>IQDA:AUTO:0018</systemName>
+        </Socket>
+      </Actions>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalActionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalActionSocketXml">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </IfThenElse>
+    <ActionSignalMast class="jmri.jmrit.logixng.actions.configurexml.ActionSignalMastXml">
+      <systemName>IQDA:AUTO:0017</systemName>
+      <namedBean>
+        <addressing>Direct</addressing>
+        <name>S-MNT</name>
+        <listenToMemory>no</listenToMemory>
+      </namedBean>
+      <operationAddressing>Direct</operationAddressing>
+      <operationType>Aspect</operationType>
+      <operationReference />
+      <operationLocalVariable />
+      <operationFormula />
+      <aspectAddressing>Direct</aspectAddressing>
+      <aspect>Stop</aspect>
+      <aspectReference />
+      <aspectLocalVariable />
+      <aspectFormula />
+      <exampleNamedBean>
+        <addressing>Direct</addressing>
+        <listenToMemory>no</listenToMemory>
+      </exampleNamedBean>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalActionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalActionSocketXml">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </ActionSignalMast>
+    <IfThenElse class="jmri.jmrit.logixng.actions.configurexml.IfThenElseXml" executeType="AlwaysExecute" evaluateType="EvaluateAll">
+      <systemName>IQDA:AUTO:0018</systemName>
+      <Expressions>
+        <Socket>
+          <socketName>If</socketName>
+          <systemName>IQDE:AUTO:0020</systemName>
+        </Socket>
+      </Expressions>
+      <Actions>
+        <Socket>
+          <socketName>Then</socketName>
+          <systemName>IQDA:AUTO:0019</systemName>
+        </Socket>
+        <Socket>
+          <socketName>Else</socketName>
+          <systemName>IQDA:AUTO:0020</systemName>
+        </Socket>
+      </Actions>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalActionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalActionSocketXml">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </IfThenElse>
+    <ActionSignalMast class="jmri.jmrit.logixng.actions.configurexml.ActionSignalMastXml">
+      <systemName>IQDA:AUTO:0019</systemName>
+      <namedBean>
+        <addressing>Direct</addressing>
+        <name>S-MNT</name>
+        <listenToMemory>no</listenToMemory>
+      </namedBean>
+      <operationAddressing>Direct</operationAddressing>
+      <operationType>Aspect</operationType>
+      <operationReference />
+      <operationLocalVariable />
+      <operationFormula />
+      <aspectAddressing>Direct</aspectAddressing>
+      <aspect>Approach</aspect>
+      <aspectReference />
+      <aspectLocalVariable />
+      <aspectFormula />
+      <exampleNamedBean>
+        <addressing>Direct</addressing>
+        <listenToMemory>no</listenToMemory>
+      </exampleNamedBean>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalActionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalActionSocketXml">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </ActionSignalMast>
+    <ActionSignalMast class="jmri.jmrit.logixng.actions.configurexml.ActionSignalMastXml">
+      <systemName>IQDA:AUTO:0020</systemName>
+      <namedBean>
+        <addressing>Direct</addressing>
+        <name>S-MNT</name>
+        <listenToMemory>no</listenToMemory>
+      </namedBean>
+      <operationAddressing>Direct</operationAddressing>
+      <operationType>Aspect</operationType>
+      <operationReference />
+      <operationLocalVariable />
+      <operationFormula />
+      <aspectAddressing>Direct</aspectAddressing>
+      <aspect>Clear</aspect>
+      <aspectReference />
+      <aspectLocalVariable />
+      <aspectFormula />
+      <exampleNamedBean>
+        <addressing>Direct</addressing>
+        <listenToMemory>no</listenToMemory>
+      </exampleNamedBean>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalActionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalActionSocketXml">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </ActionSignalMast>
+    <IfThenElse class="jmri.jmrit.logixng.actions.configurexml.IfThenElseXml" executeType="AlwaysExecute" evaluateType="EvaluateAll">
+      <systemName>IQDA:AUTO:0021</systemName>
+      <Expressions>
+        <Socket>
+          <socketName>If</socketName>
+          <systemName>IQDE:AUTO:0022</systemName>
+        </Socket>
+      </Expressions>
+      <Actions>
+        <Socket>
+          <socketName>Then</socketName>
+          <systemName>IQDA:AUTO:0022</systemName>
+        </Socket>
+        <Socket>
+          <socketName>Else</socketName>
+          <systemName>IQDA:AUTO:0023</systemName>
+        </Socket>
+      </Actions>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalActionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalActionSocketXml">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </IfThenElse>
+    <ActionSignalMast class="jmri.jmrit.logixng.actions.configurexml.ActionSignalMastXml">
+      <systemName>IQDA:AUTO:0022</systemName>
+      <namedBean>
+        <addressing>Direct</addressing>
+        <name>West-NW</name>
+        <listenToMemory>no</listenToMemory>
+      </namedBean>
+      <operationAddressing>Direct</operationAddressing>
+      <operationType>Aspect</operationType>
+      <operationReference />
+      <operationLocalVariable />
+      <operationFormula />
+      <aspectAddressing>Direct</aspectAddressing>
+      <aspect>Stop</aspect>
+      <aspectReference />
+      <aspectLocalVariable />
+      <aspectFormula />
+      <exampleNamedBean>
+        <addressing>Direct</addressing>
+        <listenToMemory>no</listenToMemory>
+      </exampleNamedBean>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalActionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalActionSocketXml">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </ActionSignalMast>
+    <IfThenElse class="jmri.jmrit.logixng.actions.configurexml.IfThenElseXml" executeType="AlwaysExecute" evaluateType="EvaluateAll">
+      <systemName>IQDA:AUTO:0023</systemName>
+      <Expressions>
+        <Socket>
+          <socketName>If</socketName>
+          <systemName>IQDE:AUTO:0027</systemName>
+        </Socket>
+      </Expressions>
+      <Actions>
+        <Socket>
+          <socketName>Then</socketName>
+          <systemName>IQDA:AUTO:0024</systemName>
+        </Socket>
+        <Socket>
+          <socketName>Else</socketName>
+          <systemName>IQDA:AUTO:0025</systemName>
+        </Socket>
+      </Actions>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalActionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalActionSocketXml">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </IfThenElse>
+    <ActionSignalMast class="jmri.jmrit.logixng.actions.configurexml.ActionSignalMastXml">
+      <systemName>IQDA:AUTO:0024</systemName>
+      <namedBean>
+        <addressing>Direct</addressing>
+        <name>West-NW</name>
+        <listenToMemory>no</listenToMemory>
+      </namedBean>
+      <operationAddressing>Direct</operationAddressing>
+      <operationType>Aspect</operationType>
+      <operationReference />
+      <operationLocalVariable />
+      <operationFormula />
+      <aspectAddressing>Direct</aspectAddressing>
+      <aspect>Approach</aspect>
+      <aspectReference />
+      <aspectLocalVariable />
+      <aspectFormula />
+      <exampleNamedBean>
+        <addressing>Direct</addressing>
+        <listenToMemory>no</listenToMemory>
+      </exampleNamedBean>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalActionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalActionSocketXml">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </ActionSignalMast>
+    <ActionSignalMast class="jmri.jmrit.logixng.actions.configurexml.ActionSignalMastXml">
+      <systemName>IQDA:AUTO:0025</systemName>
+      <namedBean>
+        <addressing>Direct</addressing>
+        <name>West-NW</name>
+        <listenToMemory>no</listenToMemory>
+      </namedBean>
+      <operationAddressing>Direct</operationAddressing>
+      <operationType>Aspect</operationType>
+      <operationReference />
+      <operationLocalVariable />
+      <operationFormula />
+      <aspectAddressing>Direct</aspectAddressing>
+      <aspect>Clear</aspect>
+      <aspectReference />
+      <aspectLocalVariable />
+      <aspectFormula />
+      <exampleNamedBean>
+        <addressing>Direct</addressing>
+        <listenToMemory>no</listenToMemory>
+      </exampleNamedBean>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalActionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalActionSocketXml">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </ActionSignalMast>
+    <IfThenElse class="jmri.jmrit.logixng.actions.configurexml.IfThenElseXml" executeType="AlwaysExecute" evaluateType="EvaluateAll">
+      <systemName>IQDA:AUTO:0026</systemName>
+      <Expressions>
+        <Socket>
+          <socketName>If</socketName>
+          <systemName>IQDE:AUTO:0030</systemName>
+        </Socket>
+      </Expressions>
+      <Actions>
+        <Socket>
+          <socketName>Then</socketName>
+          <systemName>IQDA:AUTO:0027</systemName>
+        </Socket>
+        <Socket>
+          <socketName>Else</socketName>
+          <systemName>IQDA:AUTO:0028</systemName>
+        </Socket>
+      </Actions>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalActionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalActionSocketXml">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </IfThenElse>
+    <ActionSignalMast class="jmri.jmrit.logixng.actions.configurexml.ActionSignalMastXml">
+      <systemName>IQDA:AUTO:0027</systemName>
+      <namedBean>
+        <addressing>Direct</addressing>
+        <name>SZ2</name>
+        <listenToMemory>no</listenToMemory>
+      </namedBean>
+      <operationAddressing>Direct</operationAddressing>
+      <operationType>Aspect</operationType>
+      <operationReference />
+      <operationLocalVariable />
+      <operationFormula />
+      <aspectAddressing>Direct</aspectAddressing>
+      <aspect>Stop</aspect>
+      <aspectReference />
+      <aspectLocalVariable />
+      <aspectFormula />
+      <exampleNamedBean>
+        <addressing>Direct</addressing>
+        <listenToMemory>no</listenToMemory>
+      </exampleNamedBean>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalActionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalActionSocketXml">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </ActionSignalMast>
+    <IfThenElse class="jmri.jmrit.logixng.actions.configurexml.IfThenElseXml" executeType="AlwaysExecute" evaluateType="EvaluateAll">
+      <systemName>IQDA:AUTO:0028</systemName>
+      <Expressions>
+        <Socket>
+          <socketName>If</socketName>
+          <systemName>IQDE:AUTO:0033</systemName>
+        </Socket>
+      </Expressions>
+      <Actions>
+        <Socket>
+          <socketName>Then</socketName>
+          <systemName>IQDA:AUTO:0029</systemName>
+        </Socket>
+        <Socket>
+          <socketName>Else</socketName>
+          <systemName>IQDA:AUTO:0030</systemName>
+        </Socket>
+      </Actions>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalActionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalActionSocketXml">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </IfThenElse>
+    <ActionSignalMast class="jmri.jmrit.logixng.actions.configurexml.ActionSignalMastXml">
+      <systemName>IQDA:AUTO:0029</systemName>
+      <namedBean>
+        <addressing>Direct</addressing>
+        <name>SZ2</name>
+        <listenToMemory>no</listenToMemory>
+      </namedBean>
+      <operationAddressing>Direct</operationAddressing>
+      <operationType>Aspect</operationType>
+      <operationReference />
+      <operationLocalVariable />
+      <operationFormula />
+      <aspectAddressing>Direct</aspectAddressing>
+      <aspect>Approach</aspect>
+      <aspectReference />
+      <aspectLocalVariable />
+      <aspectFormula />
+      <exampleNamedBean>
+        <addressing>Direct</addressing>
+        <listenToMemory>no</listenToMemory>
+      </exampleNamedBean>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalActionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalActionSocketXml">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </ActionSignalMast>
+    <ActionSignalMast class="jmri.jmrit.logixng.actions.configurexml.ActionSignalMastXml">
+      <systemName>IQDA:AUTO:0030</systemName>
+      <namedBean>
+        <addressing>Direct</addressing>
+        <name>SZ2</name>
+        <listenToMemory>no</listenToMemory>
+      </namedBean>
+      <operationAddressing>Direct</operationAddressing>
+      <operationType>Aspect</operationType>
+      <operationReference />
+      <operationLocalVariable />
+      <operationFormula />
+      <aspectAddressing>Direct</aspectAddressing>
+      <aspect>Clear</aspect>
+      <aspectReference />
+      <aspectLocalVariable />
+      <aspectFormula />
+      <exampleNamedBean>
+        <addressing>Direct</addressing>
+        <listenToMemory>no</listenToMemory>
+      </exampleNamedBean>
+      <MaleSocket>
+        <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalActionSocketXml" />
+        <AbstractMaleSocket enabled="yes" locked="no" system="no" catchAbortExecution="no" class="jmri.jmrit.logixng.implementation.configurexml.DefaultMaleDigitalActionSocketXml">
+          <errorHandling>Default</errorHandling>
+        </AbstractMaleSocket>
+      </MaleSocket>
+    </ActionSignalMast>
   </LogixNGDigitalActions>
-  <LayoutEditor class="jmri.jmrit.display.layoutEditor.configurexml.LayoutEditorXml" name="Mike Dean's Basement Layout" x="45" y="25" windowheight="875" windowwidth="1390" panelheight="1740" panelwidth="1439" sliders="yes" scrollable="both" editable="no" positionable="yes" controlling="yes" animating="yes" showhelpbar="no" drawgrid="no" snaponadd="no" snaponmove="no" antialiasing="yes" turnoutcircles="yes" tooltipsnotedit="yes" tooltipsinedit="yes" mainlinetrackwidth="4" xscale="1.0" yscale="1.0" sidetrackwidth="2" defaulttrackcolor="black" defaultoccupiedtrackcolor="red" defaultalternativetrackcolor="cyan" defaulttextcolor="black" turnoutcirclecolor="blue" turnoutcirclethrowncolor="red" turnoutcirclesize="2" turnoutdrawunselectedleg="no" turnoutbx="20.0" turnoutcx="20.0" turnoutwid="10.0" xoverlong="30.0" xoverhwid="10.0" xovershort="10.0" autoblkgenerate="no" gridSize="10" gridSize2nd="10" openDispatcher="no" useDirectTurnoutControl="no">
+  <LayoutEditor class="jmri.jmrit.display.layoutEditor.configurexml.LayoutEditorXml" name="Mike Dean's Basement Layout" x="83" y="87" windowheight="1302" windowwidth="1484" panelheight="1740" panelwidth="1439" sliders="yes" scrollable="both" editable="yes" positionable="yes" controlling="yes" animating="yes" showhelpbar="no" drawgrid="no" snaponadd="no" snaponmove="no" antialiasing="yes" turnoutcircles="yes" tooltipsnotedit="yes" tooltipsinedit="yes" mainlinetrackwidth="4" xscale="1.0" yscale="1.0" sidetrackwidth="2" defaulttrackcolor="black" defaultoccupiedtrackcolor="red" defaultalternativetrackcolor="cyan" defaulttextcolor="black" turnoutcirclecolor="blue" turnoutcirclethrowncolor="red" turnoutcirclesize="2" turnoutdrawunselectedleg="no" turnoutbx="20.0" turnoutcx="20.0" turnoutwid="10.0" xoverlong="30.0" xoverhwid="10.0" xovershort="10.0" autoblkgenerate="no" gridSize="10" gridSize2nd="10" openDispatcher="no" useDirectTurnoutControl="no">
     <layoutTrackDrawingOptions name="Mike Dean's Basement Layout" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutTrackDrawingOptionsXml">
       <mainBallastColor>#000000</mainBallastColor>
       <mainBallastWidth>0</mainBallastWidth>
@@ -2750,42 +3575,42 @@
       <sideTieLength>0</sideTieLength>
       <sideTieWidth>0</sideTieWidth>
     </layoutTrackDrawingOptions>
-    <positionablelabel x="73" y="898" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" text="NT400" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="72" y="826" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" text="NT401" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="95" y="752" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" text="NT402" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="130" y="830" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" text="NT403" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="110" y="696" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" text="NT404" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="126" y="636" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" text="NT405" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="141" y="571" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" text="NT406" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="181" y="545" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" text="NT407" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="73" y="1096" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" text="NT500" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="136" y="1434" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" text="NT504" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="97" y="1396" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" text="NT503" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="80" y="1327" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" text="NT502" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="59" y="1265" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" text="NT501" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="754" y="556" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="90" text="NT301" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="810" y="635" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="90" text="NT302" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="1027" y="843" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="90" text="NT303" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="1028" y="911" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="90" text="NT304" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="872" y="972" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="90" text="NT305" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="795" y="1144" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="180" text="NT306" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="691" y="1147" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="180" text="NT307" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="747" y="1046" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="90" text="NT308" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="587" y="1047" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="90" text="NT309" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="1169" y="1126" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" text="NT201" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="1094" y="1109" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" text="NT202" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="1146" y="1003" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" text="NT203" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="1132" y="919" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" text="NT204" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="1080" y="900" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" text="NT205" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="1080" y="813" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" text="NT206" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="1132" y="824" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" text="NT207" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="1148" y="716" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" text="NT208" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="1171" y="598" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" text="NT209" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="1111" y="726" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" text="NT210" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="1104" y="610" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" text="NT211" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="64" y="492" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" text="Northwest Staging" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="50" y="1425" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" text="Southwest Staging" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <sensoricon sensor="Reset" x="252" y="533" level="10" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" momentary="true" icon="no" text="Reset Turnouts" size="20" style="0" red="255" green="255" blue="0" hasBackground="yes" redBack="128" greenBack="128" blueBack="128" borderSize="3" redBorder="255" greenBorder="255" blueBorder="255" justification="centre" class="jmri.jmrit.display.configurexml.SensorIconXml">
+    <positionablelabel x="73" y="898" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" text="NT400" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="72" y="826" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" text="NT401" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="95" y="752" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" text="NT402" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="130" y="830" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" text="NT403" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="110" y="696" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" text="NT404" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="126" y="636" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" text="NT405" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="141" y="571" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" text="NT406" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="181" y="545" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" text="NT407" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="73" y="1096" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" text="NT500" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="136" y="1434" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" text="NT504" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="97" y="1396" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" text="NT503" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="80" y="1327" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" text="NT502" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="59" y="1265" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" text="NT501" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="754" y="556" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="90" text="NT301" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="810" y="635" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="90" text="NT302" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="1027" y="843" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="90" text="NT303" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="1028" y="911" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="90" text="NT304" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="872" y="972" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="90" text="NT305" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="795" y="1144" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="180" text="NT306" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="691" y="1147" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="180" text="NT307" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="747" y="1046" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="90" text="NT308" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="587" y="1047" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="90" text="NT309" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="1169" y="1126" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" text="NT201" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="1094" y="1109" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" text="NT202" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="1146" y="1003" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" text="NT203" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="1132" y="919" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" text="NT204" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="1080" y="900" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" text="NT205" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="1080" y="813" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" text="NT206" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="1132" y="824" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" text="NT207" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="1148" y="716" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" text="NT208" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="1171" y="598" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" text="NT209" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="1111" y="726" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" text="NT210" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="1104" y="610" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" text="NT211" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="64" y="492" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" text="Northwest Staging" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="50" y="1425" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" text="Southwest Staging" size="13" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <sensoricon sensor="Reset" x="252" y="533" level="10" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" momentary="true" icon="no" text="Reset Turnouts" size="20" style="0" red="255" green="255" blue="0" hasBackground="yes" redBack="128" greenBack="128" blueBack="128" borderSize="3" redBorder="255" greenBorder="255" blueBorder="255" justification="centre" class="jmri.jmrit.display.configurexml.SensorIconXml">
       <active url="program:resources/icons/smallschematics/tracksegments/circuit-occupied.gif" degrees="270" scale="1.0">
         <rotation>0</rotation>
       </active>
@@ -2804,7 +3629,7 @@
       <unknownText text="Reset All Turnouts" red="255" green="255" blue="0" redBack="128" greenBack="128" blueBack="128" />
       <inconsistentText text="Reset All Turnouts" red="255" green="255" blue="0" redBack="128" greenBack="128" blueBack="128" />
     </sensoricon>
-    <sensoricon sensor="NW Staging Track 1" x="222" y="296" level="10" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" momentary="true" icon="no" text="NW Staging Track 1" size="20" style="0" red="255" green="255" blue="0" hasBackground="yes" redBack="128" greenBack="128" blueBack="128" justification="centre" class="jmri.jmrit.display.configurexml.SensorIconXml">
+    <sensoricon sensor="NW Staging Track 1" x="222" y="296" level="10" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" momentary="true" icon="no" text="NW Staging Track 1" size="20" style="0" red="255" green="255" blue="0" hasBackground="yes" redBack="128" greenBack="128" blueBack="128" justification="centre" class="jmri.jmrit.display.configurexml.SensorIconXml">
       <active url="program:resources/icons/smallschematics/tracksegments/circuit-occupied.gif" degrees="270" scale="1.0">
         <rotation>0</rotation>
       </active>
@@ -2823,7 +3648,7 @@
       <unknownText text="NW Staging Track 1" red="255" green="255" blue="0" redBack="128" greenBack="128" blueBack="128" />
       <inconsistentText text="NW Staging Track 1" red="255" green="255" blue="0" redBack="128" greenBack="128" blueBack="128" />
     </sensoricon>
-    <sensoricon sensor="NW Staging Track 2" x="250" y="296" level="10" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" momentary="true" icon="no" text="NW Staging Track 2" size="20" style="0" red="255" green="255" blue="0" hasBackground="yes" redBack="128" greenBack="128" blueBack="128" justification="centre" class="jmri.jmrit.display.configurexml.SensorIconXml">
+    <sensoricon sensor="NW Staging Track 2" x="250" y="296" level="10" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" momentary="true" icon="no" text="NW Staging Track 2" size="20" style="0" red="255" green="255" blue="0" hasBackground="yes" redBack="128" greenBack="128" blueBack="128" justification="centre" class="jmri.jmrit.display.configurexml.SensorIconXml">
       <active url="program:resources/icons/smallschematics/tracksegments/circuit-occupied.gif" degrees="270" scale="1.0">
         <rotation>0</rotation>
       </active>
@@ -2842,7 +3667,7 @@
       <unknownText text="NW Staging Track 2" red="255" green="255" blue="0" redBack="128" greenBack="128" blueBack="128" />
       <inconsistentText text="NW Staging Track 2" red="255" green="255" blue="0" redBack="128" greenBack="128" blueBack="128" />
     </sensoricon>
-    <sensoricon sensor="NW Staging Track 3" x="281" y="297" level="10" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" momentary="true" icon="no" text="NW Staging Track 3" size="20" style="0" red="255" green="255" blue="0" hasBackground="yes" redBack="128" greenBack="128" blueBack="128" justification="centre" class="jmri.jmrit.display.configurexml.SensorIconXml">
+    <sensoricon sensor="NW Staging Track 3" x="281" y="297" level="10" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" momentary="true" icon="no" text="NW Staging Track 3" size="20" style="0" red="255" green="255" blue="0" hasBackground="yes" redBack="128" greenBack="128" blueBack="128" justification="centre" class="jmri.jmrit.display.configurexml.SensorIconXml">
       <active url="program:resources/icons/smallschematics/tracksegments/circuit-occupied.gif" degrees="270" scale="1.0">
         <rotation>0</rotation>
       </active>
@@ -2861,7 +3686,7 @@
       <unknownText text="NW Staging Track 3" red="255" green="255" blue="0" redBack="128" greenBack="128" blueBack="128" />
       <inconsistentText text="NW Staging Track 3" red="255" green="255" blue="0" redBack="128" greenBack="128" blueBack="128" />
     </sensoricon>
-    <sensoricon sensor="NW Staging Track 4" x="311" y="298" level="10" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" momentary="true" icon="no" text="NW Staging Track 4" size="20" style="0" red="255" green="255" blue="0" hasBackground="yes" redBack="128" greenBack="128" blueBack="128" justification="centre" class="jmri.jmrit.display.configurexml.SensorIconXml">
+    <sensoricon sensor="NW Staging Track 4" x="311" y="298" level="10" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" momentary="true" icon="no" text="NW Staging Track 4" size="20" style="0" red="255" green="255" blue="0" hasBackground="yes" redBack="128" greenBack="128" blueBack="128" justification="centre" class="jmri.jmrit.display.configurexml.SensorIconXml">
       <active url="program:resources/icons/smallschematics/tracksegments/circuit-occupied.gif" degrees="270" scale="1.0">
         <rotation>0</rotation>
       </active>
@@ -2880,7 +3705,7 @@
       <unknownText text="NW Staging Track 4" red="255" green="255" blue="0" redBack="128" greenBack="128" blueBack="128" />
       <inconsistentText text="NW Staging Track 4" red="255" green="255" blue="0" redBack="128" greenBack="128" blueBack="128" />
     </sensoricon>
-    <sensoricon sensor="NW Staging Track 5" x="341" y="298" level="10" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" momentary="true" icon="no" text="NW Staging Track 5" size="20" style="0" red="255" green="255" blue="0" hasBackground="yes" redBack="128" greenBack="128" blueBack="128" justification="centre" class="jmri.jmrit.display.configurexml.SensorIconXml">
+    <sensoricon sensor="NW Staging Track 5" x="341" y="298" level="10" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" momentary="true" icon="no" text="NW Staging Track 5" size="20" style="0" red="255" green="255" blue="0" hasBackground="yes" redBack="128" greenBack="128" blueBack="128" justification="centre" class="jmri.jmrit.display.configurexml.SensorIconXml">
       <active url="program:resources/icons/smallschematics/tracksegments/circuit-occupied.gif" degrees="270" scale="1.0">
         <rotation>0</rotation>
       </active>
@@ -2899,7 +3724,7 @@
       <unknownText text="NW Staging Track 5" red="255" green="255" blue="0" redBack="128" greenBack="128" blueBack="128" />
       <inconsistentText text="NW Staging Track 5" red="255" green="255" blue="0" redBack="128" greenBack="128" blueBack="128" />
     </sensoricon>
-    <sensoricon sensor="NW Staging Track 6" x="372" y="300" level="10" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" momentary="true" icon="no" text="NW Staging Track 6" size="20" style="0" red="255" green="255" blue="0" hasBackground="yes" redBack="128" greenBack="128" blueBack="128" justification="centre" class="jmri.jmrit.display.configurexml.SensorIconXml">
+    <sensoricon sensor="NW Staging Track 6" x="372" y="300" level="10" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" momentary="true" icon="no" text="NW Staging Track 6" size="20" style="0" red="255" green="255" blue="0" hasBackground="yes" redBack="128" greenBack="128" blueBack="128" justification="centre" class="jmri.jmrit.display.configurexml.SensorIconXml">
       <active url="program:resources/icons/smallschematics/tracksegments/circuit-occupied.gif" degrees="270" scale="1.0">
         <rotation>0</rotation>
       </active>
@@ -2918,7 +3743,7 @@
       <unknownText text="NW Staging Track 6" red="255" green="255" blue="0" redBack="128" greenBack="128" blueBack="128" />
       <inconsistentText text="NW Staging Track 6" red="255" green="255" blue="0" redBack="128" greenBack="128" blueBack="128" />
     </sensoricon>
-    <sensoricon sensor="NW Bypass Track" x="283" y="88" level="10" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" momentary="true" icon="no" text="NW Bypass Track" size="20" style="0" red="255" green="255" blue="0" hasBackground="yes" redBack="128" greenBack="128" blueBack="128" justification="centre" class="jmri.jmrit.display.configurexml.SensorIconXml">
+    <sensoricon sensor="NW Bypass Track" x="283" y="88" level="10" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" momentary="true" icon="no" text="NW Bypass Track" size="20" style="0" red="255" green="255" blue="0" hasBackground="yes" redBack="128" greenBack="128" blueBack="128" justification="centre" class="jmri.jmrit.display.configurexml.SensorIconXml">
       <active url="program:resources/icons/smallschematics/tracksegments/circuit-occupied.gif" degrees="270" scale="1.0">
         <rotation>0</rotation>
       </active>
@@ -2937,7 +3762,7 @@
       <unknownText text="NW Bypass Track" red="255" green="255" blue="0" redBack="128" greenBack="128" blueBack="128" />
       <inconsistentText text="NW Bypass Track" red="255" green="255" blue="0" redBack="128" greenBack="128" blueBack="128" />
     </sensoricon>
-    <sensoricon sensor="NW Staging Close" x="317" y="86" level="10" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" momentary="true" icon="no" text="NW Staging Close" size="20" style="0" red="255" green="255" blue="0" hasBackground="yes" redBack="128" greenBack="128" blueBack="128" justification="centre" class="jmri.jmrit.display.configurexml.SensorIconXml">
+    <sensoricon sensor="NW Staging Close" x="317" y="86" level="10" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" momentary="true" icon="no" text="NW Staging Close" size="20" style="0" red="255" green="255" blue="0" hasBackground="yes" redBack="128" greenBack="128" blueBack="128" justification="centre" class="jmri.jmrit.display.configurexml.SensorIconXml">
       <active url="program:resources/icons/smallschematics/tracksegments/circuit-occupied.gif" degrees="270" scale="1.0">
         <rotation>0</rotation>
       </active>
@@ -2956,7 +3781,7 @@
       <unknownText text="NW Staging Close" red="255" green="255" blue="0" redBack="128" greenBack="128" blueBack="128" />
       <inconsistentText text="NW Staging Close" red="255" green="255" blue="0" redBack="128" greenBack="128" blueBack="128" />
     </sensoricon>
-    <sensoricon sensor="SW Staging Close" x="316" y="1473" level="10" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" momentary="true" icon="no" text="SW Staging Close" size="20" style="0" red="255" green="255" blue="0" hasBackground="yes" redBack="128" greenBack="128" blueBack="128" justification="centre" class="jmri.jmrit.display.configurexml.SensorIconXml">
+    <sensoricon sensor="SW Staging Close" x="316" y="1473" level="10" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" momentary="true" icon="no" text="SW Staging Close" size="20" style="0" red="255" green="255" blue="0" hasBackground="yes" redBack="128" greenBack="128" blueBack="128" justification="centre" class="jmri.jmrit.display.configurexml.SensorIconXml">
       <active url="program:resources/icons/smallschematics/tracksegments/circuit-occupied.gif" degrees="270" scale="1.0">
         <rotation>0</rotation>
       </active>
@@ -2975,7 +3800,7 @@
       <unknownText text="SW Staging Close" red="255" green="255" blue="0" redBack="128" greenBack="128" blueBack="128" />
       <inconsistentText text="SW Staging Close" red="255" green="255" blue="0" redBack="128" greenBack="128" blueBack="128" />
     </sensoricon>
-    <sensoricon sensor="SW Staging Track 1" x="179" y="1448" level="10" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" momentary="true" icon="no" text="SW Staging Track 1" size="20" style="0" red="255" green="255" blue="0" hasBackground="yes" redBack="128" greenBack="128" blueBack="128" justification="centre" class="jmri.jmrit.display.configurexml.SensorIconXml">
+    <sensoricon sensor="SW Staging Track 1" x="179" y="1448" level="10" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" momentary="true" icon="no" text="SW Staging Track 1" size="20" style="0" red="255" green="255" blue="0" hasBackground="yes" redBack="128" greenBack="128" blueBack="128" justification="centre" class="jmri.jmrit.display.configurexml.SensorIconXml">
       <active url="program:resources/icons/smallschematics/tracksegments/circuit-occupied.gif" degrees="270" scale="1.0">
         <rotation>0</rotation>
       </active>
@@ -2994,7 +3819,7 @@
       <unknownText text="SW Staging Track 1" red="255" green="255" blue="0" redBack="128" greenBack="128" blueBack="128" />
       <inconsistentText text="SW Staging Track 1" red="255" green="255" blue="0" redBack="128" greenBack="128" blueBack="128" />
     </sensoricon>
-    <sensoricon sensor="SW Staging Track 2" x="210" y="1450" level="10" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" momentary="true" icon="no" text="SW Staging Track 2" size="20" style="0" red="255" green="255" blue="0" hasBackground="yes" redBack="128" greenBack="128" blueBack="128" justification="centre" class="jmri.jmrit.display.configurexml.SensorIconXml">
+    <sensoricon sensor="SW Staging Track 2" x="210" y="1450" level="10" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" momentary="true" icon="no" text="SW Staging Track 2" size="20" style="0" red="255" green="255" blue="0" hasBackground="yes" redBack="128" greenBack="128" blueBack="128" justification="centre" class="jmri.jmrit.display.configurexml.SensorIconXml">
       <active url="program:resources/icons/smallschematics/tracksegments/circuit-occupied.gif" degrees="270" scale="1.0">
         <rotation>0</rotation>
       </active>
@@ -3013,7 +3838,7 @@
       <unknownText text="SW Staging Track 2" red="255" green="255" blue="0" redBack="128" greenBack="128" blueBack="128" />
       <inconsistentText text="SW Staging Track 2" red="255" green="255" blue="0" redBack="128" greenBack="128" blueBack="128" />
     </sensoricon>
-    <sensoricon sensor="SW Staging Track 3" x="240" y="1449" level="10" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" momentary="true" icon="no" text="SW Staging Track 3" size="20" style="0" red="255" green="255" blue="0" hasBackground="yes" redBack="128" greenBack="128" blueBack="128" justification="centre" class="jmri.jmrit.display.configurexml.SensorIconXml">
+    <sensoricon sensor="SW Staging Track 3" x="240" y="1449" level="10" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" momentary="true" icon="no" text="SW Staging Track 3" size="20" style="0" red="255" green="255" blue="0" hasBackground="yes" redBack="128" greenBack="128" blueBack="128" justification="centre" class="jmri.jmrit.display.configurexml.SensorIconXml">
       <active url="program:resources/icons/smallschematics/tracksegments/circuit-occupied.gif" degrees="270" scale="1.0">
         <rotation>0</rotation>
       </active>
@@ -3032,7 +3857,7 @@
       <unknownText text="SW Staging Track 3" red="255" green="255" blue="0" redBack="128" greenBack="128" blueBack="128" />
       <inconsistentText text="SW Staging Track 3" red="255" green="255" blue="0" redBack="128" greenBack="128" blueBack="128" />
     </sensoricon>
-    <sensoricon sensor="SW Staging Track 4" x="270" y="1450" level="10" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" degrees="270" momentary="true" icon="no" text="SW Staging Track 4" size="20" style="0" red="255" green="255" blue="0" hasBackground="yes" redBack="128" greenBack="128" blueBack="128" justification="centre" class="jmri.jmrit.display.configurexml.SensorIconXml">
+    <sensoricon sensor="SW Staging Track 4" x="270" y="1450" level="10" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" degrees="270" momentary="true" icon="no" text="SW Staging Track 4" size="20" style="0" red="255" green="255" blue="0" hasBackground="yes" redBack="128" greenBack="128" blueBack="128" justification="centre" class="jmri.jmrit.display.configurexml.SensorIconXml">
       <active url="program:resources/icons/smallschematics/tracksegments/circuit-occupied.gif" degrees="270" scale="1.0">
         <rotation>0</rotation>
       </active>
@@ -3051,26 +3876,29 @@
       <unknownText text="SW Staging Track 4" red="255" green="255" blue="0" redBack="128" greenBack="128" blueBack="128" />
       <inconsistentText text="SW Staging Track 4" red="255" green="255" blue="0" redBack="128" greenBack="128" blueBack="128" />
     </sensoricon>
-    <positionablelabel x="312" y="1315" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" text="NT100" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="467" y="1311" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" text="NT105" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="510" y="1262" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" text="NT106" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="803" y="1258" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" text="NT115" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="857" y="1310" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" text="NT116" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="991" y="1311" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" text="NT118" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="961" y="1278" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" text="NT117" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="356" y="1147" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" text="NT101" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="399" y="1178" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" text="NT102" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="394" y="1222" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" text="NT103" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="479" y="1243" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" text="NT104" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="481" y="1201" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" text="NT107" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="644" y="1201" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" text="NT108" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="599" y="1279" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" text="NT109" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="638" y="1244" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" text="NT110" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="685" y="1244" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" text="NT111" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="721" y="1280" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" text="NT112" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="780" y="1243" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" text="NT113" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <positionablelabel x="837" y="1222" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" text="NT114" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
-    <signalmasticon signalmast="West-SW" x="245" y="1319" level="9" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="false" clickmode="0" litmode="false" degrees="0" scale="1.0" imageset="default" class="jmri.jmrit.display.configurexml.SignalMastIconXml" />
+    <positionablelabel x="312" y="1315" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT100" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="467" y="1311" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT105" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="510" y="1262" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT106" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="803" y="1258" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT115" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="857" y="1310" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT116" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="991" y="1311" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT118" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="961" y="1278" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT117" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="356" y="1147" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT101" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="399" y="1178" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT102" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="394" y="1222" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT103" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="479" y="1243" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT104" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="481" y="1201" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT107" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="644" y="1201" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT108" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="599" y="1279" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT109" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="638" y="1244" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT110" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="685" y="1244" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT111" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="721" y="1280" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT112" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="780" y="1243" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT113" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <positionablelabel x="837" y="1222" level="4" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" text="NT114" size="8" style="0" red="0" green="0" blue="0" hasBackground="no" justification="centre" class="jmri.jmrit.display.configurexml.PositionableLabelXml" />
+    <signalmasticon signalmast="West-SW" x="245" y="1319" level="9" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" clickmode="0" litmode="false" degrees="0" scale="1.0" imageset="default" class="jmri.jmrit.display.configurexml.SignalMastIconXml" />
+    <signalmasticon signalmast="S-MNT" x="412" y="1247" level="9" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" clickmode="0" litmode="false" degrees="0" scale="1.0" imageset="default" class="jmri.jmrit.display.configurexml.SignalMastIconXml" />
+    <signalmasticon signalmast="West-NW" x="573" y="1063" level="9" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" clickmode="0" litmode="false" degrees="0" scale="1.0" imageset="default" class="jmri.jmrit.display.configurexml.SignalMastIconXml" />
+    <signalmasticon signalmast="SZ2" x="390" y="1059" level="9" forcecontroloff="false" hidden="no" positionable="true" showtooltip="true" editable="true" clickmode="0" litmode="false" degrees="0" scale="1.0" imageset="default" class="jmri.jmrit.display.configurexml.SignalMastIconXml" />
     <layoutturnout ident="TO1" type="LH_TURNOUT" hidden="no" disabled="no" disableWhenOccupied="no" continuing="2" xcen="316.32244873046875" ycen="1305.5797119140625" xa="286.310791015625" ya="1305.5936279296875" xb="346.3341064453125" yb="1305.5657958984375" xc="346.33038330078125" yc="1297.66357421875" xd="286.310791015625" yd="1305.5936279296875" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutLHTurnoutXml" turnoutname="South Turnout 100" blockname="SZ1" connectaname="T13" connectbname="T6" connectcname="T12" />
     <layoutturnout ident="TO2" type="LH_TURNOUT" hidden="no" disabled="no" disableWhenOccupied="no" continuing="2" xcen="1017.2344360351562" ycen="1302.2562255859375" xa="1047.24609375" ya="1301.2421875" xb="987.2227783203125" yb="1303.270263671875" xc="987.2191162109375" yc="1292.3680419921875" xd="1047.24609375" yd="1301.2421875" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutLHTurnoutXml" turnoutname="South Turnout 118" blockname="EZ1" connectaname="T9" connectbname="T6" connectcname="T48" />
     <layoutturnout ident="TO3" type="LH_TURNOUT" hidden="no" disabled="no" disableWhenOccupied="no" continuing="2" xcen="751.2760009765625" ycen="1103.26123046875" xa="722.2643432617188" ya="1102.2752685546875" xb="780.2876586914062" yb="1104.2471923828125" xc="780.283935546875" yc="1093.344970703125" xd="722.2643432617188" yd="1102.2752685546875" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutLHTurnoutXml" turnoutname="North Turnout 308" blockname="NZ8" connectaname="T106" connectbname="T19" connectcname="T103" />
@@ -3574,104 +4402,104 @@
   <filehistory>
     <operation>
       <type>app</type>
-      <date>Tue Mar 31 12:39:00 MDT 2026</date>
+      <date>Tue Mar 31 13:30:43 MDT 2026</date>
       <filename>PanelPro (v5.14.0)</filename>
     </operation>
     <operation>
       <type>Load OK</type>
-      <date>Tue Mar 31 12:39:05 MDT 2026</date>
-      <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+      <date>Tue Mar 31 13:30:50 MDT 2026</date>
+      <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
       <filehistory>
         <operation>
           <type>app</type>
-          <date>Tue Mar 31 11:11:49 MDT 2026</date>
+          <date>Tue Mar 31 12:39:00 MDT 2026</date>
           <filename>PanelPro (v5.14.0)</filename>
         </operation>
         <operation>
           <type>Load OK</type>
-          <date>Tue Mar 31 11:11:57 MDT 2026</date>
-          <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+          <date>Tue Mar 31 12:39:05 MDT 2026</date>
+          <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
           <filehistory>
             <operation>
               <type>app</type>
-              <date>Sat Mar 28 12:32:30 MDT 2026</date>
+              <date>Tue Mar 31 11:11:49 MDT 2026</date>
               <filename>PanelPro (v5.14.0)</filename>
             </operation>
             <operation>
               <type>Load OK</type>
-              <date>Sat Mar 28 12:32:35 MDT 2026</date>
-              <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+              <date>Tue Mar 31 11:11:57 MDT 2026</date>
+              <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
               <filehistory>
                 <operation>
                   <type>app</type>
-                  <date>Fri Mar 27 15:55:28 MDT 2026</date>
+                  <date>Sat Mar 28 12:32:30 MDT 2026</date>
                   <filename>PanelPro (v5.14.0)</filename>
                 </operation>
                 <operation>
                   <type>Load OK</type>
-                  <date>Fri Mar 27 15:55:36 MDT 2026</date>
-                  <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+                  <date>Sat Mar 28 12:32:35 MDT 2026</date>
+                  <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
                   <filehistory>
                     <operation>
                       <type>app</type>
-                      <date>Mon Mar 23 14:34:34 MDT 2026</date>
+                      <date>Fri Mar 27 15:55:28 MDT 2026</date>
                       <filename>PanelPro (v5.14.0)</filename>
                     </operation>
                     <operation>
                       <type>Load OK</type>
-                      <date>Mon Mar 23 14:34:42 MDT 2026</date>
+                      <date>Fri Mar 27 15:55:36 MDT 2026</date>
                       <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
                       <filehistory>
                         <operation>
                           <type>app</type>
-                          <date>Sun Mar 22 16:07:57 MDT 2026</date>
+                          <date>Mon Mar 23 14:34:34 MDT 2026</date>
                           <filename>PanelPro (v5.14.0)</filename>
                         </operation>
                         <operation>
                           <type>Load OK</type>
-                          <date>Sun Mar 22 16:08:02 MDT 2026</date>
-                          <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+                          <date>Mon Mar 23 14:34:42 MDT 2026</date>
+                          <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
                         </operation>
                         <operation>
                           <type>Store</type>
-                          <date>Sun Mar 22 16:52:46 MDT 2026</date>
-                          <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+                          <date>Mon Mar 23 15:17:57 MDT 2026</date>
+                          <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
                         </operation>
                       </filehistory>
                     </operation>
                     <operation>
                       <type>Store</type>
-                      <date>Mon Mar 23 15:17:57 MDT 2026</date>
+                      <date>Fri Mar 27 16:55:26 MDT 2026</date>
                       <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
                     </operation>
                   </filehistory>
                 </operation>
                 <operation>
                   <type>Store</type>
-                  <date>Fri Mar 27 16:55:26 MDT 2026</date>
-                  <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+                  <date>Sat Mar 28 15:14:01 MDT 2026</date>
+                  <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
                 </operation>
               </filehistory>
             </operation>
             <operation>
               <type>Store</type>
-              <date>Sat Mar 28 15:14:01 MDT 2026</date>
-              <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+              <date>Tue Mar 31 12:27:22 MDT 2026</date>
+              <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
             </operation>
           </filehistory>
         </operation>
         <operation>
           <type>Store</type>
-          <date>Tue Mar 31 12:27:22 MDT 2026</date>
-          <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+          <date>Tue Mar 31 12:49:20 MDT 2026</date>
+          <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
         </operation>
       </filehistory>
     </operation>
     <operation>
       <type>Store</type>
-      <date>Tue Mar 31 12:49:20 MDT 2026</date>
-      <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+      <date>Tue Mar 31 14:26:40 MDT 2026</date>
+      <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
     </operation>
   </filehistory>
-  <!--Written by JMRI version 5.14+Rdea51dcccf on Tue Mar 31 12:49:20 MDT 2026-->
+  <!--Written by JMRI version 5.14+Rdea51dcccf on Tue Mar 31 14:26:40 MDT 2026-->
 </layout-config>
