@@ -509,7 +509,7 @@
     <memory>
       <systemName>IM:AUTO:0007</systemName>
     </memory>
-    <memory value="3:14 PM">
+    <memory value="12:27 PM">
       <systemName>IMCURRENTTIME</systemName>
     </memory>
     <memory value="1.0">
@@ -2445,6 +2445,9 @@
           <socketName>E3</socketName>
           <systemName>IQDE:AUTO:0014</systemName>
         </Socket>
+        <Socket>
+          <socketName>E4</socketName>
+        </Socket>
       </Expressions>
       <MaleSocket>
         <AbstractDebuggerMaleSocket class="jmri.jmrit.logixng.tools.debugger.configurexml.DebuggerMaleDigitalExpressionSocketXml" />
@@ -2526,6 +2529,9 @@
         <Socket>
           <socketName>E2</socketName>
           <systemName>IQDE:AUTO:0017</systemName>
+        </Socket>
+        <Socket>
+          <socketName>E3</socketName>
         </Socket>
       </Expressions>
       <MaleSocket>
@@ -2717,7 +2723,7 @@
       </MaleSocket>
     </ActionSignalMast>
   </LogixNGDigitalActions>
-  <LayoutEditor class="jmri.jmrit.display.layoutEditor.configurexml.LayoutEditorXml" name="Mike Dean's Basement Layout" x="50" y="25" windowheight="875" windowwidth="1390" panelheight="1740" panelwidth="1439" sliders="yes" scrollable="both" editable="no" positionable="yes" controlling="yes" animating="yes" showhelpbar="no" drawgrid="no" snaponadd="no" snaponmove="no" antialiasing="yes" turnoutcircles="yes" tooltipsnotedit="yes" tooltipsinedit="yes" mainlinetrackwidth="4" xscale="1.0" yscale="1.0" sidetrackwidth="2" defaulttrackcolor="black" defaultoccupiedtrackcolor="red" defaultalternativetrackcolor="cyan" defaulttextcolor="black" turnoutcirclecolor="blue" turnoutcirclethrowncolor="red" turnoutcirclesize="2" turnoutdrawunselectedleg="no" turnoutbx="20.0" turnoutcx="20.0" turnoutwid="10.0" xoverlong="30.0" xoverhwid="10.0" xovershort="10.0" autoblkgenerate="no" gridSize="10" gridSize2nd="10" openDispatcher="no" useDirectTurnoutControl="no">
+  <LayoutEditor class="jmri.jmrit.display.layoutEditor.configurexml.LayoutEditorXml" name="Mike Dean's Basement Layout" x="68" y="48" windowheight="1302" windowwidth="1484" panelheight="1740" panelwidth="1439" sliders="yes" scrollable="both" editable="no" positionable="yes" controlling="yes" animating="yes" showhelpbar="no" drawgrid="no" snaponadd="no" snaponmove="no" antialiasing="yes" turnoutcircles="yes" tooltipsnotedit="yes" tooltipsinedit="yes" mainlinetrackwidth="4" xscale="1.0" yscale="1.0" sidetrackwidth="2" defaulttrackcolor="black" defaultoccupiedtrackcolor="red" defaultalternativetrackcolor="cyan" defaulttextcolor="black" turnoutcirclecolor="blue" turnoutcirclethrowncolor="red" turnoutcirclesize="2" turnoutdrawunselectedleg="no" turnoutbx="20.0" turnoutcx="20.0" turnoutwid="10.0" xoverlong="30.0" xoverhwid="10.0" xovershort="10.0" autoblkgenerate="no" gridSize="10" gridSize2nd="10" openDispatcher="no" useDirectTurnoutControl="no">
     <layoutTrackDrawingOptions name="Mike Dean's Basement Layout" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutTrackDrawingOptionsXml">
       <mainBallastColor>#000000</mainBallastColor>
       <mainBallastWidth>0</mainBallastWidth>
@@ -3567,104 +3573,104 @@
   <filehistory>
     <operation>
       <type>app</type>
-      <date>Sat Mar 28 12:32:30 MDT 2026</date>
+      <date>Tue Mar 31 11:11:49 MDT 2026</date>
       <filename>PanelPro (v5.14.0)</filename>
     </operation>
     <operation>
       <type>Load OK</type>
-      <date>Sat Mar 28 12:32:35 MDT 2026</date>
-      <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+      <date>Tue Mar 31 11:11:57 MDT 2026</date>
+      <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
       <filehistory>
         <operation>
           <type>app</type>
-          <date>Fri Mar 27 15:55:28 MDT 2026</date>
+          <date>Sat Mar 28 12:32:30 MDT 2026</date>
           <filename>PanelPro (v5.14.0)</filename>
         </operation>
         <operation>
           <type>Load OK</type>
-          <date>Fri Mar 27 15:55:36 MDT 2026</date>
-          <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+          <date>Sat Mar 28 12:32:35 MDT 2026</date>
+          <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
           <filehistory>
             <operation>
               <type>app</type>
-              <date>Mon Mar 23 14:34:34 MDT 2026</date>
+              <date>Fri Mar 27 15:55:28 MDT 2026</date>
               <filename>PanelPro (v5.14.0)</filename>
             </operation>
             <operation>
               <type>Load OK</type>
-              <date>Mon Mar 23 14:34:42 MDT 2026</date>
+              <date>Fri Mar 27 15:55:36 MDT 2026</date>
               <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
               <filehistory>
                 <operation>
                   <type>app</type>
-                  <date>Sun Mar 22 16:07:57 MDT 2026</date>
+                  <date>Mon Mar 23 14:34:34 MDT 2026</date>
                   <filename>PanelPro (v5.14.0)</filename>
                 </operation>
                 <operation>
                   <type>Load OK</type>
-                  <date>Sun Mar 22 16:08:02 MDT 2026</date>
-                  <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+                  <date>Mon Mar 23 14:34:42 MDT 2026</date>
+                  <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
                   <filehistory>
                     <operation>
                       <type>app</type>
-                      <date>Tue Mar 17 18:23:45 MDT 2026</date>
+                      <date>Sun Mar 22 16:07:57 MDT 2026</date>
                       <filename>PanelPro (v5.14.0)</filename>
                     </operation>
                     <operation>
                       <type>Load OK</type>
-                      <date>Tue Mar 17 18:23:51 MDT 2026</date>
+                      <date>Sun Mar 22 16:08:02 MDT 2026</date>
                       <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
                       <filehistory>
                         <operation>
                           <type>app</type>
-                          <date>Thu Mar 12 16:00:53 MDT 2026</date>
+                          <date>Tue Mar 17 18:23:45 MDT 2026</date>
                           <filename>PanelPro (v5.14.0)</filename>
                         </operation>
                         <operation>
                           <type>Load OK</type>
-                          <date>Thu Mar 12 16:00:58 MDT 2026</date>
+                          <date>Tue Mar 17 18:23:51 MDT 2026</date>
                           <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
                         </operation>
                         <operation>
                           <type>Store</type>
-                          <date>Thu Mar 12 16:01:50 MDT 2026</date>
+                          <date>Sun Mar 22 16:07:09 MDT 2026</date>
                           <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
                         </operation>
                       </filehistory>
                     </operation>
                     <operation>
                       <type>Store</type>
-                      <date>Sun Mar 22 16:07:09 MDT 2026</date>
+                      <date>Sun Mar 22 16:52:46 MDT 2026</date>
                       <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
                     </operation>
                   </filehistory>
                 </operation>
                 <operation>
                   <type>Store</type>
-                  <date>Sun Mar 22 16:52:46 MDT 2026</date>
-                  <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+                  <date>Mon Mar 23 15:17:57 MDT 2026</date>
+                  <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
                 </operation>
               </filehistory>
             </operation>
             <operation>
               <type>Store</type>
-              <date>Mon Mar 23 15:17:57 MDT 2026</date>
+              <date>Fri Mar 27 16:55:26 MDT 2026</date>
               <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
             </operation>
           </filehistory>
         </operation>
         <operation>
           <type>Store</type>
-          <date>Fri Mar 27 16:55:26 MDT 2026</date>
-          <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+          <date>Sat Mar 28 15:14:01 MDT 2026</date>
+          <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
         </operation>
       </filehistory>
     </operation>
     <operation>
       <type>Store</type>
-      <date>Sat Mar 28 15:14:01 MDT 2026</date>
-      <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+      <date>Tue Mar 31 12:27:22 MDT 2026</date>
+      <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
     </operation>
   </filehistory>
-  <!--Written by JMRI version 5.14+Rdea51dcccf on Sat Mar 28 15:14:01 MDT 2026-->
+  <!--Written by JMRI version 5.14+Rdea51dcccf on Tue Mar 31 12:27:22 MDT 2026-->
 </layout-config>
