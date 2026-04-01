@@ -509,7 +509,7 @@
     <memory>
       <systemName>IM:AUTO:0007</systemName>
     </memory>
-    <memory value="4:16 PM">
+    <memory value="5:02 PM">
       <systemName>IMCURRENTTIME</systemName>
     </memory>
     <memory value="1.0">
@@ -536,19 +536,19 @@
         <number>2</number>
       </aspect>
       <aspect defines="SignalHeadStateLunar">
-        <number>31</number>
-      </aspect>
-      <aspect defines="SignalHeadStateFlashingRed">
         <number>3</number>
       </aspect>
-      <aspect defines="SignalHeadStateFlashingYellow">
+      <aspect defines="SignalHeadStateFlashingRed">
         <number>4</number>
       </aspect>
-      <aspect defines="SignalHeadStateFlashingGreen">
+      <aspect defines="SignalHeadStateFlashingYellow">
         <number>5</number>
       </aspect>
+      <aspect defines="SignalHeadStateFlashingGreen">
+        <number>6</number>
+      </aspect>
       <aspect defines="SignalHeadStateFlashingLunar">
-        <number>31</number>
+        <number>7</number>
       </aspect>
     </signalhead>
     <signalhead class="jmri.implementation.configurexml.DccSignalHeadXml">
@@ -6569,7 +6569,7 @@
       </MaleSocket>
     </ActionSignalMast>
   </LogixNGDigitalActions>
-  <LayoutEditor class="jmri.jmrit.display.layoutEditor.configurexml.LayoutEditorXml" name="Mike Dean's Basement Layout" x="139" y="65" windowheight="1300" windowwidth="1686" panelheight="1473" panelwidth="1740" sliders="yes" scrollable="both" editable="no" positionable="yes" controlling="yes" animating="yes" showhelpbar="no" drawgrid="no" snaponadd="no" snaponmove="no" antialiasing="yes" turnoutcircles="yes" tooltipsnotedit="yes" tooltipsinedit="yes" mainlinetrackwidth="4" xscale="1.0" yscale="1.0" sidetrackwidth="2" defaulttrackcolor="black" defaultoccupiedtrackcolor="red" defaultalternativetrackcolor="cyan" defaulttextcolor="black" turnoutcirclecolor="blue" turnoutcirclethrowncolor="red" turnoutcirclesize="2" turnoutdrawunselectedleg="no" turnoutbx="20.0" turnoutcx="20.0" turnoutwid="10.0" xoverlong="30.0" xoverhwid="10.0" xovershort="10.0" autoblkgenerate="no" gridSize="10" gridSize2nd="10" openDispatcher="no" useDirectTurnoutControl="no">
+  <LayoutEditor class="jmri.jmrit.display.layoutEditor.configurexml.LayoutEditorXml" name="Mike Dean's Basement Layout" x="-139" y="292" windowheight="875" windowwidth="1390" panelheight="1473" panelwidth="1740" sliders="yes" scrollable="both" editable="no" positionable="yes" controlling="yes" animating="yes" showhelpbar="no" drawgrid="no" snaponadd="no" snaponmove="no" antialiasing="yes" turnoutcircles="yes" tooltipsnotedit="yes" tooltipsinedit="yes" mainlinetrackwidth="4" xscale="1.0" yscale="1.0" sidetrackwidth="2" defaulttrackcolor="black" defaultoccupiedtrackcolor="red" defaultalternativetrackcolor="cyan" defaulttextcolor="black" turnoutcirclecolor="blue" turnoutcirclethrowncolor="red" turnoutcirclesize="2" turnoutdrawunselectedleg="no" turnoutbx="20.0" turnoutcx="20.0" turnoutwid="10.0" xoverlong="30.0" xoverhwid="10.0" xovershort="10.0" autoblkgenerate="no" gridSize="10" gridSize2nd="10" openDispatcher="no" useDirectTurnoutControl="no">
     <layoutTrackDrawingOptions name="Mike Dean's Basement Layout" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutTrackDrawingOptionsXml">
       <mainBallastColor>#000000</mainBallastColor>
       <mainBallastWidth>0</mainBallastWidth>
@@ -6966,14 +6966,14 @@
     <layoutturnout ident="TO23" type="RH_TURNOUT" hidden="no" disabled="no" disableWhenOccupied="no" showtooltip="yes" continuing="2" xcen="466.0" ycen="988.0" xa="466.0" ya="1008.0" xb="466.0" yb="968.0" xc="476.0" yc="968.0" xd="466.0" yd="1008.0" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutRHTurnoutXml" turnoutname="South Turnout 117" blockname="SZ5" connectaname="T64" connectbname="T8" connectcname="T86" />
     <layoutturnout ident="TO24" type="RH_XOVER" hidden="no" disabled="no" disableWhenOccupied="no" showtooltip="yes" continuing="2" xcen="456.0" ycen="869.0" xa="466.0" ya="839.0" xb="466.0" yb="878.99999" xc="446.0" yc="899.0" xd="446.0" yd="859.00001" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutRHXOverXml" turnoutname="South Turnout 115" secondturnoutname="South Turnout 116" blockname="SZ2" blockcname="SZ3" blockdname="SZ3" connectaname="T4" connectbname="T8" connectcname="T48" connectdname="T47" />
     <layoutturnout ident="TO25" type="RH_XOVER" hidden="no" disabled="no" disableWhenOccupied="no" showtooltip="yes" continuing="2" xcen="474.0" ycen="709.0" xa="484.0" ya="679.0" xb="484.0" yb="718.99999" xc="464.0" yc="739.0" xd="464.0" yd="699.00001" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutRHXOverXml" turnoutname="South Turnout 111" secondturnoutname="South Turnout 112" blockname="Dummy1" blockcname="SZ2" blockdname="SZ2" connectaname="T73" connectbname="T84" connectcname="T4" connectdname="T7" />
-    <layoutturnout ident="TO26" type="LH_XOVER" hidden="no" disabled="no" disableWhenOccupied="no" showtooltip="yes" continuing="2" xcen="453.0" ycen="506.0" xa="463.0" ya="496.0" xb="463.0" yb="536.001953125" xc="443.0" yc="516.0" xd="443.0" yd="475.998046875" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutLHXOverXml" turnoutname="South Turnout 105" secondturnoutname="South Turnout 106" blockname="SZ2" blockcname="SZ3" blockdname="SZ3" connectaname="T70" connectbname="T5" connectcname="T47" connectdname="T12" />
+    <layoutturnout ident="TO26" type="LH_XOVER" hidden="no" disabled="no" disableWhenOccupied="no" showtooltip="yes" continuing="2" xcen="453.0" ycen="506.0" xa="463.0" ya="496.0" xb="463.0" yb="536.0" xc="443.0" yc="516.0" xd="443.0" yd="476.0" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutLHXOverXml" turnoutname="South Turnout 105" secondturnoutname="South Turnout 106" blockname="SZ2" blockcname="SZ3" blockdname="SZ3" connectaname="T70" connectbname="T5" connectcname="T47" connectdname="T12" />
     <layoutturnout ident="TO27" type="LH_XOVER" hidden="no" disabled="no" disableWhenOccupied="no" showtooltip="yes" continuing="2" xcen="474.0" ycen="629.0" xa="484.0675048828125" ya="618.0205688476562" xb="483.9999999983463" yb="662.0000010773656" xc="463.9324951171875" yc="639.9794311523438" xd="464.0000000016537" yd="595.9999989226344" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutLHXOverXml" turnoutname="South Turnout 109" secondturnoutname="South Turnout 110" blockname="Dummy1" blockcname="SZ2" blockdname="SZ2" connectaname="T87" connectbname="T73" connectcname="T7" connectdname="T5" />
     <layoutturnout ident="TO28" type="RH_XOVER" hidden="no" disabled="no" disableWhenOccupied="no" showtooltip="yes" continuing="2" xcen="494.0" ycen="516.0" xa="504.0" ya="486.0" xb="504.0" yb="525.99999" xc="484.0" yc="546.0" xd="484.0" yd="506.00001" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutRHXOverXml" turnoutname="South Turnout 104" connectaname="T88" connectbname="T114" connectcname="T87" connectdname="T123" />
     <layoutturnout ident="TO29" type="RH_XOVER" hidden="no" disabled="no" disableWhenOccupied="no" showtooltip="yes" continuing="2" xcen="534.0" ycen="633.0" xa="544.0" ya="599.0" xb="544.0" yb="644.333322" xc="524.0" yc="667.0" xd="524.0" yd="621.666678" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutRHXOverXml" turnoutname="South Turnout 108" connectaname="T111" connectbname="T124" connectcname="T115" connectdname="T113" />
     <layoutturnout ident="TO30" type="RH_XOVER" hidden="no" disabled="no" disableWhenOccupied="no" showtooltip="yes" continuing="2" xcen="514.0" ycen="431.0" xa="524.0" ya="401.0" xb="524.0" yb="440.99999" xc="504.0" yc="461.0" xd="504.0" yd="421.00001" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutRHXOverXml" turnoutname="South Turnout 103" connectaname="T121" connectbname="T104" connectcname="T88" connectdname="T122" />
-    <layoutturnout ident="TO31" type="LH_XOVER" hidden="no" disabled="no" disableWhenOccupied="no" showtooltip="yes" continuing="2" xcen="534.0" ycen="520.0" xa="544.0" ya="510.0" xb="544.0" yb="550.001953125" xc="524.0" yc="530.0" xd="524.0" yd="489.998046875" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutLHXOverXml" turnoutname="South Turnout 107" connectaname="T116" connectbname="T111" connectcname="T113" connectdname="T104" />
-    <layoutturnout ident="TO32" type="LH_XOVER" hidden="no" disabled="no" disableWhenOccupied="no" showtooltip="yes" continuing="2" xcen="514.0" ycen="844.0" xa="524.0" ya="834.0" xb="524.0" yb="874.001953125" xc="504.0" yc="854.0" xd="504.0" yd="813.998046875" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutLHXOverXml" turnoutname="South Turnout 114" connectaname="T115" connectbname="T125" connectcname="T126" connectdname="T85" />
-    <layoutturnout ident="TO33" type="LH_XOVER" hidden="no" disabled="no" disableWhenOccupied="no" showtooltip="yes" continuing="2" xcen="494.0" ycen="784.0" xa="504.0" ya="774.0" xb="504.0" yb="814.001953125" xc="484.0" yc="794.0" xd="484.0" yd="753.998046875" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutLHXOverXml" turnoutname="South Turnout 113" connectaname="T114" connectbname="T85" connectcname="T86" connectdname="T84" />
+    <layoutturnout ident="TO31" type="LH_XOVER" hidden="no" disabled="no" disableWhenOccupied="no" showtooltip="yes" continuing="2" xcen="534.0" ycen="520.0" xa="544.0" ya="510.0" xb="544.0" yb="550.0" xc="524.0" yc="530.0" xd="524.0" yd="490.0" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutLHXOverXml" turnoutname="South Turnout 107" connectaname="T116" connectbname="T111" connectcname="T113" connectdname="T104" />
+    <layoutturnout ident="TO32" type="LH_XOVER" hidden="no" disabled="no" disableWhenOccupied="no" showtooltip="yes" continuing="2" xcen="514.0" ycen="844.0" xa="524.0" ya="834.0" xb="524.0" yb="874.0" xc="504.0" yc="854.0" xd="504.0" yd="814.0" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutLHXOverXml" turnoutname="South Turnout 114" connectaname="T115" connectbname="T125" connectcname="T126" connectdname="T85" />
+    <layoutturnout ident="TO33" type="LH_XOVER" hidden="no" disabled="no" disableWhenOccupied="no" showtooltip="yes" continuing="2" xcen="494.0" ycen="784.0" xa="504.0" ya="774.0" xb="504.0" yb="814.0" xc="484.0" yc="794.0" xd="484.0" yd="754.0" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutLHXOverXml" turnoutname="South Turnout 113" connectaname="T114" connectbname="T85" connectcname="T86" connectdname="T84" />
     <layoutturnout ident="TO35" type="RH_TURNOUT" hidden="no" disabled="no" disableWhenOccupied="no" showtooltip="yes" continuing="2" xcen="543.0" ycen="406.0" xa="543.0" ya="426.0" xb="543.0" yb="386.0" xc="553.0" yc="386.0" xd="543.0" yd="426.0" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutRHTurnoutXml" turnoutname="South Turnout 102" connectaname="T116" connectbname="T120" connectcname="T117" />
     <layoutturnout ident="TO36" type="WYE_TURNOUT" hidden="no" disabled="no" disableWhenOccupied="no" showtooltip="yes" continuing="2" xcen="587.0" ycen="347.0" xa="572.8579011805236" ya="361.14215626437306" xb="604.6776302561402" yb="336.39336081109764" xc="597.6065673828125" yc="329.32232666015625" xd="569.3223697438598" yd="357.60663918890236" ver="1" class="jmri.jmrit.display.layoutEditor.configurexml.LayoutWyeXml" turnoutname="South Turnout 101" connectaname="T117" connectbname="T118" connectcname="T119" />
     <tracksegment ident="T9" blockname="EZ1" connect1name="A8" type1="POS_POINT" connect2name="TO2" type2="TURNOUT_A" dashed="no" mainline="yes" hidden="no" arc="yes" flip="no" circle="yes" angle="30.0" hideConLines="yes" class="jmri.jmrit.display.layoutEditor.configurexml.TrackSegmentXml" />
@@ -7431,104 +7431,104 @@
   <filehistory>
     <operation>
       <type>app</type>
-      <date>Wed Apr 01 16:06:18 MDT 2026</date>
+      <date>Wed Apr 01 16:50:56 MDT 2026</date>
       <filename>PanelPro (v5.14.0)</filename>
     </operation>
     <operation>
       <type>Load OK</type>
-      <date>Wed Apr 01 16:06:27 MDT 2026</date>
-      <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+      <date>Wed Apr 01 16:51:00 MDT 2026</date>
+      <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
       <filehistory>
         <operation>
           <type>app</type>
-          <date>Wed Apr 01 08:38:22 MDT 2026</date>
+          <date>Wed Apr 01 16:06:18 MDT 2026</date>
           <filename>PanelPro (v5.14.0)</filename>
         </operation>
         <operation>
           <type>Load OK</type>
-          <date>Wed Apr 01 08:38:32 MDT 2026</date>
+          <date>Wed Apr 01 16:06:27 MDT 2026</date>
           <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
           <filehistory>
             <operation>
               <type>app</type>
-              <date>Tue Mar 31 14:38:14 MDT 2026</date>
+              <date>Wed Apr 01 08:38:22 MDT 2026</date>
               <filename>PanelPro (v5.14.0)</filename>
             </operation>
             <operation>
               <type>Load OK</type>
-              <date>Tue Mar 31 14:38:22 MDT 2026</date>
+              <date>Wed Apr 01 08:38:32 MDT 2026</date>
               <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
               <filehistory>
                 <operation>
                   <type>app</type>
-                  <date>Tue Mar 31 13:30:43 MDT 2026</date>
+                  <date>Tue Mar 31 14:38:14 MDT 2026</date>
                   <filename>PanelPro (v5.14.0)</filename>
                 </operation>
                 <operation>
                   <type>Load OK</type>
-                  <date>Tue Mar 31 13:30:50 MDT 2026</date>
+                  <date>Tue Mar 31 14:38:22 MDT 2026</date>
                   <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
                   <filehistory>
                     <operation>
                       <type>app</type>
-                      <date>Tue Mar 31 12:39:00 MDT 2026</date>
+                      <date>Tue Mar 31 13:30:43 MDT 2026</date>
                       <filename>PanelPro (v5.14.0)</filename>
                     </operation>
                     <operation>
                       <type>Load OK</type>
-                      <date>Tue Mar 31 12:39:05 MDT 2026</date>
-                      <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+                      <date>Tue Mar 31 13:30:50 MDT 2026</date>
+                      <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
                       <filehistory>
                         <operation>
                           <type>app</type>
-                          <date>Tue Mar 31 11:11:49 MDT 2026</date>
+                          <date>Tue Mar 31 12:39:00 MDT 2026</date>
                           <filename>PanelPro (v5.14.0)</filename>
                         </operation>
                         <operation>
                           <type>Load OK</type>
-                          <date>Tue Mar 31 11:11:57 MDT 2026</date>
-                          <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+                          <date>Tue Mar 31 12:39:05 MDT 2026</date>
+                          <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
                         </operation>
                         <operation>
                           <type>Store</type>
-                          <date>Tue Mar 31 12:27:22 MDT 2026</date>
-                          <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+                          <date>Tue Mar 31 12:49:20 MDT 2026</date>
+                          <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
                         </operation>
                       </filehistory>
                     </operation>
                     <operation>
                       <type>Store</type>
-                      <date>Tue Mar 31 12:49:20 MDT 2026</date>
-                      <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+                      <date>Tue Mar 31 14:26:40 MDT 2026</date>
+                      <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
                     </operation>
                   </filehistory>
                 </operation>
                 <operation>
                   <type>Store</type>
-                  <date>Tue Mar 31 14:26:40 MDT 2026</date>
+                  <date>Tue Mar 31 14:41:10 MDT 2026</date>
                   <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
                 </operation>
               </filehistory>
             </operation>
             <operation>
               <type>Store</type>
-              <date>Tue Mar 31 14:41:10 MDT 2026</date>
+              <date>Wed Apr 01 11:21:45 MDT 2026</date>
               <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
             </operation>
           </filehistory>
         </operation>
         <operation>
           <type>Store</type>
-          <date>Wed Apr 01 11:21:45 MDT 2026</date>
+          <date>Wed Apr 01 16:16:02 MDT 2026</date>
           <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
         </operation>
       </filehistory>
     </operation>
     <operation>
       <type>Store</type>
-      <date>Wed Apr 01 16:16:02 MDT 2026</date>
-      <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
+      <date>Wed Apr 01 17:02:09 MDT 2026</date>
+      <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
     </operation>
   </filehistory>
-  <!--Written by JMRI version 5.14+Rdea51dcccf on Wed Apr 01 16:16:02 MDT 2026-->
+  <!--Written by JMRI version 5.14+Rdea51dcccf on Wed Apr 01 17:02:09 MDT 2026-->
 </layout-config>
