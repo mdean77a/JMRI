@@ -18,4 +18,6 @@ profile.xml.4.bak
 **/.DS_Store
 **/backupPanels/*.xml
 
-
+_bmad/
+.claude/
+.agents/
