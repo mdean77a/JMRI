@@ -1,6 +1,6 @@
 # Story 2.2: Wire-format translation — `_codes`, `_parsing`, per-entity state enums
 
-Status: review
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -138,7 +138,12 @@ so that integer codes never cross the public API and the JSON-translation bounda
 
 ### Review Findings
 
-(Empty until code review runs.)
+- [x] [Review][Decision] `_optional_str` silently drops non-string `value` — resolved: keep `None` (current behavior) — intentional, matches `str | None` contract
+- [x] [Review][Patch] `isdigit()` allows Unicode digits; `int()` raises raw `ValueError` instead of `JMRIProtocolError` [`_parsing.py:461`]
+- [x] [Review][Patch] 6 of 15 `SignalMastAspect` members untested inline (APPROACH_SLOW, SLOW_APPROACH, MEDIUM_APPROACH, PERMISSIVE, SLOW, MEDIUM) [`test_parsing.py`]
+- [x] [Review][Patch] Immutability tests only for 2 of 6 `_codes.py` tables (SENSOR_STATE, LIGHT_STATE, POWER_STATE, SIGNAL_HEAD_APPEARANCE untested) [`test_codes.py`]
+- [x] [Review][Defer] DCC address `"0"` (broadcast) accepted without range check [`_parsing.py`] — deferred, pre-existing
+- [x] [Review][Defer] No cross-validation of `isLongAddress` vs. `dcc_address` numeric range [`_parsing.py`] — deferred, pre-existing
 
 ## Dev Notes
 

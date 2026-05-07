@@ -210,3 +210,31 @@ def test_block_state_table_is_immutable() -> None:
 
     with pytest.raises(TypeError):
         BLOCK_STATE[99] = BlockState.UNKNOWN  # type: ignore[index]
+
+
+def test_sensor_state_table_is_immutable() -> None:
+    import pytest
+
+    with pytest.raises(TypeError):
+        SENSOR_STATE[99] = SensorState.UNKNOWN  # type: ignore[index]
+
+
+def test_light_state_table_is_immutable() -> None:
+    import pytest
+
+    with pytest.raises(TypeError):
+        LIGHT_STATE[99] = LightState.UNKNOWN  # type: ignore[index]
+
+
+def test_power_state_table_is_immutable() -> None:
+    import pytest
+
+    with pytest.raises(TypeError):
+        POWER_STATE[99] = PowerState.UNKNOWN  # type: ignore[index]
+
+
+def test_signal_head_appearance_table_is_immutable() -> None:
+    import pytest
+
+    with pytest.raises(TypeError):
+        SIGNAL_HEAD_APPEARANCE[999] = SignalHeadAppearance.DARK  # type: ignore[index]

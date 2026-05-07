@@ -298,7 +298,7 @@ def parse_roster_entry(payload: dict[str, Any]) -> _ParsedRosterEntry:
     data = _data(payload, "rosterEntry")
     name = _required_str(data, "name", entity_type="rosterEntry")
     address_str = _required_str(data, "address", entity_type="rosterEntry")
-    if not address_str.isdigit():
+    if not address_str.isdecimal():
         raise JMRIProtocolError(
             "DCC address is not an integer string",
             entity_type="rosterEntry",
