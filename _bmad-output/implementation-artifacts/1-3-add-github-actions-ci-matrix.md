@@ -1,6 +1,6 @@
 # Story 1.3: Add GitHub Actions CI matrix
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -51,12 +51,12 @@ so that regressions are caught before merge and routine commits to JMRI panel XM
   - [x] Step 5: `uv run pytest -m "not integration"` — relies on the marker registered in `pyproject.toml` and `testpaths = ["tests"]` for collection. Wrapped with the `|| ([ $? = 5 ] && echo "...")` exit-5 guard so the empty test tree doesn't fail CI on first push (auto-removes once Story 2.1+ lands real tests).
   - [x] Each step gets a `name:` field for readable logs.
 
-- [ ] **Task 7: Push and verify on GitHub** (AC: #1, #2, #5)
-  - [ ] Commit and push `.github/workflows/ci.yml` to a branch (or to `master`).
-  - [ ] On GitHub Actions tab, confirm exactly six jobs appear in the workflow run.
-  - [ ] Confirm all six jobs go green within a few minutes (cold cache run will be slowest; expect 1–3 min per job).
-  - [ ] Verify path scoping: make a no-op edit to a JMRI panel XML or `roster.xml`, push, confirm CI does NOT trigger. Make a no-op edit under `python_code/` (e.g., add a trailing newline to `python_code/README.md`), push, confirm CI DOES trigger.
-  - [ ] Verify regression detection (AC #5) by either: (a) deliberately introducing a transient mypy error in a feature branch (e.g., add a single `def f(x): return x` to `__init__.py` — missing annotations fail under strict mode), confirming the workflow fails, then reverting; or (b) trusting the green-on-clean run as sufficient evidence and noting AC #5 as verified-by-construction.
+- [x] **Task 7: Push and verify on GitHub** (AC: #1, #2, #5)
+  - [x] Commit and push `.github/workflows/ci.yml` to a branch (or to `master`). Pushed to master 2026-05-07.
+  - [x] On GitHub Actions tab, confirm exactly six jobs appear in the workflow run. ✅ verified via screenshot: ubuntu-latest × {3.11, 3.12, 3.13} + macos-latest × {3.11, 3.12, 3.13}.
+  - [x] Confirm all six jobs go green within a few minutes. ✅ all six green; macos 3.11 detail showed every step green (Checkout, Install uv+Python, uv sync, ruff check, ruff format --check, mypy --strict, pytest, Post-* cleanup). Run completed in ~11s per job after first run primed the runner images.
+  - [ ] Path-scoping live verification (no-op edit to a JMRI panel XML / roster file confirming CI is silent) — **deferred as low-priority** since the `paths:` filter is a static GH-Actions-engine guarantee with no runtime branching; the green run already proves the workflow file is parsed and accepted. If you want belt-and-suspenders confirmation, edit any `.jmri/`, `roster.xml`, or `jython/` file in a future commit and confirm the Actions tab stays quiet for that commit.
+  - [x] Verify regression detection (AC #5) — Option B (construction proof) accepted: separate mypy step + `fail-fast: false` + non-zero exit fails the job + GitHub surfaces job failures on PR Checks panel. The workflow shape provably satisfies AC #5 without a throwaway-branch test.
 
 ## Dev Notes
 
@@ -359,4 +359,5 @@ No other files modified.
 
 ## Change Log
 
-- 2026-05-07 — Story 1.3 implementation: GitHub Actions CI workflow created at `.github/workflows/ci.yml`. Six-job matrix (ubuntu-latest + macos-latest × Python 3.11/3.12/3.13), path-scoped to `python_code/**` and the workflow file itself, runs ruff lint + format-check + mypy strict + pytest. Local YAML validation passed; live verification on GitHub deferred to user (Task 7).
+- 2026-05-07 — Story 1.3 implementation: GitHub Actions CI workflow created at `.github/workflows/ci.yml`. Six-job matrix (ubuntu-latest + macos-latest × Python 3.11/3.12/3.13), path-scoped to `python_code/**` and the workflow file itself, runs ruff lint + format-check + mypy strict + pytest. Local YAML validation passed.
+- 2026-05-07 — Pushed to `mdean77a/JMRI` master. First CI run: all six jobs green ✅. Three benign annotations observed (transient GitHub Cache Service outage during `Post Install uv` cache-save step on at least one job; Node.js 20 soft-deprecation notice on `actions/checkout@v4`). None affect correctness; cache outage just means the first run didn't prime the cache for next time. Story Status moved to `review`.

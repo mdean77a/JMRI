@@ -22,6 +22,7 @@ profile.xml.4.bak
 **/.pytest_cache/
 **/.ruff_cache/
 **/.mypy_cache/
+**/dist/
 
 
 _bmad/

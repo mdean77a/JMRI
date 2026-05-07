@@ -46,8 +46,8 @@ development_status:
   epic-1: in-progress
   1-1-initialize-package-skeleton-with-uv-init-lib: done
   1-2-configure-quality-gates-ruff-mypy-strict-pytest: review
-  1-3-add-github-actions-ci-matrix: in-progress
-  1-4-add-mit-license-and-readme-scaffold: backlog
+  1-3-add-github-actions-ci-matrix: review
+  1-4-add-mit-license-and-readme-scaffold: review
   epic-1-retrospective: optional
 
   # Epic 2: Connect to JMRI and Discover the Layout
