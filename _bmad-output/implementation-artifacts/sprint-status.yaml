@@ -43,12 +43,12 @@ story_location: "{project-root}/_bmad-output/implementation-artifacts"
 
 development_status:
   # Epic 1: Buildable, Type-checked Library Foundation
-  epic-1: in-progress
+  epic-1: done
   1-1-initialize-package-skeleton-with-uv-init-lib: done
-  1-2-configure-quality-gates-ruff-mypy-strict-pytest: review
-  1-3-add-github-actions-ci-matrix: review
-  1-4-add-mit-license-and-readme-scaffold: review
-  epic-1-retrospective: optional
+  1-2-configure-quality-gates-ruff-mypy-strict-pytest: done
+  1-3-add-github-actions-ci-matrix: done
+  1-4-add-mit-license-and-readme-scaffold: done
+  epic-1-retrospective: done
 
   # Epic 2: Connect to JMRI and Discover the Layout
   epic-2: backlog
