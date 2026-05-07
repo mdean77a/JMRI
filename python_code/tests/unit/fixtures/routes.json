@@ -1,0 +1,152 @@
+[
+    {
+        "type": "route",
+        "data": {
+            "name": "IO:AUTO:0001",
+            "userName": "NW Staging Close",
+            "comment": null,
+            "properties": [],
+            "state": 0
+        }
+    },
+    {
+        "type": "route",
+        "data": {
+            "name": "IO:AUTO:0002",
+            "userName": "SW Staging Close",
+            "comment": null,
+            "properties": [],
+            "state": 0
+        }
+    },
+    {
+        "type": "route",
+        "data": {
+            "name": "IO:AUTO:0003",
+            "userName": "NW Track 1",
+            "comment": null,
+            "properties": [],
+            "state": 0
+        }
+    },
+    {
+        "type": "route",
+        "data": {
+            "name": "IO:AUTO:0004",
+            "userName": "NW Track 2",
+            "comment": null,
+            "properties": [],
+            "state": 0
+        }
+    },
+    {
+        "type": "route",
+        "data": {
+            "name": "IO:AUTO:0005",
+            "userName": "NW Track 3",
+            "comment": null,
+            "properties": [],
+            "state": 0
+        }
+    },
+    {
+        "type": "route",
+        "data": {
+            "name": "IO:AUTO:0006",
+            "userName": "NW Track 4",
+            "comment": null,
+            "properties": [],
+            "state": 0
+        }
+    },
+    {
+        "type": "route",
+        "data": {
+            "name": "IO:AUTO:0007",
+            "userName": "NW Track 5",
+            "comment": null,
+            "properties": [],
+            "state": 0
+        }
+    },
+    {
+        "type": "route",
+        "data": {
+            "name": "IO:AUTO:0008",
+            "userName": "NW Track 6",
+            "comment": null,
+            "properties": [],
+            "state": 0
+        }
+    },
+    {
+        "type": "route",
+        "data": {
+            "name": "IO:AUTO:0009",
+            "userName": "NW Bypass",
+            "comment": null,
+            "properties": [],
+            "state": 0
+        }
+    },
+    {
+        "type": "route",
+        "data": {
+            "name": "IO:AUTO:0010",
+            "userName": "SW Track 1",
+            "comment": null,
+            "properties": [],
+            "state": 0
+        }
+    },
+    {
+        "type": "route",
+        "data": {
+            "name": "IO:AUTO:0011",
+            "userName": "SW Track 2",
+            "comment": null,
+            "properties": [],
+            "state": 0
+        }
+    },
+    {
+        "type": "route",
+        "data": {
+            "name": "IO:AUTO:0012",
+            "userName": "SW Track 3",
+            "comment": null,
+            "properties": [],
+            "state": 0
+        }
+    },
+    {
+        "type": "route",
+        "data": {
+            "name": "IO:AUTO:0013",
+            "userName": "SW Track 4",
+            "comment": null,
+            "properties": [],
+            "state": 0
+        }
+    },
+    {
+        "type": "route",
+        "data": {
+            "name": "IO:AUTO:0014",
+            "userName": "Crossover",
+            "comment": null,
+            "properties": [],
+            "state": 0
+        }
+    },
+    {
+        "type": "route",
+        "data": {
+            "name": "IO:AUTO:0015",
+            "userName": "Straight Through",
+            "comment": null,
+            "properties": [],
+            "state": 0
+        }
+    }
+]

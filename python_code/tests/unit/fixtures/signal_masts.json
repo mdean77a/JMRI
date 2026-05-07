@@ -1,0 +1,158 @@
+[
+    {
+        "type": "signalMast",
+        "data": {
+            "name": "IF$shsm:basic:one-searchlight(E-MNT)",
+            "userName": "E-MNT",
+            "comment": null,
+            "properties": [],
+            "aspect": "Clear",
+            "lit": true,
+            "held": false,
+            "state": "Clear"
+        }
+    },
+    {
+        "type": "signalMast",
+        "data": {
+            "name": "IF$shsm:basic:one-searchlight(E-NZ1)",
+            "userName": "E-NZ1",
+            "comment": null,
+            "properties": [],
+            "aspect": "Clear",
+            "lit": true,
+            "held": false,
+            "state": "Clear"
+        }
+    },
+    {
+        "type": "signalMast",
+        "data": {
+            "name": "IF$shsm:basic:one-searchlight(EZ1)",
+            "userName": "EZ1",
+            "comment": null,
+            "properties": [],
+            "aspect": "Clear",
+            "lit": true,
+            "held": false,
+            "state": "Clear"
+        }
+    },
+    {
+        "type": "signalMast",
+        "data": {
+            "name": "IF$shsm:basic:one-searchlight(EZ2)",
+            "userName": "EZ2",
+            "comment": null,
+            "properties": [],
+            "aspect": "Clear",
+            "lit": true,
+            "held": false,
+            "state": "Clear"
+        }
+    },
+    {
+        "type": "signalMast",
+        "data": {
+            "name": "IF$shsm:basic:one-searchlight(EZ9)",
+            "userName": "EZ9",
+            "comment": null,
+            "properties": [],
+            "aspect": "Clear",
+            "lit": true,
+            "held": false,
+            "state": "Clear"
+        }
+    },
+    {
+        "type": "signalMast",
+        "data": {
+            "name": "IF$shsm:basic:one-searchlight(N-NZ1)",
+            "userName": "N-NZ1",
+            "comment": null,
+            "properties": [],
+            "aspect": "Clear",
+            "lit": true,
+            "held": false,
+            "state": "Clear"
+        }
+    },
+    {
+        "type": "signalMast",
+        "data": {
+            "name": "IF$shsm:basic:one-searchlight(S-MNT)",
+            "userName": "S-MNT",
+            "comment": null,
+            "properties": [],
+            "aspect": "Clear",
+            "lit": true,
+            "held": false,
+            "state": "Clear"
+        }
+    },
+    {
+        "type": "signalMast",
+        "data": {
+            "name": "IF$shsm:basic:one-searchlight(SZ2)",
+            "userName": "SZ2",
+            "comment": null,
+            "properties": [],
+            "aspect": "Clear",
+            "lit": true,
+            "held": false,
+            "state": "Clear"
+        }
+    },
+    {
+        "type": "signalMast",
+        "data": {
+            "name": "IF$shsm:basic:one-searchlight(SZ5)",
+            "userName": "SZ5",
+            "comment": null,
+            "properties": [],
+            "aspect": "Clear",
+            "lit": true,
+            "held": false,
+            "state": "Clear"
+        }
+    },
+    {
+        "type": "signalMast",
+        "data": {
+            "name": "IF$shsm:basic:one-searchlight(SZ6)",
+            "userName": "SZ6",
+            "comment": null,
+            "properties": [],
+            "aspect": "Clear",
+            "lit": true,
+            "held": false,
+            "state": "Clear"
+        }
+    },
+    {
+        "type": "signalMast",
+        "data": {
+            "name": "IF$shsm:basic:one-searchlight(West-NW)",
+            "userName": "West-NW",
+            "comment": null,
+            "properties": [],
+            "aspect": "Clear",
+            "lit": true,
+            "held": false,
+            "state": "Clear"
+        }
+    },
+    {
+        "type": "signalMast",
+        "data": {
+            "name": "IF$shsm:basic:one-searchlight(West-SW)",
+            "userName": "West-SW",
+            "comment": null,
+            "properties": [],
+            "aspect": "Clear",
+            "lit": true,
+            "held": false,
+            "state": "Clear"
+        }
+    }
+]

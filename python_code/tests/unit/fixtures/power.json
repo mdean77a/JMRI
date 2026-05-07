@@ -1,0 +1,10 @@
+[
+    {
+        "type": "power",
+        "data": {
+            "name": "NCE",
+            "state": 0,
+            "default": true
+        }
+    }
+]

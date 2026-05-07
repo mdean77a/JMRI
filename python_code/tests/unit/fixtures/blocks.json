@@ -1,0 +1,762 @@
+[
+    {
+        "type": "block",
+        "data": {
+            "name": "IB1",
+            "userName": "Dummy3",
+            "comment": null,
+            "properties": [],
+            "state": 0,
+            "value": null,
+            "sensor": null,
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 0,
+            "direction": 0,
+            "length": 0.0,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB2",
+            "userName": "Dummy1",
+            "comment": null,
+            "properties": [],
+            "state": 0,
+            "value": null,
+            "sensor": null,
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 0,
+            "direction": 0,
+            "length": 0.0,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB3",
+            "userName": "Dummy2",
+            "comment": null,
+            "properties": [],
+            "state": 0,
+            "value": null,
+            "sensor": null,
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 0,
+            "direction": 0,
+            "length": 0.0,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB4",
+            "userName": "Dummy5",
+            "comment": null,
+            "properties": [],
+            "state": 0,
+            "value": null,
+            "sensor": null,
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 0,
+            "direction": 0,
+            "length": 0.0,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB5",
+            "userName": "Dummy6",
+            "comment": null,
+            "properties": [],
+            "state": 0,
+            "value": null,
+            "sensor": null,
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 0,
+            "direction": 0,
+            "length": 0.0,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB:AUTO:0001",
+            "userName": "SZ5",
+            "comment": null,
+            "properties": [],
+            "state": 4,
+            "value": null,
+            "sensor": "NS132",
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 0,
+            "direction": 0,
+            "length": 381.0,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB:AUTO:0002",
+            "userName": "EZ1",
+            "comment": null,
+            "properties": [],
+            "state": 4,
+            "value": null,
+            "sensor": "NS112",
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 0,
+            "direction": 0,
+            "length": 584.2,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB:AUTO:0003",
+            "userName": "NZ6",
+            "comment": null,
+            "properties": [],
+            "state": 4,
+            "value": null,
+            "sensor": "NS101",
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 1,
+            "direction": 0,
+            "length": 1016.0,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB:AUTO:0004",
+            "userName": "NZ8",
+            "comment": null,
+            "properties": [],
+            "state": 4,
+            "value": null,
+            "sensor": "NS103",
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 0,
+            "direction": 0,
+            "length": 482.6,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB:AUTO:0005",
+            "userName": "NZ3",
+            "comment": null,
+            "properties": [],
+            "state": 4,
+            "value": null,
+            "sensor": "NS98",
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 1,
+            "direction": 0,
+            "length": 1320.7999,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB:AUTO:0006",
+            "userName": "NZ2",
+            "comment": null,
+            "properties": [],
+            "state": 4,
+            "value": null,
+            "sensor": "NS97",
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 1,
+            "direction": 0,
+            "length": 381.0,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB:AUTO:0007",
+            "userName": "MNT",
+            "comment": null,
+            "properties": [],
+            "state": 4,
+            "value": null,
+            "sensor": "NS109",
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 0,
+            "direction": 0,
+            "length": 0.0,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB:AUTO:0008",
+            "userName": "SZ4",
+            "comment": null,
+            "properties": [],
+            "state": 4,
+            "value": null,
+            "sensor": "NS131",
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 0,
+            "direction": 0,
+            "length": 1981.2,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB:AUTO:0013",
+            "userName": "NZ9",
+            "comment": null,
+            "properties": [],
+            "state": 4,
+            "value": null,
+            "sensor": "NS104",
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 1,
+            "direction": 0,
+            "length": 2032.0,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB:AUTO:0014",
+            "userName": "EZ13",
+            "comment": null,
+            "properties": [],
+            "state": 4,
+            "value": null,
+            "sensor": "NS124",
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 0,
+            "direction": 0,
+            "length": 584.2,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB:AUTO:0015",
+            "userName": "NZ1",
+            "comment": null,
+            "properties": [],
+            "state": 4,
+            "value": null,
+            "sensor": "NS96",
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 1,
+            "direction": 0,
+            "length": 2438.4,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB:AUTO:0016",
+            "userName": "NZ4",
+            "comment": null,
+            "properties": [],
+            "state": 4,
+            "value": null,
+            "sensor": "NS99",
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 0,
+            "direction": 0,
+            "length": 0.0,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB:AUTO:0017",
+            "userName": "NZ7",
+            "comment": null,
+            "properties": [],
+            "state": 4,
+            "value": null,
+            "sensor": "NS102",
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 0,
+            "direction": 0,
+            "length": 0.0,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB:AUTO:0018",
+            "userName": "NZ10",
+            "comment": null,
+            "properties": [],
+            "state": 4,
+            "value": null,
+            "sensor": "NS105",
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 0,
+            "direction": 0,
+            "length": 0.0,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB:AUTO:0019",
+            "userName": "NZ5",
+            "comment": null,
+            "properties": [],
+            "state": 4,
+            "value": null,
+            "sensor": "NS100",
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 0,
+            "direction": 0,
+            "length": 0.0,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB:AUTO:0020",
+            "userName": "WEST NW",
+            "comment": null,
+            "properties": [],
+            "state": 4,
+            "value": null,
+            "sensor": "NS106",
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 1,
+            "direction": 0,
+            "length": 685.8,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB:AUTO:0021",
+            "userName": "SZ1",
+            "comment": null,
+            "properties": [],
+            "state": 4,
+            "value": null,
+            "sensor": "NS128",
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 1,
+            "direction": 0,
+            "length": 787.39996,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB:AUTO:0022",
+            "userName": "SZ3",
+            "comment": null,
+            "properties": [],
+            "state": 4,
+            "value": null,
+            "sensor": "NS130",
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 0,
+            "direction": 0,
+            "length": 0.0,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB:AUTO:0023",
+            "userName": "SZ2",
+            "comment": null,
+            "properties": [],
+            "state": 4,
+            "value": null,
+            "sensor": "NS129",
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 0,
+            "direction": 0,
+            "length": 0.0,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB:AUTO:0024",
+            "userName": "SZ6",
+            "comment": null,
+            "properties": [],
+            "state": 4,
+            "value": null,
+            "sensor": "NS135",
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 0,
+            "direction": 0,
+            "length": 0.0,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB:AUTO:0030",
+            "userName": "EZ12",
+            "comment": null,
+            "properties": [],
+            "state": 4,
+            "value": null,
+            "sensor": "NS123",
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 0,
+            "direction": 0,
+            "length": 0.0,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB:AUTO:0031",
+            "userName": "EZ9",
+            "comment": null,
+            "properties": [],
+            "state": 4,
+            "value": null,
+            "sensor": "NS120",
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 0,
+            "direction": 0,
+            "length": 0.0,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB:AUTO:0032",
+            "userName": "EZ7",
+            "comment": null,
+            "properties": [],
+            "state": 4,
+            "value": null,
+            "sensor": "NS125",
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 0,
+            "direction": 0,
+            "length": 1422.4,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB:AUTO:0033",
+            "userName": "EZ2",
+            "comment": null,
+            "properties": [],
+            "state": 4,
+            "value": null,
+            "sensor": "NS113",
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 0,
+            "direction": 0,
+            "length": 0.0,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB:AUTO:0034",
+            "userName": "EZ6",
+            "comment": null,
+            "properties": [],
+            "state": 4,
+            "value": null,
+            "sensor": "NS136",
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 0,
+            "direction": 0,
+            "length": 0.0,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB:AUTO:0035",
+            "userName": "EZ5",
+            "comment": null,
+            "properties": [],
+            "state": 4,
+            "value": null,
+            "sensor": "NS116",
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 0,
+            "direction": 0,
+            "length": 0.0,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB:AUTO:0036",
+            "userName": "EZ4",
+            "comment": null,
+            "properties": [],
+            "state": 4,
+            "value": null,
+            "sensor": "NS115",
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 0,
+            "direction": 0,
+            "length": 0.0,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB:AUTO:0037",
+            "userName": "EZ3",
+            "comment": null,
+            "properties": [],
+            "state": 4,
+            "value": null,
+            "sensor": "NS114",
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 0,
+            "direction": 0,
+            "length": 0.0,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB:AUTO:0038",
+            "userName": "EZ8",
+            "comment": null,
+            "properties": [],
+            "state": 4,
+            "value": null,
+            "sensor": "NS119",
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 0,
+            "direction": 0,
+            "length": 0.0,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB:AUTO:0039",
+            "userName": "EZ11",
+            "comment": null,
+            "properties": [],
+            "state": 4,
+            "value": null,
+            "sensor": "NS122",
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 0,
+            "direction": 0,
+            "length": 0.0,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB:AUTO:0040",
+            "userName": "EZ10",
+            "comment": null,
+            "properties": [],
+            "state": 4,
+            "value": null,
+            "sensor": "NS121",
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 0,
+            "direction": 0,
+            "length": 0.0,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB:AUTO:0041",
+            "userName": "SZ7",
+            "comment": null,
+            "properties": [],
+            "state": 4,
+            "value": null,
+            "sensor": "NS137",
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 0,
+            "direction": 0,
+            "length": 0.0,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    },
+    {
+        "type": "block",
+        "data": {
+            "name": "IB:AUTO:0042",
+            "userName": "WEST SW",
+            "comment": null,
+            "properties": [],
+            "state": 4,
+            "value": null,
+            "sensor": "NS107",
+            "reporter": null,
+            "speed": "Use Global Normal",
+            "curvature": 0,
+            "direction": 0,
+            "length": 812.8,
+            "permissive": false,
+            "speedLimit": 100.0,
+            "denied": []
+        }
+    }
+]

@@ -1,0 +1,170 @@
+[
+    {
+        "type": "signalHead",
+        "data": {
+            "name": "NH$1101",
+            "userName": "West-SW",
+            "comment": "sz1-west-SW",
+            "properties": [],
+            "lit": true,
+            "appearance": 16,
+            "held": false,
+            "state": 16,
+            "appearanceName": "Green"
+        }
+    },
+    {
+        "type": "signalHead",
+        "data": {
+            "name": "NH$1102",
+            "userName": "SZ2",
+            "comment": "mnt-sz2",
+            "properties": [],
+            "lit": true,
+            "appearance": 16,
+            "held": false,
+            "state": 16,
+            "appearanceName": "Green"
+        }
+    },
+    {
+        "type": "signalHead",
+        "data": {
+            "name": "NH$1105",
+            "userName": "S-MNT",
+            "comment": "sz2-mnt",
+            "properties": [],
+            "lit": true,
+            "appearance": 16,
+            "held": false,
+            "state": 16,
+            "appearanceName": "Green"
+        }
+    },
+    {
+        "type": "signalHead",
+        "data": {
+            "name": "NH$1114",
+            "userName": "EZ2",
+            "comment": "sz6-ez2",
+            "properties": [],
+            "lit": true,
+            "appearance": 16,
+            "held": false,
+            "state": 16,
+            "appearanceName": "Green"
+        }
+    },
+    {
+        "type": "signalHead",
+        "data": {
+            "name": "NH$1117",
+            "userName": "EZ1",
+            "comment": "sz5-ez1",
+            "properties": [],
+            "lit": true,
+            "appearance": 16,
+            "held": false,
+            "state": 16,
+            "appearanceName": "Green"
+        }
+    },
+    {
+        "type": "signalHead",
+        "data": {
+            "name": "NH$1201",
+            "userName": "SZ5",
+            "comment": "ez1-sz5",
+            "properties": [],
+            "lit": true,
+            "appearance": 16,
+            "held": false,
+            "state": 16,
+            "appearanceName": "Green"
+        }
+    },
+    {
+        "type": "signalHead",
+        "data": {
+            "name": "NH$1202",
+            "userName": "SZ6",
+            "comment": "ez2-sz6",
+            "properties": [],
+            "lit": true,
+            "appearance": 16,
+            "held": false,
+            "state": 16,
+            "appearanceName": "Green"
+        }
+    },
+    {
+        "type": "signalHead",
+        "data": {
+            "name": "NH$1209",
+            "userName": "E-NZ1",
+            "comment": "ez13-nz1",
+            "properties": [],
+            "lit": true,
+            "appearance": 16,
+            "held": false,
+            "state": 16,
+            "appearanceName": "Green"
+        }
+    },
+    {
+        "type": "signalHead",
+        "data": {
+            "name": "NH$1211",
+            "userName": "E-MNT",
+            "comment": "ez9-mnt",
+            "properties": [],
+            "lit": true,
+            "appearance": 16,
+            "held": false,
+            "state": 16,
+            "appearanceName": "Green"
+        }
+    },
+    {
+        "type": "signalHead",
+        "data": {
+            "name": "NH$1212",
+            "userName": "EZ9",
+            "comment": "mnt-ez9",
+            "properties": [],
+            "lit": true,
+            "appearance": 16,
+            "held": false,
+            "state": 16,
+            "appearanceName": "Green"
+        }
+    },
+    {
+        "type": "signalHead",
+        "data": {
+            "name": "NH$1301",
+            "userName": "N-NZ1",
+            "comment": "nz2-nz1",
+            "properties": [],
+            "lit": true,
+            "appearance": 16,
+            "held": false,
+            "state": 16,
+            "appearanceName": "Green"
+        }
+    },
+    {
+        "type": "signalHead",
+        "data": {
+            "name": "NH$1309",
+            "userName": "West-NW",
+            "comment": "nz9-west-NW",
+            "properties": [],
+            "lit": true,
+            "appearance": 16,
+            "held": false,
+            "state": 16,
+            "appearanceName": "Green"
+        }
+    }
+]

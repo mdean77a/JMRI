@@ -1,0 +1,92 @@
+[
+    {
+        "type": "memory",
+        "data": {
+            "name": "IM:AUTO:0001",
+            "userName": "Train Done",
+            "comment": "Flag that preceding train done.",
+            "properties": [],
+            "value": "No"
+        }
+    },
+    {
+        "type": "memory",
+        "data": {
+            "name": "IM:AUTO:0002",
+            "userName": "Start Amtrak Train",
+            "comment": "Flag to start Amtrak train.",
+            "properties": [],
+            "value": "No"
+        }
+    },
+    {
+        "type": "memory",
+        "data": {
+            "name": "IM:AUTO:0003",
+            "userName": "Start Coal Train",
+            "comment": "Flag to start SP coal train.",
+            "properties": [],
+            "value": "No"
+        }
+    },
+    {
+        "type": "memory",
+        "data": {
+            "name": "IM:AUTO:0004",
+            "userName": null,
+            "comment": null,
+            "properties": [],
+            "value": null
+        }
+    },
+    {
+        "type": "memory",
+        "data": {
+            "name": "IM:AUTO:0005",
+            "userName": "Start Intermodal Train",
+            "comment": null,
+            "properties": [],
+            "value": "No"
+        }
+    },
+    {
+        "type": "memory",
+        "data": {
+            "name": "IM:AUTO:0006",
+            "userName": "Intermediate Work Done",
+            "comment": null,
+            "properties": [],
+            "value": "No"
+        }
+    },
+    {
+        "type": "memory",
+        "data": {
+            "name": "IM:AUTO:0007",
+            "userName": null,
+            "comment": null,
+            "properties": [],
+            "value": null
+        }
+    },
+    {
+        "type": "memory",
+        "data": {
+            "name": "IMCURRENTTIME",
+            "userName": null,
+            "comment": null,
+            "properties": [],
+            "value": "4:31 PM"
+        }
+    },
+    {
+        "type": "memory",
+        "data": {
+            "name": "IMRATEFACTOR",
+            "userName": null,
+            "comment": null,
+            "properties": [],
+            "value": "1.0"
+        }
+    }
+]

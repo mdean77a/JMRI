@@ -1,0 +1,695 @@
+[
+    {
+        "type": "sensor",
+        "data": {
+            "name": "IS1",
+            "userName": "NW Staging Close",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "IS2",
+            "userName": "NW Staging Track 1",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "IS3",
+            "userName": "NW Staging Track 2",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "IS4",
+            "userName": "Reset",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "IS5",
+            "userName": "NW Staging Track 3",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "IS6",
+            "userName": "NW Staging Track 4",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "IS7",
+            "userName": "NW Staging Track 5",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "IS8",
+            "userName": "NW Staging Track 6",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "IS9",
+            "userName": "NW Bypass Track",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "IS10",
+            "userName": "SW Staging Close",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "IS11",
+            "userName": "SW Staging Track 1",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "IS12",
+            "userName": "SW Staging Track 2",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "IS13",
+            "userName": "SW Staging Track 3",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "IS14",
+            "userName": "SW Staging Track 4",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "IS15",
+            "userName": "SW Close Staging Track 4",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "ISCLOCKRUNNING",
+            "userName": null,
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS80",
+            "userName": "South Track 4",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS81",
+            "userName": "South Track 2",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS82",
+            "userName": "South Track 3",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS83",
+            "userName": "South Reset Main",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS84",
+            "userName": null,
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS85",
+            "userName": "South Track 1",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS86",
+            "userName": "North Reset Main",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS87",
+            "userName": "North Track 2",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS88",
+            "userName": "North Track 1",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS89",
+            "userName": "North Track 4",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS90",
+            "userName": "North Track 3",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS91",
+            "userName": "North Bypass",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS92",
+            "userName": "North Track 5",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS93",
+            "userName": "North Track 6",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS96",
+            "userName": "North Zone 1",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS97",
+            "userName": "North Zone 2",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS98",
+            "userName": "North Zone 3",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS99",
+            "userName": "North Zone 4",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS100",
+            "userName": "North Zone 5",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS101",
+            "userName": "North Zone 6",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS102",
+            "userName": "North Zone 7",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS103",
+            "userName": "North Zone 8",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS104",
+            "userName": "North Zone 9",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS105",
+            "userName": "North Zone 10",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS106",
+            "userName": "West / NW",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS107",
+            "userName": "West / SW",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS109",
+            "userName": "Mountain",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS112",
+            "userName": "East Zone 1",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS113",
+            "userName": "East Zone 2",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS114",
+            "userName": "East Zone 3",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS115",
+            "userName": "East Zone 4",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS116",
+            "userName": "East Zone 5",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS119",
+            "userName": "East Zone 8",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS120",
+            "userName": "East Zone 9",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS121",
+            "userName": "East Zone 10",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS122",
+            "userName": "East Zone 11",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS123",
+            "userName": "East Zone 12",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS124",
+            "userName": "East Zone 13",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS125",
+            "userName": "East Zone 7",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS128",
+            "userName": "South Zone 1",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS129",
+            "userName": "South Zone 2",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS130",
+            "userName": "South Zone 3",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS131",
+            "userName": "South Zone 4",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS132",
+            "userName": "South Zone 5",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS135",
+            "userName": "South Zone 6",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS136",
+            "userName": "East Zone 6",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    },
+    {
+        "type": "sensor",
+        "data": {
+            "name": "NS137",
+            "userName": "South Zone 7",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4
+        }
+    }
+]

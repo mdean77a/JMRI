@@ -1,0 +1,1198 @@
+[
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT100",
+            "userName": "South Turnout 100",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT101",
+            "userName": "South Turnout 101",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 0,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT102",
+            "userName": "South Turnout 102",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 0,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT103",
+            "userName": "South Turnout 103",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 0,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT104",
+            "userName": "South Turnout 104",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 0,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT105",
+            "userName": "South Turnout 105",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT106",
+            "userName": "South Turnout 106",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT107",
+            "userName": "South Turnout 107",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 0,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT108",
+            "userName": "South Turnout 108",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 0,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT109",
+            "userName": "South Turnout 109",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT110",
+            "userName": "South Turnout 110",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT111",
+            "userName": "South Turnout 111",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT112",
+            "userName": "South Turnout 112",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT113",
+            "userName": "South Turnout 113",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 0,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT114",
+            "userName": "South Turnout 114",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 0,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT115",
+            "userName": "South Turnout 115",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT116",
+            "userName": "South Turnout 116",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT117",
+            "userName": "South Turnout 117",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT118",
+            "userName": "South Turnout 118",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT201",
+            "userName": "East Turnout 201",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT202",
+            "userName": "East Turnout 202",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT203",
+            "userName": "East Turnout 203",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT204",
+            "userName": "East Turnout 204",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT205",
+            "userName": "East Turnout 205",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT206",
+            "userName": "East Turnout 206",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT207",
+            "userName": "East Turnout 207",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT208",
+            "userName": "East Turnout 208",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT209",
+            "userName": "East Turnout 209",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT210",
+            "userName": "East Turnout 210",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT211",
+            "userName": "East Turnout 211",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT301",
+            "userName": "North Turnout 301",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT302",
+            "userName": "North Turnout 302",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT303",
+            "userName": "North Turnout 303",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT304",
+            "userName": "North Turnout 304",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT305",
+            "userName": "North Turnout 305",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT306",
+            "userName": "North Turnout 306",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT307",
+            "userName": "North Turnout 307",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT308",
+            "userName": "North Turnout 308",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT309",
+            "userName": "North Turnout 309",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT400",
+            "userName": "Staging NW Turnout 400",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT401",
+            "userName": "Staging NW Turnout 401",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT402",
+            "userName": "Staging NW Turnout 402",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT403",
+            "userName": "Staging NW Turnout 403",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT404",
+            "userName": "Staging NW Turnout 404",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT405",
+            "userName": "Staging NW Turnout 405",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT406",
+            "userName": "Staging NW Turnout 406",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT407",
+            "userName": "Staging NW Turnout 407",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 4,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT500",
+            "userName": "Staging SW Turnout 500",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT501",
+            "userName": "Staging SW Turnout 501",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT502",
+            "userName": "Staging SW Turnout 502",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT503",
+            "userName": "Staging SW Turnout 503",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    },
+    {
+        "type": "turnout",
+        "data": {
+            "name": "NT504",
+            "userName": "Staging SW Turnout 504",
+            "comment": null,
+            "properties": [],
+            "inverted": false,
+            "state": 2,
+            "feedbackMode": 1,
+            "feedbackModes": [
+                16,
+                32,
+                128,
+                1,
+                8
+            ],
+            "sensor": [
+                null,
+                null
+            ]
+        }
+    }
+]
