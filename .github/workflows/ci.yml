@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    paths:
+      - 'python_code/**'
+      - '.github/workflows/ci.yml'
+  pull_request:
+    paths:
+      - 'python_code/**'
+      - '.github/workflows/ci.yml'
+
+defaults:
+  run:
+    working-directory: python_code
+
+jobs:
+  test:
+    name: ${{ matrix.os }} / Python ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: ['3.11', '3.12', '3.13']
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install uv and Python ${{ matrix.python-version }}
+        uses: astral-sh/setup-uv@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
+          cache-dependency-glob: "python_code/uv.lock"
+
+      - name: Install dependencies (uv sync)
+        run: uv sync
+
+      - name: Lint (ruff check)
+        run: uv run ruff check
+
+      - name: Format check (ruff format --check)
+        run: uv run ruff format --check
+
+      - name: Type check (mypy --strict)
+        run: uv run mypy src/pyjmri
+
+      - name: Unit tests (pytest -m "not integration")
+        run: uv run pytest -m "not integration" || ([ $? = 5 ] && echo "No tests collected — passing.")
