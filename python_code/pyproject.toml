@@ -1,0 +1,14 @@
+[project]
+name = "pyjmri"
+version = "0.1.0"
+description = "Async Python client for the JMRI web server"
+readme = "README.md"
+authors = [
+    { name = "Mike Dean", email = "miketraindoc@gmail.com" }
+]
+requires-python = ">=3.11"
+dependencies = []
+
+[build-system]
+requires = ["uv_build>=0.7.6,<0.8"]
+build-backend = "uv_build"
