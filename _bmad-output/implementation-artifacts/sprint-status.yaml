@@ -51,8 +51,8 @@ development_status:
   epic-1-retrospective: done
 
   # Epic 2: Connect to JMRI and Discover the Layout
-  epic-2: backlog
-  2-1-http-transport-client-lifecycle-exception-hierarchy-logging-foundation: backlog
+  epic-2: in-progress
+  2-1-http-transport-client-lifecycle-exception-hierarchy-logging-foundation: done
   2-2-wire-format-translation-codes-parsing-per-entity-state-enums: backlog
   2-3-per-entity-classes-with-read-only-state-and-value-access: backlog
   2-4-layout-container-entitycollection-with-dual-name-lookup: backlog
