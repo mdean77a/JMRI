@@ -85,42 +85,6 @@ def test_client_accepts_documented_url_forms(url: str) -> None:
     assert client._port == 12080
 
 
-@pytest.fixture
-def patch_http_factory(
-    monkeypatch: pytest.MonkeyPatch,
-) -> list[Any]:
-    """Replace ``HTTPClient`` inside ``client.py`` with a test factory.
-
-    Returns a list that captures every constructed fake transport so tests
-    can assert on ``probed`` and ``closed`` flags.
-    """
-    from pyjmri import client as client_module
-
-    constructed: list[Any] = []
-
-    class FakeHTTPClient:
-        def __init__(self, **kwargs: Any) -> None:
-            self.kwargs = kwargs
-            self.host = kwargs["host"]
-            self.port = kwargs["port"]
-            self.probed: list[str] = []
-            self.close_count = 0
-            self.fail_with: BaseException | None = None
-            constructed.append(self)
-
-        async def get(self, path: str) -> dict[str, Any]:
-            self.probed.append(path)
-            if self.fail_with is not None:
-                raise self.fail_with
-            return {}
-
-        async def aclose(self) -> None:
-            self.close_count += 1
-
-    monkeypatch.setattr(client_module, "HTTPClient", FakeHTTPClient)
-    return constructed
-
-
 async def test_aenter_probes_version_and_aexit_closes(
     patch_http_factory: list[Any],
 ) -> None:

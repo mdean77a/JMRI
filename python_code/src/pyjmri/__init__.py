@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 
-from pyjmri.block import BlockState
+from pyjmri.block import Block, BlockState
 from pyjmri.client import Client, ClientConfig, ReconnectConfig
 from pyjmri.exceptions import (
     JMRIConnectionError,
@@ -20,15 +20,18 @@ from pyjmri.exceptions import (
     ThrottleReleased,
     WaitTimeout,
 )
-from pyjmri.light import LightState
+from pyjmri.light import Light, LightState
+from pyjmri.memory import Memory
 from pyjmri.power import PowerState
-from pyjmri.sensor import SensorState
-from pyjmri.signal import SignalHeadAppearance, SignalMastAspect
-from pyjmri.turnout import TurnoutState
+from pyjmri.route import Route
+from pyjmri.sensor import Sensor, SensorState
+from pyjmri.signal import SignalHead, SignalHeadAppearance, SignalMast, SignalMastAspect
+from pyjmri.turnout import Turnout, TurnoutState
 
 logging.getLogger("pyjmri").addHandler(logging.NullHandler())
 
 __all__ = [
+    "Block",
     "BlockState",
     "Client",
     "ClientConfig",
@@ -40,15 +43,22 @@ __all__ = [
     "JMRIVersionUnsupported",
     "LayoutEntityNotControllable",
     "LayoutEntityNotFound",
+    "Light",
     "LightState",
+    "Memory",
     "PowerState",
     "ReconnectConfig",
+    "Route",
+    "Sensor",
     "SensorState",
+    "SignalHead",
     "SignalHeadAppearance",
+    "SignalMast",
     "SignalMastAspect",
     "ThrottleAcquireFailed",
     "ThrottleError",
     "ThrottleReleased",
+    "Turnout",
     "TurnoutState",
     "WaitTimeout",
 ]

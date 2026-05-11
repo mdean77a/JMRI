@@ -8,10 +8,13 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass, field
 from types import TracebackType
-from typing import Self
-from urllib.parse import urlparse
+from typing import Any, Self
+from urllib.parse import quote, urlparse
 
+from pyjmri._parsing import parse_power
 from pyjmri._transport import HTTPClient
+from pyjmri.exceptions import JMRIProtocolError
+from pyjmri.power import PowerState
 
 __all__ = ["Client", "ClientConfig", "ReconnectConfig"]
 
@@ -104,6 +107,81 @@ class Client:
         if self._http is not None:
             await self._http.aclose()
             self._http = None
+
+    async def get_entity(self, entity_type: str, name: str) -> dict[str, Any]:
+        """Implementation of :class:`pyjmri._protocols.ClientHandle`.
+
+        For internal use by domain entity classes (``Turnout``, ``Sensor``,
+        etc.). Issues ``GET /json/v5/{entity_type}/{quoted_name}`` and
+        returns the single-entity envelope dict that ``parse_<entity>``
+        consumes.
+
+        Raises:
+            RuntimeError: when the Client is not open.
+            JMRIProtocolError: when JMRI returns an empty list (entity
+                not found) or a non-dict payload for a per-name endpoint.
+            JMRIConnectionError, JMRIRequestTimeout: surfaced from the
+                HTTP transport.
+        """
+        if self._http is None:
+            raise RuntimeError("Client is not open; use 'async with Client() as jmri:'")
+        path = f"/json/v5/{entity_type}/{quote(name, safe='')}"
+        payload = await self._http.get(path)
+        if isinstance(payload, list) and not payload:
+            raise JMRIProtocolError(
+                "entity not found: per-name endpoint returned empty list",
+                entity_type=entity_type,
+                name=name,
+                path=path,
+            )
+        if not isinstance(payload, dict):
+            raise JMRIProtocolError(
+                "expected single entity envelope, got list",
+                entity_type=entity_type,
+                name=name,
+                path=path,
+            )
+        return payload
+
+    async def power_state(self) -> PowerState:
+        """Return the current JMRI track-power state.
+
+        Issues ``GET /json/v5/power`` and returns the parsed
+        :class:`~pyjmri.PowerState`. Read-only by design — the booster's
+        physical power switch is the source of truth on NCE hardware
+        (PRD FR16, sec. "Power control" note).
+
+        Raises:
+            RuntimeError: when the Client is not open.
+            JMRIProtocolError: when the JMRI response is empty or
+                malformed.
+            JMRIConnectionError, JMRIRequestTimeout: surfaced from the
+                HTTP transport.
+        """
+        if self._http is None:
+            raise RuntimeError("Client is not open; use 'async with Client() as jmri:'")
+        payload = await self._http.get("/json/v5/power")
+        if isinstance(payload, list):
+            if not payload:
+                raise JMRIProtocolError(
+                    "empty power response",
+                    path="/json/v5/power",
+                )
+            envelope = payload[0]
+            if not isinstance(envelope, dict):
+                raise JMRIProtocolError(
+                    "unexpected power response type",
+                    path="/json/v5/power",
+                )
+        elif isinstance(payload, dict):
+            envelope = payload
+        else:
+            raise JMRIProtocolError(
+                "unexpected power response type",
+                path="/json/v5/power",
+            )
+        parsed = parse_power(envelope)
+        return parsed.state
 
 
 def _parse_url(url: str) -> tuple[str, int, str]:
