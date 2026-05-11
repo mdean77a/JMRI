@@ -20,6 +20,7 @@ from pyjmri.exceptions import (
     ThrottleReleased,
     WaitTimeout,
 )
+from pyjmri.layout import EntityCollection, Layout
 from pyjmri.light import Light, LightState
 from pyjmri.memory import Memory
 from pyjmri.power import PowerState
@@ -35,12 +36,14 @@ __all__ = [
     "BlockState",
     "Client",
     "ClientConfig",
+    "EntityCollection",
     "JMRIConnectionError",
     "JMRIError",
     "JMRIProtocolError",
     "JMRIReconnectFailed",
     "JMRIRequestTimeout",
     "JMRIVersionUnsupported",
+    "Layout",
     "LayoutEntityNotControllable",
     "LayoutEntityNotFound",
     "Light",

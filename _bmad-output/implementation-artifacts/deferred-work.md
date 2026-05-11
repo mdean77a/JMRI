@@ -17,6 +17,11 @@
 - **`power_state()` discards `parsed.name` and `parsed.default`** — By design for single-booster v1. If multi-district support is added, the `default=True` flag should be used to select the primary booster rather than always taking `payload[0]`.
 - **`SignalHead`/`SignalMast` `get_state()` atomicity guarantee undocumented** — Both methods update all fields only after a successful parse (all-or-nothing). The docstrings' "Side effects: also updates `held` and `lit`" should note this is atomic.
 
+## Deferred from: code review of 2-4-layout-container-entitycollection-with-dual-name-lookup (2026-05-11)
+
+- **`Mapping.get()` raises `LayoutEntityNotFound` instead of returning default** — `EntityCollection` inherits `Mapping.get()` which catches only `KeyError`; `LayoutEntityNotFound` inherits `JMRIError`, not `KeyError`. Fix: add `KeyError` to `LayoutEntityNotFound`'s bases in `exceptions.py` (analogous to `WaitTimeout(JMRIError, TimeoutError)`). Apply next time `exceptions.py` is touched.
+- **Silent overwrite on duplicate system names in `EntityCollection.__init__`** — If two entities share a system name, the later one silently overwrites the earlier one. JMRI guarantees unique system names per entity type, so this is low-risk in practice. Could add an assertion or warning if defensive validation is desired in a future hardening pass.
+
 ## Deferred from: code review of 2-1-http-transport-client-lifecycle-exception-hierarchy-logging-foundation (2026-05-07)
 
 - **Logger calls absent in `_transport.py` and `client.py`** — AC #5 only requires logger declaration; actual `logger.debug()`/`logger.info()` calls for HTTP request/response events are appropriate for stories 2.2+ when there are substantive transport operations to log.
