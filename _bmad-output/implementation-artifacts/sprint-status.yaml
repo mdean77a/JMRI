@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-05-07
-last_updated: 2026-05-11  # 2-4 review → done (code review, 2 deferred)
+last_updated: 2026-05-11  # 2-5 in-progress → review (dev-story complete)
 project: JMRI
 project_key: NOKEY
 tracking_system: file-system
@@ -56,7 +56,7 @@ development_status:
   2-2-wire-format-translation-codes-parsing-per-entity-state-enums: done
   2-3-per-entity-classes-with-read-only-state-and-value-access: done
   2-4-layout-container-entitycollection-with-dual-name-lookup: done
-  2-5-client-discover-parallel-discovery-jmri-version-check-integration-smoke-test: backlog
+  2-5-client-discover-parallel-discovery-jmri-version-check-integration-smoke-test: review
   epic-2-retrospective: optional
 
   # Epic 3: Subscribe to State Changes and Wait Asynchronously

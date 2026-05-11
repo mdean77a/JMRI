@@ -83,10 +83,24 @@ def patch_http_factory(
     tests can assert on ``probed`` and ``close_count``. Each fake exposes
     a ``next_response`` attribute (default ``{}``) which controls what
     :meth:`get` returns.
+
+    ``next_response`` may be one of:
+
+    * A ``dict`` or ``list`` — returned verbatim for every ``get()`` call.
+    * A callable ``(path: str) -> dict | list`` — invoked with the request
+      path, and its return value used as the response. Use this form to
+      stage different responses per path (e.g., distinct payloads for
+      ``/json/v5/version`` vs. ``/json/v5/turnout``).
     """
     from pyjmri import client as client_module
 
     constructed: list[Any] = []
+
+    NextResponse = (
+        dict[str, Any]
+        | list[dict[str, Any]]
+        | Callable[[str], dict[str, Any] | list[dict[str, Any]]]
+    )
 
     class FakeHTTPClient:
         def __init__(self, **kwargs: Any) -> None:
@@ -96,13 +110,15 @@ def patch_http_factory(
             self.probed: list[str] = []
             self.close_count = 0
             self.fail_with: BaseException | None = None
-            self.next_response: dict[str, Any] | list[dict[str, Any]] = {}
+            self.next_response: NextResponse = {}
             constructed.append(self)
 
         async def get(self, path: str) -> dict[str, Any] | list[dict[str, Any]]:
             self.probed.append(path)
             if self.fail_with is not None:
                 raise self.fail_with
+            if callable(self.next_response):
+                return self.next_response(path)
             return self.next_response
 
         async def aclose(self) -> None:
