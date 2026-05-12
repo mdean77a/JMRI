@@ -76,6 +76,14 @@ class JMRIConnectionError(JMRIError):
 class JMRIReconnectFailed(JMRIConnectionError):
     """Raised when the WebSocket reconnect loop exhausts ``max_attempts``."""
 
+    def __str__(self) -> str:
+        attempts = self.context.get("attempts", "?")
+        cause = self.context.get("cause", "unknown")
+        return (
+            f"WebSocket reconnect failed after {attempts} attempt(s) ({cause}) "
+            f"on {self.host}:{self.port}"
+        )
+
 
 class JMRIRequestTimeout(JMRIError):
     """Raised when an HTTP request exceeds ``request_timeout``."""
@@ -89,8 +97,13 @@ class JMRIVersionUnsupported(JMRIProtocolError):
     """Raised when the connected JMRI is older than the minimum version (5.14)."""
 
 
-class LayoutEntityNotFound(JMRIError):
-    """Raised when a name is not in the user-name OR system-name index."""
+class LayoutEntityNotFound(JMRIError, KeyError):
+    """Raised when a name is not in the user-name OR system-name index.
+
+    Multi-inherits :class:`KeyError` so :meth:`collections.abc.Mapping.get`
+    (which catches only ``KeyError``) returns the supplied default rather
+    than surfacing the lookup miss.
+    """
 
 
 class LayoutEntityNotControllable(JMRIError):

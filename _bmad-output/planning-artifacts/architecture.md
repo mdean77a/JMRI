@@ -276,8 +276,7 @@ configured as part of the project-init story:
 - **Mypy** strict config in `[tool.mypy]` (`strict = true`, no
   implicit `Any` on the public surface)
 - **Pytest** config in `[tool.pytest.ini_options]` plus
-  `pytest-asyncio` as a dev dependency (`asyncio_mode = "auto"`
-  or per-test marker — to be decided when writing the first test)
+  `pytest-asyncio` as a dev dependency (`asyncio_mode = "auto"`)
 - **Tests directory split**: `tests/unit/` and `tests/integration/`
   to enforce the unit-vs-integration test-harness boundary
   identified in step 2's cross-cutting concerns
@@ -294,6 +293,12 @@ configured as part of the project-init story:
 
 **Note:** Project initialization using this command should be the
 first implementation story.
+
+**Tool versions are not pinned in this document.** `uv.lock` is the
+source of truth for dev-tool versions (`ruff`, `mypy`, `pytest`,
+`pytest-asyncio`, etc.). Stories that need a specific tool feature
+should reference the feature, not a version range, and let `uv`
+resolve the lockfile.
 
 ## Core Architectural Decisions
 
@@ -363,7 +368,7 @@ loaded, discovery and the library's primitives must work.
 | Concern | Decision | Rationale |
 |---|---|---|
 | HTTP client | `httpx` (async client only) | Modern, mypy-strict friendly, used by major Python SDKs (OpenAI, Anthropic, FastAPI TestClient); JMRI is HTTP/1.1 so HTTP/2 is irrelevant; performance ceiling is irrelevant for human-paced layout commands |
-| WebSocket client | `websockets` (>= 16.0) | Purpose-built for WS, asyncio-first; built-in auto-reconnect via `connect()` async iterator and `process_exception()` retry policy hook — maps directly to NFR5/NFR6 |
+| WebSocket client | `websockets` (>= 16.0) | Purpose-built for WS, asyncio-first; built-in auto-reconnect via `connect()` async iterator (NFR5). Backoff timing is the library's built-in (NFR6); `process_exception(exc) -> Exception \| None` controls retryable-vs-fatal only (not delays). |
 | Rejected: `aiohttp` for both | n/a | WS is secondary in aiohttp; reconnect is roll-your-own; no win over the split design |
 | Rejected: `httpx-ws` | n/a | Still in beta on PyPI; one-hour-unattended NFR4 makes beta a risk |
 
@@ -472,12 +477,28 @@ JMRIError                           (base; carries diagnostic context dict)
 - **No event replay attempted.** Events that fired during the
   disconnect window are not delivered as discrete events; they
   surface only as "current state on resubscribe."
-- **Backoff policy** (encoded in the `process_exception` hook):
-  initial 0.5 s, doubled on each failure, capped at 30 s, with ±25%
-  jitter. PRD NFR6.
+- **Backoff policy:** delegated to `websockets`' built-in `backoff()`
+  generator (random initial 0–5 s, then 3.1 s growing by factor 1.618,
+  capped at 90 s). This satisfies NFR6's "bounded exponential backoff
+  with sensible defaults" — the library's defaults are the sensible
+  defaults. The library does not expose a per-`connect()` parameter
+  for delay tuning; only env vars (`WEBSOCKETS_BACKOFF_INITIAL_DELAY`,
+  etc.) can override globally. v1 ships with library defaults and
+  exposes no delay-tuning knob on `ReconnectConfig` — the `process_exception`
+  hook returns `Exception | None` (retryable vs fatal), not a delay
+  value. *(Spec revision 2026-05-12: the original architecture text
+  showed a `process_exception` hook returning the next delay as a
+  float. That misread the websockets v16 API; corrected during Story
+  3.1 dev.)*
 - **Give-up:** retry forever by default. Optional
-  `max_attempts: int | None = None` config; if exhausted, raise
-  `JMRIReconnectFailed` and tear down the Client.
+  `max_attempts: int | None = None` config; the `process_exception`
+  hook counts consecutive failures and returns a fatal exception
+  once `attempt >= max_attempts`, breaking the async-iterator loop.
+  `WSConnection.run` re-raises as `JMRIReconnectFailed`.
+- **Heartbeat:** JMRI's `hello` envelope advertises a 13.5 s heartbeat.
+  pyjmri sets `websockets.connect(..., ping_interval=10)` so the WS
+  protocol's ping/pong satisfies JMRI's "any inbound traffic" check
+  without a JMRI-specific heartbeat envelope.
 
 ### Command / Event Correlation
 
@@ -623,10 +644,9 @@ class Client:
 
 @dataclass(frozen=True, kw_only=True)
 class ReconnectConfig:
-    initial_delay: float = 0.5
-    max_delay: float = 30.0
-    jitter: float = 0.25
-    max_attempts: int | None = None  # None = retry forever
+    max_attempts: int | None = None  # None = retry forever; backoff timing
+                                     # is delegated to websockets' built-in
+                                     # backoff() (NFR6).
 
 @dataclass(frozen=True, kw_only=True)
 class ClientConfig:
@@ -937,10 +957,14 @@ it rather than duplicating rules.
 ### Complete Project Directory Structure
 
 ```text
+# Note: .github/workflows/ci.yml lives at the JMRI repository root,
+# NOT under python_code/. GitHub Actions only reads .github/ from the
+# repository root, so workflow files must be there. The pyjmri-specific
+# CI workflow path-scopes itself to python_code/** to avoid running on
+# panel-XML / roster / Jython commits. The tree below shows only the
+# pyjmri project directory.
+
 python_code/                              # repo-root for pyjmri (named per Step 3)
-├── .github/
-│   └── workflows/
-│       └── ci.yml                        # macOS+Linux × Python 3.11/3.12/3.13
 ├── .gitignore                            # uv init default + project additions
 ├── .python-version                       # Python 3.11 (or later) pin
 ├── LICENSE                               # MIT (Business Success)
@@ -1116,8 +1140,11 @@ tree.
 - `examples/hello_jmri.py`, `examples/back_and_forth.py`,
   `examples/multi_train_session.py` — FR43 shipped examples
 - `src/pyjmri/py.typed` — FR44 marker
-- `.github/workflows/ci.yml` — macOS+Linux × Python 3.11/3.12/3.13
-  matrix (NFR9)
+- `<repo-root>/.github/workflows/ci.yml` — macOS+Linux × Python
+  3.11/3.12/3.13 matrix (NFR9). Lives at the JMRI repository root,
+  not under `python_code/`, because GitHub Actions only reads
+  `.github/` from the repo root. Path-scoped to `python_code/**` so
+  panel-XML / roster / Jython commits do not trigger CI.
 
 ### Cross-Cutting Concerns Mapping
 

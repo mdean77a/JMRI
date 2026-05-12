@@ -90,6 +90,19 @@ def test_getitem_missing_key_raises_layout_entity_not_found(make_fake_handle: An
         collection["NT-missing"]
 
 
+def test_get_missing_returns_default_now_that_layout_entity_not_found_is_key_error(
+    make_fake_handle: Any,
+) -> None:
+    # AC10 (Story 3.1): LayoutEntityNotFound multi-inherits KeyError so
+    # Mapping.get's internal except-KeyError catches it and returns the
+    # default rather than surfacing the lookup miss.
+    collection: EntityCollection[Turnout] = EntityCollection([], entity_type="turnout")
+
+    assert collection.get("NT-missing") is None
+    sentinel = object()
+    assert collection.get("NT-missing", sentinel) is sentinel
+
+
 def test_layout_entity_not_found_carries_entity_type_and_key(make_fake_handle: Any) -> None:
     collection: EntityCollection[Turnout] = EntityCollection([], entity_type="turnout")
 

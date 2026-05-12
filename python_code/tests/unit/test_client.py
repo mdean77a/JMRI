@@ -8,6 +8,7 @@ import httpx
 import pytest
 
 from pyjmri import Client, ClientConfig, JMRIConnectionError, ReconnectConfig
+from pyjmri._transport import WSConnection
 from pyjmri.client import _parse_url
 
 
@@ -47,6 +48,25 @@ def test_parse_url_rejects_unsupported_scheme() -> None:
     assert "unsupported URL scheme" in str(exc_info.value)
 
 
+def test_ws_connection_url_uses_wss_when_secure() -> None:
+    ws = WSConnection(
+        host="secure.example.com",
+        port=443,
+        reconnect_config=ReconnectConfig(),
+        secure=True,
+    )
+    assert ws.url == "wss://secure.example.com:443/json/"
+
+
+def test_ws_connection_url_uses_ws_by_default() -> None:
+    ws = WSConnection(
+        host="localhost",
+        port=12080,
+        reconnect_config=ReconnectConfig(),
+    )
+    assert ws.url == "ws://localhost:12080/json/"
+
+
 def test_client_default_url_is_localhost_12080() -> None:
     client = Client()
     assert client._host == "localhost"
@@ -64,7 +84,7 @@ def test_client_default_config_has_expected_defaults() -> None:
 def test_client_accepts_custom_config() -> None:
     cfg = ClientConfig(
         request_timeout=2.5,
-        reconnect=ReconnectConfig(initial_delay=1.0, max_attempts=5),
+        reconnect=ReconnectConfig(max_attempts=5),
     )
     client = Client("localhost:12080", config=cfg)
     assert client._config.request_timeout == 2.5
@@ -169,3 +189,73 @@ async def test_aenter_reentrant_raises_runtime_error(
     async with client:
         with pytest.raises(RuntimeError, match="already open"):
             await client.__aenter__()
+
+
+async def test_aenter_https_passes_secure_to_ws_connection(
+    patch_http_factory: list[Any],
+) -> None:
+    client = Client("https://localhost:12080")
+    async with client:
+        assert client._ws is not None
+        assert client._ws.kwargs.get("secure") is True
+
+
+async def test_aenter_establishes_websocket_alongside_http(
+    patch_http_factory: list[Any],
+) -> None:
+    # AC2: Client.__aenter__ establishes both HTTP and WS.
+    client = Client()
+    async with client:
+        assert client._http is not None
+        assert client._ws is not None
+        assert client._registry is not None
+        # FakeWSConnection records that "first connect" succeeded.
+        assert client._ws_connected is not None and client._ws_connected.is_set()
+
+
+async def test_aenter_supervises_ws_run_inside_taskgroup(
+    patch_http_factory: list[Any],
+) -> None:
+    # AC7: a single asyncio.TaskGroup supervises the WS receive loop.
+    client = Client()
+    async with client:
+        assert client._tg is not None
+        assert client._supervisor_task is not None
+        assert not client._supervisor_task.done()  # still running
+    # Exit cleanly: TaskGroup must have been closed.
+    assert client._tg is None
+    assert client._supervisor_task is None
+
+
+async def test_aexit_cancels_supervisor_task_cleanly(
+    patch_http_factory: list[Any],
+) -> None:
+    # AC7: __aexit__ cancels the supervisor; clean shutdown leaves no
+    # uncancelled task behind.
+    import asyncio
+
+    client = Client()
+    async with client:
+        captured_task = client._supervisor_task
+    assert captured_task is not None
+    assert captured_task.done()
+    # The fake supervisor swallows CancelledError and returns cleanly,
+    # so done() is True without an exception.
+    assert captured_task.cancelled() or captured_task.exception() is None
+    # Sanity: no uncancelled tasks left after the Client closes.
+    remaining = [t for t in asyncio.all_tasks() if not t.done()]
+    # Filter out the currently-running test task itself.
+    remaining = [t for t in remaining if t is not asyncio.current_task()]
+    assert remaining == []
+
+
+async def test_on_ws_message_is_a_stub_for_story_3_1(
+    patch_http_factory: list[Any],
+) -> None:
+    # AC11: 3.1 ships a stub message handler. Story 3.2 wires real dispatch.
+    client = Client()
+    async with client:
+        result = await client._on_ws_message(
+            {"type": "turnout", "data": {"name": "NT1", "state": 2}}
+        )
+    assert result is None

@@ -77,21 +77,28 @@ def make_fake_handle() -> Callable[[Callable[[str, str], dict[str, Any]]], Any]:
 def patch_http_factory(
     monkeypatch: pytest.MonkeyPatch,
 ) -> list[Any]:
-    """Replace ``HTTPClient`` inside ``client.py`` with a test factory.
+    """Replace ``HTTPClient`` and ``WSConnection`` inside ``client.py`` with test factories.
 
-    Returns a list that captures every constructed fake transport so
-    tests can assert on ``probed`` and ``close_count``. Each fake exposes
-    a ``next_response`` attribute (default ``{}``) which controls what
-    :meth:`get` returns.
+    Returns a list that captures every constructed fake HTTP transport so
+    tests can assert on ``probed`` and ``close_count``. Each fake HTTP
+    exposes a ``next_response`` attribute (default ``{}``) which controls
+    what :meth:`get` returns.
 
     ``next_response`` may be one of:
 
     * A ``dict`` or ``list`` — returned verbatim for every ``get()`` call.
     * A callable ``(path: str) -> dict | list`` — invoked with the request
-      path, and its return value used as the response. Use this form to
-      stage different responses per path (e.g., distinct payloads for
-      ``/json/v5/version`` vs. ``/json/v5/turnout``).
+      path, and its return value used as the response.
+
+    The fixture also stubs out ``WSConnection`` so unit tests do not
+    require a live JMRI WebSocket. The fake WS immediately signals
+    "connected" on its :class:`asyncio.Event`, records sent messages on
+    ``ws_constructed[-1].sent`` (when accessible via the
+    ``patch_ws_constructed`` fixture), and runs an inert receive loop
+    until cancelled.
     """
+    import asyncio as _asyncio
+
     from pyjmri import client as client_module
 
     constructed: list[Any] = []
@@ -124,5 +131,31 @@ def patch_http_factory(
         async def aclose(self) -> None:
             self.close_count += 1
 
+    class FakeWSConnection:
+        def __init__(self, **kwargs: Any) -> None:
+            self.kwargs = kwargs
+            self.host = kwargs["host"]
+            self.port = kwargs["port"]
+            self.sent: list[dict[str, Any]] = []
+            self._connected: _asyncio.Event | None = kwargs.get("connected_event")
+            self.on_reconnect = kwargs.get("on_reconnect")
+
+        async def run(
+            self,
+            on_message: Callable[[dict[str, Any]], Any],
+        ) -> None:
+            # Signal first-connect immediately; then idle until cancelled.
+            if self._connected is not None:
+                self._connected.set()
+            never_set = _asyncio.Event()
+            try:
+                await never_set.wait()  # blocks forever; cancelled in __aexit__
+            except _asyncio.CancelledError:
+                return
+
+        async def send(self, message: dict[str, Any]) -> None:
+            self.sent.append(message)
+
     monkeypatch.setattr(client_module, "HTTPClient", FakeHTTPClient)
+    monkeypatch.setattr(client_module, "WSConnection", FakeWSConnection)
     return constructed

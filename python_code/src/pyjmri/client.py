@@ -23,9 +23,14 @@ from pyjmri._parsing import (
     parse_signal_mast,
     parse_turnout,
 )
-from pyjmri._transport import HTTPClient
+from pyjmri._subscriptions import SubscriptionRegistry
+from pyjmri._transport import HTTPClient, WSConnection
 from pyjmri.block import Block
-from pyjmri.exceptions import JMRIProtocolError, JMRIVersionUnsupported
+from pyjmri.exceptions import (
+    JMRIConnectionError,
+    JMRIProtocolError,
+    JMRIVersionUnsupported,
+)
 from pyjmri.layout import EntityCollection, Layout
 from pyjmri.light import Light
 from pyjmri.memory import Memory
@@ -38,21 +43,25 @@ from pyjmri.turnout import Turnout
 __all__ = ["Client", "ClientConfig", "ReconnectConfig"]
 
 logger = logging.getLogger(__name__)
+logger_reconnect = logging.getLogger("pyjmri.reconnect")
 
 
 @dataclass(frozen=True, kw_only=True)
 class ReconnectConfig:
-    """WebSocket reconnect tuning. Consumed by Epic 3.
+    """WebSocket reconnect tuning.
 
-    Defined here in v1 so the public API surface is fixed before the
-    reconnect machinery lands. Constructing a ``ReconnectConfig`` today
-    has no effect; the values are read by the WebSocket transport in a
-    later story.
+    Only ``max_attempts`` is configurable. Delay timing is delegated to
+    the ``websockets`` library's built-in backoff (random initial 0-5 s,
+    growing by factor 1.618, capped at 90 s) — the v16 API exposes no
+    per-``connect()`` parameter for delay tuning, so ``pyjmri`` ships
+    with the library defaults and avoids process-wide env-var hacks.
+
+    Args:
+        max_attempts: Maximum consecutive reconnect attempts before the
+            Client gives up and raises :class:`JMRIReconnectFailed`.
+            ``None`` (default) retries forever.
     """
 
-    initial_delay: float = 0.5
-    max_delay: float = 30.0
-    jitter: float = 0.25
     max_attempts: int | None = None
 
 
@@ -63,8 +72,10 @@ class ClientConfig:
     request_timeout: float = 10.0
     reconnect: ReconnectConfig = field(default_factory=ReconnectConfig)
     subscription_replay_timeout: float = 30.0
-    """Seconds to wait for the subscription registry to replay after a
-    WebSocket reconnect. Consumed by Epic 3; currently unused in v1."""
+    """Maximum seconds to wait for the first WebSocket connection in
+    :meth:`Client.__aenter__`. Story 3.2 may also use this for
+    subscription-replay or ``wait_*`` deadlines tied to reconnect.
+    """
 
 
 class Client:
@@ -97,6 +108,11 @@ class Client:
         self._config = config or ClientConfig()
         self._http: HTTPClient | None = None
         self._version_checked: bool = False
+        self._tg: asyncio.TaskGroup | None = None
+        self._ws: WSConnection | None = None
+        self._registry: SubscriptionRegistry | None = None
+        self._ws_connected: asyncio.Event | None = None
+        self._supervisor_task: asyncio.Task[None] | None = None
 
     async def __aenter__(self) -> Self:
         if self._http is not None:
@@ -118,6 +134,48 @@ class Client:
             await self._http.aclose()
             self._http = None
             raise
+
+        # Open the Client-level TaskGroup that supervises every
+        # long-running coroutine the library owns (architecture sec.
+        # Concurrency Model). Currently supervises the WS receive loop;
+        # Story 5.1 will add per-throttle keep-alive tasks here.
+        self._tg = asyncio.TaskGroup()
+        await self._tg.__aenter__()
+        self._ws_connected = asyncio.Event()
+        self._ws = WSConnection(
+            host=self._host,
+            port=self._port,
+            reconnect_config=self._config.reconnect,
+            secure=self._scheme == "https",
+            on_reconnect=self._on_ws_reconnect,
+            connected_event=self._ws_connected,
+        )
+        self._registry = SubscriptionRegistry(send=self._ws.send)
+        self._supervisor_task = self._tg.create_task(self._ws.run(on_message=self._on_ws_message))
+
+        # Wait for the first WS connection to come up. If it doesn't
+        # within subscription_replay_timeout, tear down cleanly so the
+        # user doesn't get a half-open Client. If the supervisor task
+        # raises during this wait, the TaskGroup cancels this parent
+        # task; we catch CancelledError and unwrap the supervisor's
+        # exception from the TaskGroup's __aexit__ ExceptionGroup
+        # (Open Design Decision #2: unwrap single-exception groups at
+        # the API boundary).
+        try:
+            async with asyncio.timeout(self._config.subscription_replay_timeout):
+                await self._ws_connected.wait()
+        except BaseException as first_connect_exc:
+            await self._teardown_on_aenter_failure(first_connect_exc)
+            if isinstance(first_connect_exc, asyncio.CancelledError):
+                # CancelledError was almost certainly the TaskGroup
+                # cancelling us because the supervisor raised. The
+                # supervisor's exception was already unwrapped and
+                # raised by _teardown_on_aenter_failure; if we get
+                # here, fall back to a generic ConnectionError.
+                raise JMRIConnectionError(host=self._host, port=self._port) from first_connect_exc
+            if isinstance(first_connect_exc, TimeoutError):
+                raise JMRIConnectionError(host=self._host, port=self._port) from first_connect_exc
+            raise
         return self
 
     async def __aexit__(
@@ -126,10 +184,95 @@ class Client:
         exc: BaseException | None,
         tb: TracebackType | None,
     ) -> None:
-        if self._http is not None:
-            await self._http.aclose()
-            self._http = None
-        self._version_checked = False
+        try:
+            if self._supervisor_task is not None and not self._supervisor_task.done():
+                self._supervisor_task.cancel()
+            if self._tg is not None:
+                try:
+                    await self._tg.__aexit__(exc_type, exc, tb)
+                except BaseExceptionGroup as eg:
+                    non_cancelled = [
+                        e for e in eg.exceptions if not isinstance(e, asyncio.CancelledError)
+                    ]
+                    if len(non_cancelled) == 1 and non_cancelled[0] is exc:
+                        # The TaskGroup re-wrapped the body exception in a
+                        # group with no other failures. Let the original
+                        # body exception propagate (it's already on its
+                        # way out via Python's context-manager protocol).
+                        return
+                    if len(non_cancelled) == 1:
+                        raise non_cancelled[0] from None
+                    if non_cancelled:
+                        raise
+                    # ExceptionGroup carried only CancelledErrors —
+                    # expected during clean teardown; swallow.
+        finally:
+            self._tg = None
+            if self._http is not None:
+                await self._http.aclose()
+                self._http = None
+            self._ws = None
+            self._registry = None
+            self._ws_connected = None
+            self._supervisor_task = None
+            self._version_checked = False
+
+    async def _teardown_on_aenter_failure(self, first_exc: BaseException) -> None:
+        """Tear down the half-open Client when first-connect fails.
+
+        Cancels the supervisor task (if still running), drives the
+        TaskGroup through its ``__aexit__``, unwraps any single non-
+        cancellation exception, and closes the HTTP transport. Always
+        leaves the Client in a fully-closed state before re-raising the
+        original ``first_exc`` (which the caller is responsible for).
+        """
+        if self._supervisor_task is not None and not self._supervisor_task.done():
+            self._supervisor_task.cancel()
+        try:
+            if self._tg is not None:
+                try:
+                    await self._tg.__aexit__(type(first_exc), first_exc, first_exc.__traceback__)
+                except BaseExceptionGroup as eg:
+                    non_cancelled = [
+                        e for e in eg.exceptions if not isinstance(e, asyncio.CancelledError)
+                    ]
+                    if len(non_cancelled) == 1:
+                        raise non_cancelled[0] from None
+                    if non_cancelled:
+                        raise
+        finally:
+            self._tg = None
+            if self._http is not None:
+                await self._http.aclose()
+                self._http = None
+            self._ws = None
+            self._registry = None
+            self._ws_connected = None
+            self._supervisor_task = None
+
+    async def _on_ws_message(self, envelope: dict[str, Any]) -> None:
+        """Stub WS message handler. Story 3.2 wires per-entity dispatch.
+
+        In Story 3.1 this is a no-op — the WS receive loop logs every
+        inbound envelope at DEBUG on ``pyjmri.transport`` and otherwise
+        drops it. Story 3.2 will replace this body with per-entity
+        dispatch into ``entity._on_event(new_state)``.
+        """
+        return None
+
+    async def _on_ws_reconnect(self) -> None:
+        """Called by ``WSConnection`` after each successful reconnect (not the first).
+
+        Replays every known subscription so in-flight ``wait_*`` calls
+        survive the disconnect (FR7, NFR5). Story 3.2 wires the
+        waiter side; Story 3.1 just stands up the replay plumbing.
+        """
+        if self._registry is not None:
+            logger_reconnect.info(
+                "WebSocket reconnected; replaying subscriptions",
+                extra={"host": self._host, "subscription_count": self._registry.size},
+            )
+            await self._registry.replay()
 
     async def get_entity(self, entity_type: str, name: str) -> dict[str, Any]:
         """Implementation of :class:`pyjmri._protocols.ClientHandle`.
