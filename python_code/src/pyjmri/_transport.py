@@ -302,6 +302,18 @@ class WSConnection:
         )
         return None
 
+    async def _force_disconnect(self) -> None:
+        """Test-only hook: close the active WS connection to trigger the reconnect loop.
+
+        Closing ``self._connection`` causes the ``async for raw in connection``
+        inner loop to exit, which the outer ``async for connection in
+        websockets.connect(...)`` iterator handles by scheduling a reconnect.
+        Safe to call when no connection is active (no-op). Never call from
+        production code — use this hook only in integration tests.
+        """
+        if self._connection is not None:
+            await self._connection.close()
+
     async def send(self, message: dict[str, Any]) -> None:
         """JSON-encode ``message`` and send it on the current connection.
 

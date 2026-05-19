@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from types import TracebackType
 from typing import Any, Self
@@ -23,6 +24,7 @@ from pyjmri._parsing import (
     parse_signal_mast,
     parse_turnout,
 )
+from pyjmri._protocols import Waitable
 from pyjmri._subscriptions import SubscriptionRegistry
 from pyjmri._transport import HTTPClient, WSConnection
 from pyjmri.block import Block
@@ -44,6 +46,7 @@ __all__ = ["Client", "ClientConfig", "ReconnectConfig"]
 
 logger = logging.getLogger(__name__)
 logger_reconnect = logging.getLogger("pyjmri.reconnect")
+logger_transport = logging.getLogger("pyjmri.transport")
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -113,6 +116,7 @@ class Client:
         self._registry: SubscriptionRegistry | None = None
         self._ws_connected: asyncio.Event | None = None
         self._supervisor_task: asyncio.Task[None] | None = None
+        self._entities: dict[tuple[str, str], Waitable] = {}
 
     async def __aenter__(self) -> Self:
         if self._http is not None:
@@ -215,6 +219,7 @@ class Client:
             self._registry = None
             self._ws_connected = None
             self._supervisor_task = None
+            self._entities = {}
             self._version_checked = False
 
     async def _teardown_on_aenter_failure(self, first_exc: BaseException) -> None:
@@ -249,16 +254,99 @@ class Client:
             self._registry = None
             self._ws_connected = None
             self._supervisor_task = None
+            self._entities = {}
 
     async def _on_ws_message(self, envelope: dict[str, Any]) -> None:
-        """Stub WS message handler. Story 3.2 wires per-entity dispatch.
+        """Dispatch one inbound WS envelope to the matching entity.
 
-        In Story 3.1 this is a no-op — the WS receive loop logs every
-        inbound envelope at DEBUG on ``pyjmri.transport`` and otherwise
-        drops it. Story 3.2 will replace this body with per-entity
-        dispatch into ``entity._on_event(new_state)``.
+        Parses ``envelope["type"]`` against the six waitable entity-type
+        strings, calls the matching parser, looks up the entity in
+        :attr:`_entities`, and invokes ``entity._on_event(primary_state)``.
+
+        Non-fatal paths (drop + log at DEBUG):
+
+        - JMRI ``hello`` envelopes and any unrecognized ``type``
+        - ``memory`` and ``route`` envelopes (no waitable model in v1)
+        - Known type whose ``(entity_type, name)`` is not in this
+          Client's discovered Layout
+
+        Non-fatal error paths (drop + log at WARNING):
+
+        - Parser raises :class:`JMRIProtocolError`, or raises any other
+          :class:`Exception` during parse/extract (bad frame handling)
+        - ``entity._on_event`` raises any :class:`Exception` (treated
+          adversarially so a buggy waiter cannot kill the supervisor)
         """
+        entity_type = envelope.get("type")
+        if not isinstance(entity_type, str):
+            logger_transport.debug("WS dispatch: drop", extra={"reason": "no type field"})
+            return None
+        parser_entry = _DISPATCH_PARSERS.get(entity_type)
+        if parser_entry is None:
+            logger_transport.debug("WS dispatch: drop", extra={"type": entity_type})
+            return None
+        parser, primary_attr = parser_entry
+        try:
+            parsed = parser(envelope)
+            name = parsed.name
+            primary = getattr(parsed, primary_attr)
+        except Exception as e:
+            logger_transport.warning(
+                "WS dispatch: parse failed",
+                extra={"entity_type": entity_type, "error_type": type(e).__name__},
+                exc_info=True,
+            )
+            return None
+        entity = self._entities.get((entity_type, name))
+        if entity is None:
+            logger_transport.debug(
+                "WS dispatch: entity not in current Layout",
+                extra={"entity_type": entity_type, "system_name": name},
+            )
+            return None
+        try:
+            entity._on_event(primary)
+        except Exception as e:
+            logger_transport.warning(
+                "WS dispatch: entity _on_event raised",
+                extra={
+                    "entity_type": entity_type,
+                    "system_name": name,
+                    "error_type": type(e).__name__,
+                },
+                exc_info=True,
+            )
         return None
+
+    async def _force_disconnect(self) -> None:
+        """Test-only hook: force a WebSocket disconnect to exercise reconnect resilience.
+
+        Delegates to :meth:`pyjmri._transport.WSConnection._force_disconnect`.
+        After this call returns, the ``websockets`` library schedules a
+        reconnect (initial backoff 0-5 s); :meth:`_on_ws_reconnect` fires on
+        the fresh connection and replays all subscriptions. Never call from
+        production code.
+
+        Raises:
+            RuntimeError: when the Client is not open.
+        """
+        if self._ws is None:
+            raise RuntimeError("Client is not open; use 'async with Client() as jmri:'")
+        await self._ws._force_disconnect()
+
+    async def ensure_subscription(self, entity_type: str, name: str) -> None:
+        """Implementation of :class:`pyjmri._protocols.ClientHandle`.
+
+        Idempotently registers a WS subscription for ``(entity_type,
+        name)``. Called by entity ``wait_*`` methods before they
+        register a waiter (FR29).
+
+        Raises:
+            RuntimeError: when the Client is not open.
+        """
+        if self._registry is None:
+            raise RuntimeError("Client is not open; use 'async with Client() as jmri:'")
+        await self._registry.ensure(entity_type, name)
 
     async def _on_ws_reconnect(self) -> None:
         """Called by ``WSConnection`` after each successful reconnect (not the first).
@@ -349,6 +437,15 @@ class Client:
             :class:`ExceptionGroup`. Catch with ``except*
             JMRIProtocolError`` (Python 3.11+) or ``except
             ExceptionGroup``.
+
+        Note:
+            Calling ``discover()`` more than once rebuilds the
+            Client's internal WS-dispatch index from the freshly
+            discovered entities. In-flight ``wait_*`` calls on
+            entities from a *previous* Layout will silently never
+            resolve because their entity instances are no longer in
+            the dispatch index — cancel them or restructure your
+            script to call ``discover()`` once.
         """
         if self._http is None:
             raise RuntimeError("Client is not open; use 'async with Client() as jmri:'")
@@ -463,6 +560,26 @@ class Client:
                 )
             )
 
+        # Rebuild the WS-dispatch entity index from this discovery.
+        # Memory and Route entities are skipped (no _on_event in v1).
+        # Stale Layouts returned by prior discover() calls keep their
+        # waiters but those waiters will never resolve via dispatch —
+        # see discover() docstring.
+        new_index: dict[tuple[str, str], Waitable] = {}
+        for t in turnouts:
+            new_index[("turnout", t.name)] = t
+        for s in sensors:
+            new_index[("sensor", s.name)] = s
+        for b in blocks:
+            new_index[("block", b.name)] = b
+        for la in lights:
+            new_index[("light", la.name)] = la
+        for sh in signal_heads:
+            new_index[("signalHead", sh.name)] = sh
+        for sm in signal_masts:
+            new_index[("signalMast", sm.name)] = sm
+        self._entities = new_index
+
         return Layout(
             turnouts=EntityCollection(turnouts, entity_type="turnout"),
             sensors=EntityCollection(sensors, entity_type="sensor"),
@@ -513,6 +630,26 @@ class Client:
             )
         parsed = parse_power(envelope)
         return parsed.state
+
+
+_DISPATCH_PARSERS: dict[
+    str,
+    tuple[Callable[[dict[str, Any]], Any], str],
+] = {
+    "turnout": (parse_turnout, "state"),
+    "sensor": (parse_sensor, "state"),
+    "block": (parse_block, "state"),
+    "light": (parse_light, "state"),
+    "signalHead": (parse_signal_head, "appearance"),
+    "signalMast": (parse_signal_mast, "aspect"),
+}
+"""Per-entity-type ``(parser_fn, primary_attr)`` table.
+
+The six entries are the waitable entity types. ``memory`` and ``route``
+are intentionally absent — their envelopes drop at the dispatch layer.
+Adding a seventh waitable entity is one line here plus the entity's
+own ``_on_event``/``_waiters`` plumbing.
+"""
 
 
 def _parse_url(url: str) -> tuple[str, int, str]:

@@ -5,9 +5,13 @@ Architecture sec. Domain State Modeling.
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from enum import Enum
 from typing import TYPE_CHECKING
+
+from pyjmri._waiters import WaiterList
+from pyjmri.exceptions import WaitTimeout
 
 if TYPE_CHECKING:
     from pyjmri._protocols import ClientHandle
@@ -39,6 +43,11 @@ class Light:
             if current is LightState.ON:
                 ...
 
+        Wait for a state change pushed over the WebSocket::
+
+            await light.wait_state(LightState.ON, timeout=5.0)
+            await light.wait_change()
+
     Args:
         name: JMRI system name.
         user_name: Optional JMRI user name.
@@ -59,6 +68,7 @@ class Light:
         self.user_name = user_name
         self.state = state
         self._handle = _handle
+        self._waiters: WaiterList[LightState] = WaiterList()
 
     async def get_state(self) -> LightState:
         """Refresh the cached :attr:`state` from JMRI and return it.
@@ -73,3 +83,74 @@ class Light:
         parsed = parse_light(envelope)
         self.state = parsed.state
         return parsed.state
+
+    def _on_event(self, new_state: LightState) -> None:
+        """Update cached state and resolve matching waiters."""
+        self.state = new_state
+        self._waiters.fanout(new_state)
+
+    async def wait_state(
+        self,
+        target: LightState,
+        *,
+        timeout: float | None = None,  # noqa: ASYNC109
+    ) -> LightState:
+        """Await the light reaching ``target`` (FR31).
+
+        Raises:
+            WaitTimeout: if ``timeout`` elapses before the target state.
+            RuntimeError: if the owning :class:`~pyjmri.Client` is closed
+                while this call is suspended inside ``ensure_subscription``.
+        """
+        if self.state == target:
+            return self.state
+        await self._handle.ensure_subscription("light", self.name)
+        if self.state == target:
+            return self.state
+        future = self._waiters.register(lambda s: s == target)
+        try:
+            if timeout is None:
+                return await future
+            async with asyncio.timeout(timeout):
+                return await future
+        except TimeoutError as e:
+            raise WaitTimeout(
+                entity_type="light",
+                name=self.name,
+                target=target.name,
+            ) from e
+        finally:
+            self._waiters.remove(future)
+
+    async def wait_change(
+        self,
+        *,
+        timeout: float | None = None,  # noqa: ASYNC109
+    ) -> LightState:
+        """Await the next state change from whatever :attr:`state` is now (FR32).
+
+        Captures :attr:`state` after ensuring the subscription is live, so
+        the "starting" reference cannot be invalidated by an event that
+        arrives during the subscribe await.
+
+        Raises:
+            WaitTimeout: if ``timeout`` elapses before any state change.
+            RuntimeError: if the owning :class:`~pyjmri.Client` is closed
+                while this call is suspended inside ``ensure_subscription``.
+        """
+        await self._handle.ensure_subscription("light", self.name)
+        starting = self.state
+        future = self._waiters.register(lambda s: s != starting)
+        try:
+            if timeout is None:
+                return await future
+            async with asyncio.timeout(timeout):
+                return await future
+        except TimeoutError as e:
+            raise WaitTimeout(
+                entity_type="light",
+                name=self.name,
+                from_state=starting.name,
+            ) from e
+        finally:
+            self._waiters.remove(future)

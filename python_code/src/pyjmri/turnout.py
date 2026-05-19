@@ -5,9 +5,13 @@ Architecture sec. Domain State Modeling.
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from enum import Enum
 from typing import TYPE_CHECKING
+
+from pyjmri._waiters import WaiterList
+from pyjmri.exceptions import WaitTimeout
 
 if TYPE_CHECKING:
     from pyjmri._protocols import ClientHandle
@@ -41,6 +45,11 @@ class Turnout:
             if current is TurnoutState.THROWN:
                 ...
 
+        Wait for a state change pushed over the WebSocket::
+
+            await turnout.wait_state(TurnoutState.THROWN, timeout=5.0)
+            await turnout.wait_change()  # any transition from current
+
     Args:
         name: JMRI system name (e.g., ``"NT400"``).
         user_name: Optional JMRI user name.
@@ -62,6 +71,7 @@ class Turnout:
         self.user_name = user_name
         self.state = state
         self._handle = _handle
+        self._waiters: WaiterList[TurnoutState] = WaiterList()
 
     async def get_state(self) -> TurnoutState:
         """Refresh the cached :attr:`state` from JMRI and return it.
@@ -84,3 +94,82 @@ class Turnout:
         parsed = parse_turnout(envelope)
         self.state = parsed.state
         return parsed.state
+
+    def _on_event(self, new_state: TurnoutState) -> None:
+        """Update cached state and resolve matching waiters.
+
+        Called from :meth:`pyjmri.Client._on_ws_message` on inbound
+        turnout state-change envelopes.
+        """
+        self.state = new_state
+        self._waiters.fanout(new_state)
+
+    async def wait_state(
+        self,
+        target: TurnoutState,
+        *,
+        timeout: float | None = None,  # noqa: ASYNC109
+    ) -> TurnoutState:
+        """Await the turnout reaching ``target`` (FR31).
+
+        Returns immediately when :attr:`state` already equals ``target``.
+        Otherwise auto-subscribes the entity, registers a one-shot
+        waiter on :attr:`state` and awaits it.
+
+        Raises:
+            WaitTimeout: if ``timeout`` elapses before the target state.
+            RuntimeError: if the owning :class:`~pyjmri.Client` is closed
+                while this call is suspended inside ``ensure_subscription``.
+        """
+        if self.state == target:
+            return self.state
+        await self._handle.ensure_subscription("turnout", self.name)
+        if self.state == target:
+            return self.state
+        future = self._waiters.register(lambda s: s == target)
+        try:
+            if timeout is None:
+                return await future
+            async with asyncio.timeout(timeout):
+                return await future
+        except TimeoutError as e:
+            raise WaitTimeout(
+                entity_type="turnout",
+                name=self.name,
+                target=target.name,
+            ) from e
+        finally:
+            self._waiters.remove(future)
+
+    async def wait_change(
+        self,
+        *,
+        timeout: float | None = None,  # noqa: ASYNC109
+    ) -> TurnoutState:
+        """Await the next state change from whatever :attr:`state` is now (FR32).
+
+        Captures :attr:`state` after ensuring the subscription is live, so
+        the "starting" reference cannot be invalidated by an event that
+        arrives during the subscribe await.
+
+        Raises:
+            WaitTimeout: if ``timeout`` elapses before any state change.
+            RuntimeError: if the owning :class:`~pyjmri.Client` is closed
+                while this call is suspended inside ``ensure_subscription``.
+        """
+        await self._handle.ensure_subscription("turnout", self.name)
+        starting = self.state
+        future = self._waiters.register(lambda s: s != starting)
+        try:
+            if timeout is None:
+                return await future
+            async with asyncio.timeout(timeout):
+                return await future
+        except TimeoutError as e:
+            raise WaitTimeout(
+                entity_type="turnout",
+                name=self.name,
+                from_state=starting.name,
+            ) from e
+        finally:
+            self._waiters.remove(future)

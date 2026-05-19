@@ -63,10 +63,14 @@ def make_fake_handle() -> Callable[[Callable[[str, str], dict[str, Any]]], Any]:
         class _FakeHandle:
             def __init__(self) -> None:
                 self.calls: list[tuple[str, str]] = []
+                self.ensure_calls: list[tuple[str, str]] = []
 
             async def get_entity(self, entity_type: str, name: str) -> dict[str, Any]:
                 self.calls.append((entity_type, name))
                 return envelope_for(entity_type, name)
+
+            async def ensure_subscription(self, entity_type: str, name: str) -> None:
+                self.ensure_calls.append((entity_type, name))
 
         return _FakeHandle()
 

@@ -5,9 +5,13 @@ Architecture sec. Domain State Modeling.
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from enum import Enum
 from typing import TYPE_CHECKING
+
+from pyjmri._waiters import WaiterList
+from pyjmri.exceptions import WaitTimeout
 
 if TYPE_CHECKING:
     from pyjmri._protocols import ClientHandle
@@ -41,6 +45,11 @@ class Block:
             await block.get_state()
             print(block.state, block.value)
 
+        Wait for a state change pushed over the WebSocket::
+
+            await block.wait_state(BlockState.OCCUPIED, timeout=60.0)
+            await block.wait_change()
+
     Args:
         name: JMRI system name.
         user_name: Optional JMRI user name.
@@ -64,6 +73,7 @@ class Block:
         self.state = state
         self.value = value
         self._handle = _handle
+        self._waiters: WaiterList[BlockState] = WaiterList()
 
     async def get_state(self) -> BlockState:
         """Refresh both cached :attr:`state` and :attr:`value`; return state.
@@ -79,3 +89,79 @@ class Block:
         self.state = parsed.state
         self.value = parsed.value
         return parsed.state
+
+    def _on_event(self, new_state: BlockState) -> None:
+        """Update cached state and resolve matching waiters.
+
+        The block's :attr:`value` is not updated by ``_on_event`` —
+        block-value pushes are not modeled as waitable events in v1.
+        Call :meth:`get_state` to refresh both fields explicitly.
+        """
+        self.state = new_state
+        self._waiters.fanout(new_state)
+
+    async def wait_state(
+        self,
+        target: BlockState,
+        *,
+        timeout: float | None = None,  # noqa: ASYNC109
+    ) -> BlockState:
+        """Await the block reaching ``target`` (FR31).
+
+        Raises:
+            WaitTimeout: if ``timeout`` elapses before the target state.
+            RuntimeError: if the owning :class:`~pyjmri.Client` is closed
+                while this call is suspended inside ``ensure_subscription``.
+        """
+        if self.state == target:
+            return self.state
+        await self._handle.ensure_subscription("block", self.name)
+        if self.state == target:
+            return self.state
+        future = self._waiters.register(lambda s: s == target)
+        try:
+            if timeout is None:
+                return await future
+            async with asyncio.timeout(timeout):
+                return await future
+        except TimeoutError as e:
+            raise WaitTimeout(
+                entity_type="block",
+                name=self.name,
+                target=target.name,
+            ) from e
+        finally:
+            self._waiters.remove(future)
+
+    async def wait_change(
+        self,
+        *,
+        timeout: float | None = None,  # noqa: ASYNC109
+    ) -> BlockState:
+        """Await the next state change from whatever :attr:`state` is now (FR32).
+
+        Captures :attr:`state` after ensuring the subscription is live, so
+        the "starting" reference cannot be invalidated by an event that
+        arrives during the subscribe await.
+
+        Raises:
+            WaitTimeout: if ``timeout`` elapses before any state change.
+            RuntimeError: if the owning :class:`~pyjmri.Client` is closed
+                while this call is suspended inside ``ensure_subscription``.
+        """
+        await self._handle.ensure_subscription("block", self.name)
+        starting = self.state
+        future = self._waiters.register(lambda s: s != starting)
+        try:
+            if timeout is None:
+                return await future
+            async with asyncio.timeout(timeout):
+                return await future
+        except TimeoutError as e:
+            raise WaitTimeout(
+                entity_type="block",
+                name=self.name,
+                from_state=starting.name,
+            ) from e
+        finally:
+            self._waiters.remove(future)

@@ -1,5 +1,33 @@
 # Deferred Work
 
+## Deferred from: code review of 3-2 and 3-3 (BMAD code-review, 2026-05-19)
+
+- **`_DISPATCH_PARSERS` primary_attr is an opaque string with no static type-checking** — stored as plain `str`; `getattr(parsed, primary_attr)` is unchecked by mypy. A typo becomes a runtime `AttributeError` swallowed by the dispatch `except Exception`. Current strings are correct at HEAD. Fix: replace with a typed accessor callable. [`python_code/src/pyjmri/client.py:635-652`]
+- **Entity dispatch name matching without case/whitespace normalization (pre-existing)** — `_entities.get((entity_type, name))` uses exact string match. JMRI WS vs REST name-form mismatch would cause silent event drops. Pre-existing; not introduced by Stories 3.2 or 3.3. [`python_code/src/pyjmri/client.py:259-319`]
+
+## Deferred from: fresh independent review of 3-2-per-entity-waiter-list-and-wait-primitives (2026-05-12)
+
+- **`wait_change` may miss A→B transition during `ensure_subscription` await** — `starting` captured post-subscribe reflects any transitions that fired during subscribe; inherent trade-off from the prior review's lost-wakeup fix (capturing before subscribe risks missing the registered event). AC3 says "at call time" but implementation chose post-subscribe semantics. [`python_code/src/pyjmri/turnout.py:963-965` and equivalents]
+- **`_entities` rebuild window during `discover()`** — WS events arriving for newly-polled entities between HTTP discovery and `self._entities = new_index` are silently dropped; window is very small and caller has no entity references yet. Inherent to HTTP-poll + WS-subscribe. [`python_code/src/pyjmri/client.py:379-392`]
+- **`Waitable` Protocol `_on_event: Any` allows silent wrong-type dispatch** — If a parser returns the wrong type for a primary attribute, all waiters silently never resolve (predicates return `False` forever). Design Decision #2 accepted this. [`python_code/src/pyjmri/_protocols.py:116`]
+- **TOCTOU on stale cached state in `wait_state` early-return** — Pre-subscribe `if self.state == target` reads last-polled state; if cache is stale, early-return gives a false "already there" result. By design; documented behavior. [All six entity `wait_state` implementations]
+- **`ensure_subscription` raising after `register` untested** — If `_registry.send()` fails inside `ensure_subscription`, the exception propagates through the `try` block; Python `finally` guarantees `remove(future)` runs. No test exercises this error path. [`python_code/src/pyjmri/turnout.py:131` and equivalents]
+- **`_on_event(None)` could corrupt cached state** — Requires a parser to return `None` for its primary attribute field; speculative under `mypy --strict`, but no `isinstance` guard exists in `_on_event`. [`python_code/src/pyjmri/turnout.py:907-914` and equivalents]
+- **`BaseException` from predicate escapes `fanout` and `_on_ws_message` exception guards** — `fanout` catches `Exception` per predicate; `CancelledError` (a `BaseException` in Python 3.8+) would escape both guards. Practically impossible with current equality-only lambdas. [`python_code/src/pyjmri/_waiters.py`, `client.py:323-334`]
+- **Old Layout entity waiters never resolve after second `discover()`** — Documented in `discover()` docstring. No programmatic safety net (e.g., cancellation sweep). Considered and deferred in prior review. [`python_code/src/pyjmri/client.py:~540`]
+- **AC1 spec text says `_waiters: list[tuple[...]]` but implementation uses `WaiterList[StateT]`** — Design Decision #1 chose Option A but the AC1 `Then` clause was not updated to reflect it. Spec/implementation documentation inconsistency only; no code change needed. [Spec AC1 vs. `_waiters.py`]
+
+## Deferred from: code review of 3-2-per-entity-waiter-list-and-wait-primitives (2026-05-12)
+
+- **`_on_ws_message` dispatch DROP logs vs AC6 prose** — AC6 wording references `pyjmri.transport`; story Tasks / implementation log via `logging.getLogger(__name__)` on `pyjmri.client`. Behavior matches Task 162; unify documentation or logger name in a doc-hardening pass. [`python_code/src/pyjmri/client.py:258-284`]
+- **`discover()` silently abandons in-flight waiters from the prior Layout** — documented in the `discover()` docstring; consider adding a WARNING log on rebuild if `_entities` was non-empty at entry. [`python_code/src/pyjmri/client.py:~538`]
+- **Tests inline JMRI integer state codes (`2`, `4`) rather than importing from `_codes.SENSOR_STATE`** — drift in `_codes.py` would not surface as a test failure. [`python_code/tests/unit/test_state_machine.py:~50-60`, `python_code/tests/integration/test_wait_primitives_latency.py:32-34`]
+- **`WaiterList.remove` is O(n) via list comprehension** — fine for expected N (≤ tens per entity), but a hot-fired waiter loop on a high-event entity would prefer in-place remove. [`python_code/src/pyjmri/_waiters.py:53`]
+- **`# noqa: ASYNC109` repeated on every `timeout` parameter across six entity files** — user-chosen approach (preferred over project-wide ruff config for narrower suppression scope); revisit if more `timeout`-bearing public methods land.
+- **`signalHead`/`signalMast` partial-envelope tolerance unverified against live JMRI** — `parse_signal_head`/`parse_signal_mast` require `held`+`lit` as `_required_bool`; a thin push event would raise `JMRIProtocolError` and silently drop. Speculation — verify against live JMRI during Story 3.3 (forced-disconnect resilience test exercises push paths); loosen parser only if real JMRI behavior confirms partial pushes. [`python_code/src/pyjmri/_parsing.py:245-289`, `client.py:~395`]
+- **`_DISPATCH_TABLE` keys are case-sensitive** — future JMRI version drift in entity-type strings would silently stop dispatch. Forward-compat speculation; no current evidence of JMRI changing these keys. [`python_code/src/pyjmri/client.py:~410`]
+- **`asyncio.timeout(0)` behavior on `wait_*`** — always raises before any event can arrive; minor documentation note: `timeout=0` is a non-blocking probe that succeeds only via early-return. [Five entity modules' `wait_state` / `wait_change` docstrings]
+
 ## Deferred from: code review of 3-1-websocket-transport-subscriptionregistry-reconnect-with-bounded-backoff (2026-05-12)
 
 - **`replay()` partial re-subscribe on mid-replay `send()` failure** — If `send()` raises on the nth of N subscriptions, remaining ones are not re-sent this cycle. Set is unchanged, so the next reconnect replays all correctly. Low impact: JMRI subscription state self-corrects. [`_subscriptions.py:62`]
