@@ -21,6 +21,7 @@ build-backend = "uv_build"
 [dependency-groups]
 dev = [
     "mypy>=2.0.0",
+    "psutil>=5.9",
     "pytest>=9.0.3",
     "pytest-asyncio>=1.3.0",
     "ruff>=0.15.12",
@@ -46,4 +47,5 @@ asyncio_mode = "auto"
 testpaths = ["tests"]
 markers = [
     "integration: requires a real JMRI instance on localhost:12080; excluded from CI",
+    "slow: long-running tests intended for manual / pre-release invocation; excluded from the default test run",
 ]

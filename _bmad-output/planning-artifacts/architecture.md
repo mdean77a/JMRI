@@ -276,7 +276,8 @@ configured as part of the project-init story:
 - **Mypy** strict config in `[tool.mypy]` (`strict = true`, no
   implicit `Any` on the public surface)
 - **Pytest** config in `[tool.pytest.ini_options]` plus
-  `pytest-asyncio` as a dev dependency (`asyncio_mode = "auto"`)
+  `pytest-asyncio` as a dev dependency (`asyncio_mode = "auto"`); `psutil` as a
+  dev dependency (added Story 3.4 — required for `test_long_run.py` leak metrics)
 - **Tests directory split**: `tests/unit/` and `tests/integration/`
   to enforce the unit-vs-integration test-harness boundary
   identified in step 2's cross-cutting concerns
@@ -590,6 +591,8 @@ src/pyjmri/
 ├── _transport.py        # HTTPClient + WSConnection                ┐
 ├── _parsing.py          # JSON → typed-value functions             │ private
 ├── _subscriptions.py    # SubscriptionRegistry                     │
+├── _waiters.py          # WaiterList[StateT] — predicate fanout    │
+├── _protocols.py        # ClientHandle Protocol (avoids cycles)    │
 ├── _codes.py            # JMRI integer-code ↔ enum tables          ┘
 └── py.typed
 ```
@@ -957,12 +960,15 @@ it rather than duplicating rules.
 ### Complete Project Directory Structure
 
 ```text
-# Note: .github/workflows/ci.yml lives at the JMRI repository root,
-# NOT under python_code/. GitHub Actions only reads .github/ from the
-# repository root, so workflow files must be there. The pyjmri-specific
-# CI workflow path-scopes itself to python_code/** to avoid running on
-# panel-XML / roster / Jython commits. The tree below shows only the
-# pyjmri project directory.
+# A1 fix (2026-05-19): showing the full JMRI repo root so the .github/ path
+# is unambiguous. GitHub Actions reads .github/ from the repo root only.
+
+JMRI/                                     # git repository root
+├── .github/
+│   └── workflows/
+│       └── ci.yml                        # pyjmri CI — path-scoped to python_code/**
+│                                         # (panel-XML / roster / Jython commits do NOT trigger CI)
+└── python_code/                          # pyjmri package (all content below)
 
 python_code/                              # repo-root for pyjmri (named per Step 3)
 ├── .gitignore                            # uv init default + project additions
@@ -993,9 +999,11 @@ python_code/                              # repo-root for pyjmri (named per Step
 │       ├── _parsing.py                   # JSON → typed value functions
 │       ├── _subscriptions.py             # SubscriptionRegistry
 │       ├── _codes.py                     # JMRI integer code ↔ Enum tables
-│       ├── _protocols.py                 # internal Protocol typing for Client handle
+│       ├── _protocols.py                 # ClientHandle Protocol (avoids circular imports)
+│       ├── _waiters.py                   # WaiterList[StateT] predicate-fanout helper
 │       └── py.typed                      # FR44 marker (shipped in wheel)
 ├── tests/
+│   ├── conftest.py                       # root conftest — pytest_addoption (--duration etc.)
 │   ├── unit/
 │   │   ├── conftest.py                   # synthetic JSON fixture loader
 │   │   ├── fixtures/
@@ -1017,12 +1025,15 @@ python_code/                              # repo-root for pyjmri (named per Step
 │   │   └── test_exceptions.py            # diagnostic context, chaining, __str__
 │   └── integration/
 │       ├── conftest.py                   # JMRI-probe session fixture (skip-on-absence)
+│       ├── test_connection_lifecycle.py  # Client __aenter__ / __aexit__ lifecycle
 │       ├── test_discovery.py             # parallel discovery, layout-agnostic
-│       ├── test_command_round_trip.py    # set_state + wait_for_jmri_state (FR21)
-│       ├── test_subscription_lifecycle.py # subscribe/unsubscribe/replay
+│       ├── test_ws_connect.py            # WS connect + subscription-ack smoke
+│       ├── test_wait_primitives_latency.py # NFR1 median latency (≤ 100 ms)
+│       ├── test_command_round_trip.py    # set_state + wait_for_jmri_state (FR21) [Epic 4]
+│       ├── test_subscription_lifecycle.py # subscribe/unsubscribe/replay [Epic 4]
 │       ├── test_reconnect_resilience.py  # forced disconnect mid-run (NFR5)
-│       ├── test_throttle_lifecycle.py    # acquire / release / multi-throttle parallel
-│       └── test_long_run.py              # one-hour unattended stability (NFR4)
+│       ├── test_throttle_lifecycle.py    # acquire / release / multi-throttle parallel [Epic 5]
+│       └── test_long_run.py              # unattended stability; default 5 min, 1 hr pre-release (NFR4)
 └── examples/
     ├── hello_jmri.py                     # FR43 #1 — connect, discover, list
     ├── back_and_forth.py                 # FR43 #2 — port of MikeBackAndForth.py

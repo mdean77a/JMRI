@@ -1,5 +1,9 @@
 # Deferred Work
 
+## Deferred from: code review of 3-4-parameterized-unattended-stability-test (2026-05-19)
+
+- **`sensor.state` potentially stale between reconnect-log confirmation and `_opposite_sensor(sensor.state)` call** — After `_await_reconnect_log` returns, subscription-ack events may not yet have been processed, leaving `sensor.state` at its pre-disconnect cached value. If the sensor's actual state changed during the disconnect window, `_opposite_sensor` targets the wrong state. Inherent integration-test race; mitigated by the level-triggered fallback branch. [`python_code/tests/integration/test_long_run.py:242`]
+
 ## Deferred from: code review of 3-2 and 3-3 (BMAD code-review, 2026-05-19)
 
 - **`_DISPATCH_PARSERS` primary_attr is an opaque string with no static type-checking** — stored as plain `str`; `getattr(parsed, primary_attr)` is unchecked by mypy. A typo becomes a runtime `AttributeError` swallowed by the dispatch `except Exception`. Current strings are correct at HEAD. Fix: replace with a typed accessor callable. [`python_code/src/pyjmri/client.py:635-652`]

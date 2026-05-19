@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-05-07
-last_updated: 2026-05-19  # Story 3.3 → done (review patches applied)
+last_updated: 2026-05-19  # Epic 3 → done; retro complete; architecture A1+A2 fixed
 project: JMRI
 project_key: NOKEY
 tracking_system: file-system
@@ -60,12 +60,12 @@ development_status:
   epic-2-retrospective: done
 
   # Epic 3: Subscribe to State Changes and Wait Asynchronously
-  epic-3: in-progress
+  epic-3: done
   3-1-websocket-transport-subscriptionregistry-reconnect-with-bounded-backoff: done
   3-2-per-entity-waiter-list-and-wait-primitives: done
   3-3-forced-disconnect-resilience-integration-test: done
-  3-4-parameterized-unattended-stability-test-5-min-default-1-hour-optional-pre-release: backlog
-  epic-3-retrospective: optional
+  3-4-parameterized-unattended-stability-test-5-min-default-1-hour-optional-pre-release: done
+  epic-3-retrospective: done
 
   # Epic 4: Command Layout Entities
   epic-4: backlog
