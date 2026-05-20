@@ -70,6 +70,47 @@ class Light:
         self._handle = _handle
         self._waiters: WaiterList[LightState] = WaiterList()
 
+    async def set_state(self, state: LightState) -> None:
+        """Command the light to ``state`` (FR19).
+
+        Returns when JMRI has accepted the command; the library does not
+        confirm physical layout state because NCE is open-loop.
+
+        ``state`` must be ``LightState.ON`` or ``LightState.OFF``.
+        Passing ``UNKNOWN`` or ``INCONSISTENT`` raises :class:`ValueError`
+        synchronously — those are observable-only states, not
+        commandable.
+
+        Note:
+            Story 4.2 adds a ``wait_for_jmri_state=True`` keyword for
+            callers who want to await JMRI's WS-reported post-command
+            state. In this version the method is optimistic only.
+        """
+        from pyjmri._codes import LIGHT_STATE_OUTBOUND
+
+        if state not in LIGHT_STATE_OUTBOUND:
+            raise ValueError(
+                f"{state!r} is not a commandable light state; "
+                f"use {sorted(s.name for s in LIGHT_STATE_OUTBOUND)!r}"
+            )
+        await self._handle.command("light", self.name, {"state": LIGHT_STATE_OUTBOUND[state]})
+
+    async def on(self) -> None:
+        """Alias for ``set_state(LightState.ON)`` (FR19).
+
+        Returns when JMRI has accepted the command; the library does not
+        confirm physical layout state because NCE is open-loop.
+        """
+        await self.set_state(LightState.ON)
+
+    async def off(self) -> None:
+        """Alias for ``set_state(LightState.OFF)`` (FR19).
+
+        Returns when JMRI has accepted the command; the library does not
+        confirm physical layout state because NCE is open-loop.
+        """
+        await self.set_state(LightState.OFF)
+
     async def get_state(self) -> LightState:
         """Refresh the cached :attr:`state` from JMRI and return it.
 

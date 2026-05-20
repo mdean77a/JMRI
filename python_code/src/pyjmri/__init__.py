@@ -24,7 +24,7 @@ from pyjmri.layout import EntityCollection, Layout
 from pyjmri.light import Light, LightState
 from pyjmri.memory import Memory
 from pyjmri.power import PowerState
-from pyjmri.route import Route
+from pyjmri.route import Route, RouteState
 from pyjmri.sensor import Sensor, SensorState
 from pyjmri.signal import SignalHead, SignalHeadAppearance, SignalMast, SignalMastAspect
 from pyjmri.turnout import Turnout, TurnoutState
@@ -52,6 +52,7 @@ __all__ = [
     "PowerState",
     "ReconnectConfig",
     "Route",
+    "RouteState",
     "Sensor",
     "SensorState",
     "SignalHead",

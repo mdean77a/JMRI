@@ -31,6 +31,10 @@ class SensorState(Enum):
 class Sensor:
     """A JMRI sensor (block detector, button, etc.).
 
+    Read-only in pyjmri v1: there are no command methods on
+    :class:`Sensor`; sensors report layout state, they don't drive it.
+    See README §Limitations.
+
     The cached :attr:`state` reflects JMRI's last reported value. When
     the sensor has not yet reported, the state is
     :attr:`SensorState.UNKNOWN` and pyjmri preserves it as ``UNKNOWN``

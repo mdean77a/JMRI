@@ -64,6 +64,8 @@ def make_fake_handle() -> Callable[[Callable[[str, str], dict[str, Any]]], Any]:
             def __init__(self) -> None:
                 self.calls: list[tuple[str, str]] = []
                 self.ensure_calls: list[tuple[str, str]] = []
+                self.command_calls: list[tuple[str, str, dict[str, Any]]] = []
+                self.command_raises: BaseException | None = None
 
             async def get_entity(self, entity_type: str, name: str) -> dict[str, Any]:
                 self.calls.append((entity_type, name))
@@ -71,6 +73,16 @@ def make_fake_handle() -> Callable[[Callable[[str, str], dict[str, Any]]], Any]:
 
             async def ensure_subscription(self, entity_type: str, name: str) -> None:
                 self.ensure_calls.append((entity_type, name))
+
+            async def command(
+                self,
+                entity_type: str,
+                name: str,
+                payload: dict[str, Any],
+            ) -> None:
+                self.command_calls.append((entity_type, name, payload))
+                if self.command_raises is not None:
+                    raise self.command_raises
 
         return _FakeHandle()
 
@@ -119,8 +131,10 @@ def patch_http_factory(
             self.host = kwargs["host"]
             self.port = kwargs["port"]
             self.probed: list[str] = []
+            self.commands: list[tuple[str, str, dict[str, Any]]] = []
             self.close_count = 0
             self.fail_with: BaseException | None = None
+            self.command_raises: BaseException | None = None
             self.next_response: NextResponse = {}
             constructed.append(self)
 
@@ -131,6 +145,16 @@ def patch_http_factory(
             if callable(self.next_response):
                 return self.next_response(path)
             return self.next_response
+
+        async def command(
+            self,
+            entity_type: str,
+            name: str,
+            payload: dict[str, Any],
+        ) -> None:
+            self.commands.append((entity_type, name, payload))
+            if self.command_raises is not None:
+                raise self.command_raises
 
         async def aclose(self) -> None:
             self.close_count += 1

@@ -41,6 +41,21 @@ class ClientHandle(Protocol):
         """
         ...
 
+    async def command(
+        self,
+        entity_type: str,
+        name: str,
+        payload: dict[str, Any],
+    ) -> None:
+        """Issue an HTTP command to JMRI and return when JMRI acks.
+
+        Story 4.1 implements the optimistic path (HTTP 2xx is the
+        contract; no WS-event confirmation). Story 4.2 layers
+        ``wait_for_jmri_state=True`` over per-entity command methods.
+        See architecture sec. Command / Event Correlation.
+        """
+        ...
+
 
 class Waitable(Protocol):
     """Internal Protocol describing a state-bearing entity.

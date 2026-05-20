@@ -362,6 +362,23 @@ class Client:
             )
             await self._registry.replay()
 
+    async def command(
+        self,
+        entity_type: str,
+        name: str,
+        payload: dict[str, Any],
+    ) -> None:
+        """Implementation of :class:`pyjmri._protocols.ClientHandle`.
+
+        Dispatches to :meth:`HTTPClient.command`. The optimistic-only
+        contract is documented there; this method exists so entity
+        classes can issue commands through the Protocol-typed handle
+        rather than importing ``_transport`` directly.
+        """
+        if self._http is None:
+            raise RuntimeError("Client is not open; use 'async with Client() as jmri:'")
+        await self._http.command(entity_type, name, payload)
+
     async def get_entity(self, entity_type: str, name: str) -> dict[str, Any]:
         """Implementation of :class:`pyjmri._protocols.ClientHandle`.
 
@@ -530,7 +547,7 @@ class Client:
         routes: list[Route] = []
         for envelope in t_route.result():
             parsed_r = parse_route(envelope)
-            routes.append(Route(name=parsed_r.name, user_name=parsed_r.user_name))
+            routes.append(Route(name=parsed_r.name, user_name=parsed_r.user_name, _handle=self))
 
         signal_heads: list[SignalHead] = []
         for envelope in t_sighead.result():

@@ -8,6 +8,7 @@ import pytest
 
 from pyjmri import JMRIProtocolError, Light, LightState
 from pyjmri._protocols import ClientHandle
+from pyjmri.exceptions import LayoutEntityNotControllable
 
 
 def _envelope(state: int, *, name: str = "IL1", user_name: str | None = None) -> dict[str, Any]:
@@ -101,3 +102,96 @@ async def test_get_state_propagates_protocol_error(make_fake_handle: Any) -> Non
 
     with pytest.raises(JMRIProtocolError):
         await light.get_state()
+
+
+# --- Story 4.1: Light.set_state / on / off ---
+
+
+async def test_on_sends_on_state_code(make_fake_handle: Any) -> None:
+    handle = make_fake_handle(lambda _t, _n: _envelope(2))
+    light = Light(
+        name="IL1",
+        user_name=None,
+        state=LightState.OFF,
+        _handle=cast(ClientHandle, handle),
+    )
+
+    await light.on()
+
+    assert handle.command_calls == [("light", "IL1", {"state": 2})]
+
+
+async def test_off_sends_off_state_code(make_fake_handle: Any) -> None:
+    handle = make_fake_handle(lambda _t, _n: _envelope(2))
+    light = Light(
+        name="IL1",
+        user_name=None,
+        state=LightState.ON,
+        _handle=cast(ClientHandle, handle),
+    )
+
+    await light.off()
+
+    assert handle.command_calls == [("light", "IL1", {"state": 4})]
+
+
+async def test_set_state_does_not_optimistically_update_cache(make_fake_handle: Any) -> None:
+    handle = make_fake_handle(lambda _t, _n: _envelope(2))
+    light = Light(
+        name="IL1",
+        user_name=None,
+        state=LightState.OFF,
+        _handle=cast(ClientHandle, handle),
+    )
+
+    await light.on()
+
+    assert light.state is LightState.OFF
+
+
+async def test_set_state_unknown_raises_value_error(make_fake_handle: Any) -> None:
+    handle = make_fake_handle(lambda _t, _n: _envelope(2))
+    light = Light(
+        name="IL1",
+        user_name=None,
+        state=LightState.OFF,
+        _handle=cast(ClientHandle, handle),
+    )
+
+    with pytest.raises(ValueError):
+        await light.set_state(LightState.UNKNOWN)
+    assert handle.command_calls == []
+
+
+async def test_set_state_inconsistent_raises_value_error(make_fake_handle: Any) -> None:
+    handle = make_fake_handle(lambda _t, _n: _envelope(2))
+    light = Light(
+        name="IL1",
+        user_name=None,
+        state=LightState.OFF,
+        _handle=cast(ClientHandle, handle),
+    )
+
+    with pytest.raises(ValueError):
+        await light.set_state(LightState.INCONSISTENT)
+    assert handle.command_calls == []
+
+
+@pytest.mark.anyio
+async def test_on_propagates_layout_entity_not_controllable(make_fake_handle: Any) -> None:
+    handle = make_fake_handle(lambda _t, _n: _envelope(4))
+    handle.command_raises = LayoutEntityNotControllable(
+        entity_type="light",
+        name="IL1",
+        jmri_message="locked",
+        status=409,
+    )
+    light = Light(
+        name="IL1",
+        user_name=None,
+        state=LightState.OFF,
+        _handle=cast(ClientHandle, handle),
+    )
+
+    with pytest.raises(LayoutEntityNotControllable):
+        await light.on()

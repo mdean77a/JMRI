@@ -1,5 +1,12 @@
 # Deferred Work
 
+## Deferred from: code review of story 4-1 (2026-05-20)
+
+- **`payload` "name" key silently overwrites entity name in request body** — `{"name": name, **payload}` gives spread keys priority; an internal or future caller passing `payload={"name": "X"}` would corrupt the body while the URL path stays correct. All current call sites pass `{"state": int}` or `{"value": str}` only. [`python_code/src/pyjmri/_transport.py:188`]
+- **`entity_type` not URL-encoded in path** — interpolated raw into the URL path; safe today because all call sites pass known-clean strings ("turnout", "light", "memory", "route"), but there is no `quote()` guard and no test covering a slash or space in entity_type. [`python_code/src/pyjmri/_transport.py:187`]
+- **`command_raises` in `_FakeHandle` records call before raising** — `command_calls.append(...)` runs before the `command_raises` check; tests that assert `command_calls == []` on early-exit paths get a misleading record. No current test is bitten. [`python_code/tests/unit/conftest.py:83–85`]
+- **HTTP 401 (Unauthorized) falls through to `JMRIProtocolError`** — JMRI with optional HTTP auth returns 401 with a standard error envelope, but the status dispatch in `HTTPClient.command` only special-cases {400, 403, 404, 409}. Out of Story 4.1 scope; revisit when auth-enabled JMRI support is needed. [`python_code/src/pyjmri/_transport.py`]
+
 ## Deferred from: code review of 3-4-parameterized-unattended-stability-test (2026-05-19)
 
 - **`sensor.state` potentially stale between reconnect-log confirmation and `_opposite_sensor(sensor.state)` call** — After `_await_reconnect_log` returns, subscription-ack events may not yet have been processed, leaving `sensor.state` at its pre-disconnect cached value. If the sensor's actual state changed during the disconnect window, `_opposite_sensor` targets the wrong state. Inherent integration-test race; mitigated by the level-triggered fallback branch. [`python_code/tests/integration/test_long_run.py:242`]

@@ -17,6 +17,7 @@ from types import MappingProxyType
 from pyjmri.block import BlockState
 from pyjmri.light import LightState
 from pyjmri.power import PowerState
+from pyjmri.route import RouteState
 from pyjmri.sensor import SensorState
 from pyjmri.signal import SignalHeadAppearance
 from pyjmri.turnout import TurnoutState
@@ -82,6 +83,37 @@ POWER_STATE: Mapping[int, PowerState] = MappingProxyType(
         4: PowerState.OFF,
     }
 )
+
+# Outbound (Enum -> int) maps for commandable entities. Verified against
+# JMRI 5.14.0 by the Story 4.1 live-spike (2026-05-20). The integer codes
+# JMRI accepts on POST match the codes it emits on GET, so the outbound
+# maps are the canonical (non-zero) inverse of the inbound tables above.
+# Memory does not need an outbound code map — its payload is
+# ``{"value": str}``, not ``{"state": int}``.
+
+TURNOUT_STATE_OUTBOUND: Mapping[TurnoutState, int] = MappingProxyType(
+    {
+        TurnoutState.CLOSED: 2,
+        TurnoutState.THROWN: 4,
+    }
+)
+
+LIGHT_STATE_OUTBOUND: Mapping[LightState, int] = MappingProxyType(
+    {
+        LightState.ON: 2,
+        LightState.OFF: 4,
+    }
+)
+
+# Route activation: JMRI's ``jmri.Route.ACTIVATE`` is state=2. The live-
+# spike confirmed JMRI accepts state=2 with HTTP 200; state=8 (TOGGLE) is
+# also accepted but state=2 is the documented canonical value.
+ROUTE_STATE_OUTBOUND: Mapping[RouteState, int] = MappingProxyType(
+    {
+        RouteState.ACTIVE: 2,
+    }
+)
+
 
 # JMRI SignalHead appearances:
 # DARK=0, RED=1, FLASHRED=2, YELLOW=4, FLASHYELLOW=8,

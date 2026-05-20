@@ -72,6 +72,10 @@ class SignalMastAspect(Enum):
 class SignalHead:
     """A JMRI signal head with its current appearance.
 
+    Read-only in pyjmri v1: there are no command methods on
+    :class:`SignalHead`; appearances are driven by JMRI's CTC / signal
+    logic, not by direct API writes. See README §Limitations.
+
     Args:
         name: JMRI system name.
         user_name: Optional JMRI user name.
@@ -202,6 +206,10 @@ class SignalHead:
 
 class SignalMast:
     """A JMRI signal mast with its current aspect.
+
+    Read-only in pyjmri v1: there are no command methods on
+    :class:`SignalMast`; aspects are driven by JMRI's signaling logic,
+    not by direct API writes. See README §Limitations.
 
     pyjmri v1 binds to the JMRI "basic" signaling system only; aspects
     outside that system raise :class:`~pyjmri.JMRIProtocolError` on read.

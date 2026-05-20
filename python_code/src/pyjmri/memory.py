@@ -46,6 +46,18 @@ class Memory:
         self.value = value
         self._handle = _handle
 
+    async def set_value(self, value: str) -> None:
+        """Set the memory's value to ``value`` (FR18).
+
+        Returns when JMRI has accepted the assignment. The cached
+        :attr:`value` is **not** updated optimistically — call
+        :meth:`get_value` afterward to refresh it. FR22 discipline: the
+        library does not confirm a state it has not observed, and a
+        successful HTTP ack does not yet mean a WS state-change event
+        has propagated.
+        """
+        await self._handle.command("memory", self.name, {"value": value})
+
     async def get_value(self) -> str | None:
         """Refresh the cached :attr:`value` from JMRI and return it.
 

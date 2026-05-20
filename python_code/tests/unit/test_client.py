@@ -259,3 +259,22 @@ async def test_on_ws_message_is_a_stub_for_story_3_1(
             {"type": "turnout", "data": {"name": "NT1", "state": 2}}
         )
     assert result is None
+
+
+# --- Story 4.1: Client.command dispatch ---
+
+
+async def test_client_command_raises_runtime_error_when_not_open() -> None:
+    client = Client()
+    with pytest.raises(RuntimeError):
+        await client.command("turnout", "NT9", {"state": 4})
+
+
+async def test_client_command_dispatches_to_http_client(
+    patch_http_factory: list[Any],
+) -> None:
+    async with Client() as jmri:
+        await jmri.command("turnout", "NT9", {"state": 4})
+
+    fake = patch_http_factory[0]
+    assert fake.commands == [("turnout", "NT9", {"state": 4})]

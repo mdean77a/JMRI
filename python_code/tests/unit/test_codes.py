@@ -13,6 +13,7 @@ from pyjmri import (
     BlockState,
     LightState,
     PowerState,
+    RouteState,
     SensorState,
     SignalHeadAppearance,
     TurnoutState,
@@ -20,10 +21,13 @@ from pyjmri import (
 from pyjmri._codes import (
     BLOCK_STATE,
     LIGHT_STATE,
+    LIGHT_STATE_OUTBOUND,
     POWER_STATE,
+    ROUTE_STATE_OUTBOUND,
     SENSOR_STATE,
     SIGNAL_HEAD_APPEARANCE,
     TURNOUT_STATE,
+    TURNOUT_STATE_OUTBOUND,
 )
 
 # ---- Total integer-key coverage per JMRI's published constants ----
@@ -238,3 +242,62 @@ def test_signal_head_appearance_table_is_immutable() -> None:
 
     with pytest.raises(TypeError):
         SIGNAL_HEAD_APPEARANCE[999] = SignalHeadAppearance.DARK  # type: ignore[index]
+
+
+# ---- Story 4.1: outbound code maps for commandable entities ----
+
+
+def test_turnout_outbound_codes_invert_inbound() -> None:
+    # For each (Enum -> int) outbound entry, the matching int must map
+    # back to the same Enum member in the inbound table. Catches the
+    # "two literal tables drifted apart" bug.
+    for member, code in TURNOUT_STATE_OUTBOUND.items():
+        assert TURNOUT_STATE[code] is member
+
+
+def test_turnout_outbound_codes_only_cover_commandable_states() -> None:
+    # UNKNOWN and INCONSISTENT are observable-only; commanding them is
+    # nonsense and would be rejected by Turnout.set_state with ValueError.
+    assert set(TURNOUT_STATE_OUTBOUND) == {TurnoutState.CLOSED, TurnoutState.THROWN}
+
+
+def test_light_outbound_codes_invert_inbound() -> None:
+    for member, code in LIGHT_STATE_OUTBOUND.items():
+        assert LIGHT_STATE[code] is member
+
+
+def test_light_outbound_codes_only_cover_commandable_states() -> None:
+    assert set(LIGHT_STATE_OUTBOUND) == {LightState.ON, LightState.OFF}
+
+
+def test_route_outbound_codes_active_only() -> None:
+    # Routes activate; there is no commandable INACTIVE in v1.
+    assert set(ROUTE_STATE_OUTBOUND) == {RouteState.ACTIVE}
+    # Per JMRI Route.ACTIVATE, the activation code is 2.
+    assert ROUTE_STATE_OUTBOUND[RouteState.ACTIVE] == 2
+
+
+def test_turnout_outbound_table_is_immutable() -> None:
+    import pytest
+
+    with pytest.raises(TypeError):
+        TURNOUT_STATE_OUTBOUND[TurnoutState.UNKNOWN] = 99  # type: ignore[index]
+
+
+def test_light_outbound_table_is_immutable() -> None:
+    import pytest
+
+    with pytest.raises(TypeError):
+        LIGHT_STATE_OUTBOUND[LightState.UNKNOWN] = 99  # type: ignore[index]
+
+
+def test_route_outbound_table_is_immutable() -> None:
+    import pytest
+
+    with pytest.raises(TypeError):
+        ROUTE_STATE_OUTBOUND[RouteState.UNKNOWN] = 99  # type: ignore[index]
+
+
+def test_route_state_is_not_int_or_str_enum() -> None:
+    assert not issubclass(RouteState, int)
+    assert not issubclass(RouteState, str)

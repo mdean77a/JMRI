@@ -32,6 +32,10 @@ class BlockState(Enum):
 class Block:
     """A JMRI block.
 
+    Read-only in pyjmri v1: there are no command methods on
+    :class:`Block`; block occupancy is driven by hardware detectors, not
+    by API writes. See README §Limitations.
+
     Blocks model occupancy regions on the layout and may carry an
     optional :attr:`value` (for example, the train ID currently in the
     block). :attr:`BlockState.UNDETECTED` (JMRI ``state=0``) means the

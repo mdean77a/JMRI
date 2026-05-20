@@ -292,7 +292,7 @@ def test_layout_accepts_all_eight_entity_types(make_fake_handle: Any) -> None:
     )
     light = Light(name="L1", user_name=None, state=LightState.UNKNOWN, _handle=handle)
     memory = Memory(name="M1", user_name=None, value=None, _handle=handle)
-    route = Route(name="R1", user_name=None)
+    route = Route(name="R1", user_name=None, _handle=handle)
     signal_head = SignalHead(
         name="SH1",
         user_name=None,

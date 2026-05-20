@@ -73,6 +73,56 @@ class Turnout:
         self._handle = _handle
         self._waiters: WaiterList[TurnoutState] = WaiterList()
 
+    async def set_state(self, state: TurnoutState) -> None:
+        """Command the turnout to ``state`` (FR17).
+
+        Returns when JMRI has accepted the command; the library does not
+        confirm physical layout state because NCE is open-loop.
+
+        ``state`` must be ``TurnoutState.CLOSED`` or
+        ``TurnoutState.THROWN``. Passing ``UNKNOWN`` or ``INCONSISTENT``
+        raises :class:`ValueError` synchronously — those are observable-
+        only states, not commandable.
+
+        FR37 discipline: the only exceptions this method ever raises are
+        ``JMRIConnectionError``, ``JMRIRequestTimeout``,
+        ``JMRIProtocolError``, ``LayoutEntityNotFound``,
+        ``LayoutEntityNotControllable``, and ``ValueError`` for invalid
+        commandable-state arguments. The library does not synthesize
+        exceptions for failure modes it cannot detect — e.g., the
+        physical turnout failing to move on the layout. NCE is
+        open-loop; pyjmri never claims a state it has not observed.
+
+        Note:
+            Story 4.2 adds a ``wait_for_jmri_state=True`` keyword for
+            callers who want to await JMRI's WS-reported post-command
+            state. In this version the method is optimistic only.
+        """
+        from pyjmri._codes import TURNOUT_STATE_OUTBOUND
+
+        if state not in TURNOUT_STATE_OUTBOUND:
+            raise ValueError(
+                f"{state!r} is not a commandable turnout state; "
+                f"use {sorted(s.name for s in TURNOUT_STATE_OUTBOUND)!r}"
+            )
+        await self._handle.command("turnout", self.name, {"state": TURNOUT_STATE_OUTBOUND[state]})
+
+    async def throw(self) -> None:
+        """Alias for ``set_state(TurnoutState.THROWN)`` (FR17).
+
+        Returns when JMRI has accepted the command; the library does not
+        confirm physical layout state because NCE is open-loop.
+        """
+        await self.set_state(TurnoutState.THROWN)
+
+    async def close(self) -> None:
+        """Alias for ``set_state(TurnoutState.CLOSED)`` (FR17).
+
+        Returns when JMRI has accepted the command; the library does not
+        confirm physical layout state because NCE is open-loop.
+        """
+        await self.set_state(TurnoutState.CLOSED)
+
     async def get_state(self) -> TurnoutState:
         """Refresh the cached :attr:`state` from JMRI and return it.
 

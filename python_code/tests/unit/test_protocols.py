@@ -11,6 +11,10 @@ def test_client_handle_has_get_entity_member() -> None:
     assert hasattr(ClientHandle, "get_entity")
 
 
+def test_client_handle_has_command_member() -> None:
+    assert hasattr(ClientHandle, "command")
+
+
 async def test_structurally_conforming_class_satisfies_protocol() -> None:
     class Conforming:
         async def get_entity(self, entity_type: str, name: str) -> dict[str, Any]:

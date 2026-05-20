@@ -11,6 +11,7 @@ import json
 import logging
 from collections.abc import Awaitable, Callable
 from typing import TYPE_CHECKING, Any
+from urllib.parse import quote
 
 import httpx
 import websockets
@@ -22,6 +23,8 @@ from pyjmri.exceptions import (
     JMRIProtocolError,
     JMRIReconnectFailed,
     JMRIRequestTimeout,
+    LayoutEntityNotControllable,
+    LayoutEntityNotFound,
 )
 
 if TYPE_CHECKING:
@@ -143,6 +146,101 @@ class HTTPClient:
             "response JSON was not a JMRI v5 entity (object or array of objects)",
             path=path,
             actual_type=type(payload).__name__,
+        )
+
+    async def command(
+        self,
+        entity_type: str,
+        name: str,
+        payload: dict[str, Any],
+    ) -> None:
+        """POST a state/value command to JMRI and return when JMRI acks.
+
+        FR22 / FR37 discipline: JMRI's HTTP 2xx response means JMRI
+        accepted the command into its model. It does NOT mean the
+        physical layout has reached the commanded state — NCE is
+        open-loop and the library never claims a state it did not
+        observe. Story 4.2 layers a ``wait_for_jmri_state=True`` opt-in
+        over this method for callers who want to await the WS echo.
+
+        Args:
+            entity_type: JMRI entity-type string (``"turnout"``,
+                ``"light"``, ``"memory"``, ``"route"``).
+            name: Entity system name; URL-encoded into the path.
+            payload: Per-type body fragment merged into
+                ``{"type", "data": {"name", **payload}}``. For state-
+                bearing types pass ``{"state": <int>}``; for memory pass
+                ``{"value": <str>}``.
+
+        Raises:
+            JMRIConnectionError: socket-level failure (transport error).
+            JMRIRequestTimeout: request exceeded ``request_timeout``.
+            JMRIProtocolError: JMRI returned a non-2xx with a non-error-
+                envelope body, or a 2xx with a malformed body.
+            LayoutEntityNotControllable: JMRI returned an error envelope
+                indicating the entity is locked, refuses the command, or
+                is otherwise not controllable.
+            LayoutEntityNotFound: JMRI returned an error envelope
+                indicating the entity name does not exist on JMRI's
+                side.
+        """
+        path = f"/json/v5/{entity_type}/{quote(name, safe='')}"
+        body = {"type": entity_type, "data": {"name": name, **payload}}
+        try:
+            response = await self._http.post(path, json=body)
+        except httpx.ConnectError as e:
+            raise JMRIConnectionError(host=self._host, port=self._port) from e
+        except httpx.TimeoutException as e:
+            raise JMRIRequestTimeout(
+                "HTTP request exceeded request_timeout",
+                host=self._host,
+                port=self._port,
+                path=path,
+            ) from e
+        except httpx.TransportError as e:
+            raise JMRIConnectionError(
+                host=self._host,
+                port=self._port,
+                error_type=type(e).__name__,
+            ) from e
+
+        status = response.status_code
+        if 200 <= status < 300:
+            logger.debug(
+                "HTTP POST %s -> %d",
+                path,
+                status,
+                extra={"method": "POST", "path": path, "status": status},
+            )
+            return None
+
+        # Non-2xx — try to translate JMRI's error envelope.
+        jmri_message = _extract_jmri_error_message(response)
+        if jmri_message is None:
+            raise JMRIProtocolError(
+                "unexpected HTTP status from command",
+                status=status,
+                path=path,
+            )
+        if status == 404:
+            raise LayoutEntityNotFound(
+                entity_type=entity_type,
+                name=name,
+                jmri_message=jmri_message,
+                status=status,
+            )
+        if status in (400, 403, 409):
+            raise LayoutEntityNotControllable(
+                entity_type=entity_type,
+                name=name,
+                jmri_message=jmri_message,
+                status=status,
+            )
+        raise JMRIProtocolError(
+            "unexpected HTTP status from command",
+            status=status,
+            path=path,
+            jmri_message=jmri_message,
         )
 
     async def aclose(self) -> None:
@@ -332,6 +430,31 @@ class WSConnection:
             "WS outbound",
             extra={"direction": "outbound", "type": message.get("type")},
         )
+
+
+def _extract_jmri_error_message(response: httpx.Response) -> str | None:
+    """Return JMRI's error message if the body matches the error envelope.
+
+    JMRI 5.14+ returns ``{"type":"error","data":{"code":<int>,
+    "message":"<text>"}}`` for command-path failures. Returns ``None``
+    when the body cannot be parsed as JSON or does not match this shape;
+    the caller then raises :class:`JMRIProtocolError` instead.
+    """
+    try:
+        body = response.json()
+    except (ValueError, UnicodeDecodeError):
+        return None
+    if not isinstance(body, dict):
+        return None
+    if body.get("type") != "error":
+        return None
+    data = body.get("data")
+    if not isinstance(data, dict):
+        return None
+    message = data.get("message")
+    if not isinstance(message, str):
+        return None
+    return message
 
 
 def _decode_ws_frame(raw: Any) -> dict[str, Any]:

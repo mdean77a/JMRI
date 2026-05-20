@@ -107,7 +107,13 @@ class LayoutEntityNotFound(JMRIError, KeyError):
 
 
 class LayoutEntityNotControllable(JMRIError):
-    """Raised when ``set_state`` is attempted on a read-only entity (e.g. signalMast)."""
+    """Raised when a command is rejected because the entity is not controllable.
+
+    Two raise sites: (1) ``HTTPClient.command`` when JMRI returns HTTP 400/403/409
+    with a JMRI error envelope (e.g. a turnout locked by an active Dispatcher section);
+    (2) ``EntityCollection.__getitem__`` when ``set_state`` is called on a read-only
+    entity type (e.g. ``SignalMast``).
+    """
 
 
 class ThrottleError(JMRIError):
