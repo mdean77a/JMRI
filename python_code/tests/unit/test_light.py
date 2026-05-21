@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from typing import Any, cast
 
 import pytest
@@ -195,3 +196,124 @@ async def test_on_propagates_layout_entity_not_controllable(make_fake_handle: An
 
     with pytest.raises(LayoutEntityNotControllable):
         await light.on()
+
+
+# --- Story 4.2: wait_for_jmri_state=True ---
+
+
+def _make_wait_light(make_fake_handle: Any) -> tuple[Light, Any]:
+    handle = make_fake_handle(lambda _t, _n: _envelope(2))
+    light = Light(
+        name="IL1",
+        user_name=None,
+        state=LightState.OFF,
+        _handle=cast(ClientHandle, handle),
+    )
+    return light, handle
+
+
+async def test_on_wait_default_false_takes_optimistic_path(make_fake_handle: Any) -> None:
+    light, handle = _make_wait_light(make_fake_handle)
+    await light.on()
+    assert handle.ensure_calls == []
+    assert handle.command_calls == [("light", "IL1", {"state": 2})]
+    assert len(light._waiters) == 0
+
+
+async def test_on_wait_true_registers_waiter_before_command(make_fake_handle: Any) -> None:
+    light, handle = _make_wait_light(make_fake_handle)
+    handle.command_gate = asyncio.Event()
+
+    task = asyncio.create_task(light.on(wait_for_jmri_state=True))
+    await asyncio.sleep(0)
+    await asyncio.sleep(0)
+
+    assert handle.ensure_calls == [("light", "IL1")]
+    assert len(light._waiters) == 1
+    assert handle.command_calls == []
+
+    handle.command_gate.set()
+    await asyncio.sleep(0)
+    light._on_event(LightState.ON)
+    await task
+
+    assert handle.command_calls == [("light", "IL1", {"state": 2})]
+    assert len(light._waiters) == 0
+
+
+async def test_on_wait_true_resolves_on_ws_event_not_http_response(make_fake_handle: Any) -> None:
+    light, handle = _make_wait_light(make_fake_handle)
+
+    task = asyncio.create_task(light.on(wait_for_jmri_state=True))
+    for _ in range(5):
+        await asyncio.sleep(0)
+
+    assert handle.command_calls == [("light", "IL1", {"state": 2})]
+    assert not task.done()
+    assert len(light._waiters) == 1
+
+    light._on_event(LightState.ON)
+    await task
+    assert len(light._waiters) == 0
+
+
+async def test_on_wait_true_event_during_pre_command_window_resolves_correctly(
+    make_fake_handle: Any,
+) -> None:
+    light, handle = _make_wait_light(make_fake_handle)
+    handle.command_gate = asyncio.Event()
+
+    task = asyncio.create_task(light.on(wait_for_jmri_state=True))
+    await asyncio.sleep(0)
+    await asyncio.sleep(0)
+
+    assert len(light._waiters) == 1
+    assert handle.command_calls == []
+    light._on_event(LightState.ON)
+    assert len(light._waiters) == 0
+
+    handle.command_gate.set()
+    await task
+    assert handle.command_calls == [("light", "IL1", {"state": 2})]
+
+
+async def test_on_wait_true_cancellation_cleans_up_waiter(make_fake_handle: Any) -> None:
+    light, handle = _make_wait_light(make_fake_handle)
+
+    with pytest.raises(TimeoutError):
+        await asyncio.wait_for(light.on(wait_for_jmri_state=True), timeout=0.05)
+    await asyncio.sleep(0)  # let asyncio.shield background task complete before asserting
+
+    assert len(light._waiters) == 0
+    assert handle.command_calls == [("light", "IL1", {"state": 2})]
+
+
+async def test_on_wait_true_command_error_cleans_up_waiter(make_fake_handle: Any) -> None:
+    light, handle = _make_wait_light(make_fake_handle)
+    handle.command_raises = LayoutEntityNotControllable(
+        entity_type="light",
+        name="IL1",
+        jmri_message="locked",
+        status=409,
+    )
+
+    with pytest.raises(LayoutEntityNotControllable):
+        await light.on(wait_for_jmri_state=True)
+
+    assert len(light._waiters) == 0
+    assert handle.ensure_calls == [("light", "IL1")]
+    # command was sent (recorded before raising).
+    assert handle.command_calls == [("light", "IL1", {"state": 2})]
+
+
+async def test_light_set_state_wait_true_invalid_state_raises_before_subscribe(
+    make_fake_handle: Any,
+) -> None:
+    light, handle = _make_wait_light(make_fake_handle)
+
+    with pytest.raises(ValueError):
+        await light.set_state(LightState.UNKNOWN, wait_for_jmri_state=True)
+
+    assert handle.ensure_calls == []
+    assert handle.command_calls == []
+    assert len(light._waiters) == 0

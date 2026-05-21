@@ -68,10 +68,11 @@ class Route:
         does not confirm the physical turnout outcomes because NCE is
         open-loop.
 
-        ``wait_for_jmri_state=True`` is not available for routes — the
-        route entity has no observable post-activation state to await.
-        Story 4.2 introduces the keyword on state-bearing command
-        methods only.
+        ``wait_for_jmri_state=True`` is not available on this method in
+        v1 — routes have no observable persistent post-state to wait on
+        (JMRI emits ``state=0`` after activation). Story 4.2 introduces
+        the keyword on state-bearing command methods only. See README
+        §Limitations.
         """
         from pyjmri._codes import ROUTE_STATE_OUTBOUND
 

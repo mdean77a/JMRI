@@ -1,5 +1,14 @@
 # Deferred Work
 
+## Deferred from: code review of 4-2-wait-for-jmri-state (2026-05-20)
+
+- **asyncio.shield comment rationale misleading for common cancellation scenario** — Comment/docstring says shield protects the command on "caller-side cancellation," which is accurate only if cancellation arrives during the HTTP request. In the common case (fast command, slow WS echo), cancel fires at `await future` where shield is no longer active. The protection is real but the stated rationale is misleading. [turnout.py + light.py, `asyncio.shield` comment]
+- **Shielded background task exception → "Task exception was never retrieved" log noise** — If cancellation fires during `await asyncio.shield(command)` and the background task later raises (e.g., `JMRIConnectionError`), asyncio logs an unhandled exception. Not a correctness bug; would require a done-callback restructure to suppress. [turnout.py + light.py]
+- **`WaiterList.fanout` misses `KeyboardInterrupt` in predicate guard** — `except Exception` guard catches normal predicate exceptions but not `BaseException` subclasses like `KeyboardInterrupt` / `SystemExit`. Pre-existing in `_waiters.py`. [python_code/src/pyjmri/_waiters.py]
+- **`WaiterList.fanout` orphans tail entries when predicate raises mid-iteration** — If a predicate raises, `finally: self._entries = kept` fires with only pre-exception entries; all tail entries are silently lost (not cancelled, not retained). Pre-existing in `_waiters.py`. [python_code/src/pyjmri/_waiters.py]
+- **Concurrent `wait_for_jmri_state=True` callers on same entity: two HTTP commands sent** — Both register waiters; first JMRI echo resolves both, but two commands went out. Benign on NCE (idempotent). Undocumented behavior, no test. [turnout.py / light.py, set_state]
+- **Light round-trip integration test provides no assurance when WS echo is absent** — `test_light_wait_for_jmri_state_round_trip` WARN-and-passes on timeout, so a broken light wait-path never fails CI. Spec-mandated (AC10) because the dev profile has no lights. Revisit when a profile with lights is available. [tests/integration/test_command_round_trip.py]
+
 ## Deferred from: code review of story 4-1 (2026-05-20)
 
 - **`payload` "name" key silently overwrites entity name in request body** — `{"name": name, **payload}` gives spread keys priority; an internal or future caller passing `payload={"name": "X"}` would corrupt the body while the URL path stays correct. All current call sites pass `{"state": int}` or `{"value": str}` only. [`python_code/src/pyjmri/_transport.py:188`]

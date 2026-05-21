@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 from collections.abc import Callable
 from pathlib import Path
@@ -66,6 +67,14 @@ def make_fake_handle() -> Callable[[Callable[[str, str], dict[str, Any]]], Any]:
                 self.ensure_calls: list[tuple[str, str]] = []
                 self.command_calls: list[tuple[str, str, dict[str, Any]]] = []
                 self.command_raises: BaseException | None = None
+                # Optional gate that ``command`` awaits BEFORE recording or
+                # raising. Tests that need to inspect entity state mid-call
+                # (e.g. waiter registered, command not yet sent) set this to
+                # a fresh ``asyncio.Event()``, start the entity call as a
+                # task, inspect state, then call ``gate.set()`` to release
+                # ``command``. When ``None`` (default), ``command`` returns
+                # synchronously as in Story 4.1.
+                self.command_gate: asyncio.Event | None = None
 
             async def get_entity(self, entity_type: str, name: str) -> dict[str, Any]:
                 self.calls.append((entity_type, name))
@@ -80,6 +89,8 @@ def make_fake_handle() -> Callable[[Callable[[str, str], dict[str, Any]]], Any]:
                 name: str,
                 payload: dict[str, Any],
             ) -> None:
+                if self.command_gate is not None:
+                    await self.command_gate.wait()
                 self.command_calls.append((entity_type, name, payload))
                 if self.command_raises is not None:
                     raise self.command_raises

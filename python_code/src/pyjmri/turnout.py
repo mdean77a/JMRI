@@ -73,30 +73,54 @@ class Turnout:
         self._handle = _handle
         self._waiters: WaiterList[TurnoutState] = WaiterList()
 
-    async def set_state(self, state: TurnoutState) -> None:
-        """Command the turnout to ``state`` (FR17).
+    async def set_state(
+        self,
+        state: TurnoutState,
+        *,
+        wait_for_jmri_state: bool = False,
+    ) -> None:
+        """Command the turnout to ``state`` (FR17, FR21).
 
-        Returns when JMRI has accepted the command; the library does not
-        confirm physical layout state because NCE is open-loop.
+        With ``wait_for_jmri_state=False`` (the default), returns when
+        JMRI has accepted the command via HTTP. With
+        ``wait_for_jmri_state=True``, returns only after JMRI has
+        reported the post-command state via its WebSocket state-change
+        event.
 
         ``state`` must be ``TurnoutState.CLOSED`` or
         ``TurnoutState.THROWN``. Passing ``UNKNOWN`` or ``INCONSISTENT``
         raises :class:`ValueError` synchronously — those are observable-
         only states, not commandable.
 
+        FR22 honesty: ``wait_for_jmri_state=True`` waits for JMRI's
+        *reported* commanded state, **not** physical layout confirmation.
+        NCE is open-loop with no feedback path; the library cannot and
+        does not promise the physical turnout actually moved. JMRI's WS
+        state-change echo for turnouts is verified on this layout (JMRI
+        5.14 simulator). On other JMRI versions or layouts where the WS
+        echo is not emitted, a ``wait_for_jmri_state=True`` call will
+        hang until cancelled — wrap in ``asyncio.timeout()`` if you
+        cannot tolerate that.
+
+        Cancellation contract (AC4 of Story 4.2): if a caller cancels
+        a ``wait_for_jmri_state=True`` operation (e.g. via
+        ``asyncio.timeout``), the wait future is cancelled and removed
+        from the entity's waiter list, but the in-flight HTTP command
+        is shielded and allowed to complete in the background. Its
+        result is silently discarded. Cancelling the command mid-flight
+        could leave JMRI in an indeterminate state, so the library
+        prefers to let the command finish.
+
         FR37 discipline: the only exceptions this method ever raises are
         ``JMRIConnectionError``, ``JMRIRequestTimeout``,
         ``JMRIProtocolError``, ``LayoutEntityNotFound``,
-        ``LayoutEntityNotControllable``, and ``ValueError`` for invalid
-        commandable-state arguments. The library does not synthesize
-        exceptions for failure modes it cannot detect — e.g., the
-        physical turnout failing to move on the layout. NCE is
-        open-loop; pyjmri never claims a state it has not observed.
-
-        Note:
-            Story 4.2 adds a ``wait_for_jmri_state=True`` keyword for
-            callers who want to await JMRI's WS-reported post-command
-            state. In this version the method is optimistic only.
+        ``LayoutEntityNotControllable``, ``ValueError`` (for invalid
+        commandable-state arguments), and — when
+        ``wait_for_jmri_state=True`` — whatever the caller's cancellation
+        scope propagates (``asyncio.CancelledError`` /
+        ``TimeoutError``). The library does not synthesize exceptions
+        for failure modes it cannot detect (the physical turnout
+        failing to move, JMRI silently dropping the state event, etc.).
         """
         from pyjmri._codes import TURNOUT_STATE_OUTBOUND
 
@@ -105,23 +129,45 @@ class Turnout:
                 f"{state!r} is not a commandable turnout state; "
                 f"use {sorted(s.name for s in TURNOUT_STATE_OUTBOUND)!r}"
             )
-        await self._handle.command("turnout", self.name, {"state": TURNOUT_STATE_OUTBOUND[state]})
 
-    async def throw(self) -> None:
-        """Alias for ``set_state(TurnoutState.THROWN)`` (FR17).
+        payload = {"state": TURNOUT_STATE_OUTBOUND[state]}
 
-        Returns when JMRI has accepted the command; the library does not
-        confirm physical layout state because NCE is open-loop.
+        if not wait_for_jmri_state:
+            await self._handle.command("turnout", self.name, payload)
+            return
+
+        # Pre-register-wait pattern (architecture sec. Command / Event
+        # Correlation). Order matters: ensure subscription, register
+        # waiter, send command, await event. If the waiter were
+        # registered AFTER the command went out, a fast post-ack state
+        # event could race ahead of registration and be silently dropped.
+        await self._handle.ensure_subscription("turnout", self.name)
+        future = self._waiters.register(lambda s: s == state)
+        try:
+            # asyncio.shield: a caller-side cancel must not abort the
+            # in-flight HTTP command. JMRI would be left uncertain
+            # whether the command was received. The outer await raises
+            # CancelledError immediately; the inner task finishes in
+            # the background.
+            await asyncio.shield(self._handle.command("turnout", self.name, payload))
+            await future
+        except BaseException:
+            self._waiters.remove(future)
+            raise
+
+    async def throw(self, *, wait_for_jmri_state: bool = False) -> None:
+        """Alias for ``set_state(TurnoutState.THROWN, ...)`` (FR17, FR21).
+
+        See :meth:`set_state` for the ``wait_for_jmri_state`` contract.
         """
-        await self.set_state(TurnoutState.THROWN)
+        await self.set_state(TurnoutState.THROWN, wait_for_jmri_state=wait_for_jmri_state)
 
-    async def close(self) -> None:
-        """Alias for ``set_state(TurnoutState.CLOSED)`` (FR17).
+    async def close(self, *, wait_for_jmri_state: bool = False) -> None:
+        """Alias for ``set_state(TurnoutState.CLOSED, ...)`` (FR17, FR21).
 
-        Returns when JMRI has accepted the command; the library does not
-        confirm physical layout state because NCE is open-loop.
+        See :meth:`set_state` for the ``wait_for_jmri_state`` contract.
         """
-        await self.set_state(TurnoutState.CLOSED)
+        await self.set_state(TurnoutState.CLOSED, wait_for_jmri_state=wait_for_jmri_state)
 
     async def get_state(self) -> TurnoutState:
         """Refresh the cached :attr:`state` from JMRI and return it.

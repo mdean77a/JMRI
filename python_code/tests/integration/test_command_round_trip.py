@@ -24,6 +24,7 @@ Marker: ``@pytest.mark.integration`` — excluded from default CI by the
 
 from __future__ import annotations
 
+import asyncio
 import contextlib
 import logging
 
@@ -145,3 +146,79 @@ async def test_route_activate_round_trip(jmri_available: None) -> None:
         # route is a one-shot trigger). The Story 4.1 acceptance criterion
         # is simply that JMRI HTTP-acks the activation.
         await route.activate()
+
+
+# --- Story 4.2: wait_for_jmri_state=True round-trip ---
+
+
+async def test_turnout_wait_for_jmri_state_round_trip(jmri_available: None) -> None:
+    """AC10 part 1: wait_for_jmri_state=True confirms via WS event.
+
+    On this layout family (JMRI 5.14 sim, Mikey's profile), turnout WS
+    echo IS emitted on REST commands — the Story 4.1 spike verified
+    this. So we assert strictly that the call returns and cached state
+    matches the commanded state.
+    """
+    async with Client() as jmri:
+        layout = await jmri.discover()
+        turnouts = list(layout.turnouts.values())
+        if not turnouts:
+            pytest.skip("layout has no turnouts")
+        turnout = turnouts[0]
+
+        original = await turnout.get_state()
+        if original not in {TurnoutState.CLOSED, TurnoutState.THROWN}:
+            pytest.skip(f"turnout {turnout.name} in non-binary state {original.name}")
+        target = TurnoutState.THROWN if original is TurnoutState.CLOSED else TurnoutState.CLOSED
+
+        try:
+            # wait_for: cap the wait so a non-echoing JMRI can't hang the suite.
+            await asyncio.wait_for(
+                turnout.set_state(target, wait_for_jmri_state=True),
+                timeout=5.0,
+            )
+            # WS event must have updated cached state.
+            assert turnout.state is target
+        finally:
+            # Restore optimistically (no wait) — the test's purpose is the wait
+            # path; restore complexity should not add new failure modes.
+            with contextlib.suppress(Exception):
+                await turnout.set_state(original)
+
+
+async def test_light_wait_for_jmri_state_round_trip(jmri_available: None) -> None:
+    """AC10 part 2: light wait_for_jmri_state — WARN-and-pass on timeout.
+
+    Light WS echo is UNVERIFIED on Mikey's profile family (Story 4.1
+    spike could not probe — no lights present). If the wait times out
+    here, treat it as informational rather than a hard fail.
+    """
+    async with Client() as jmri:
+        layout = await jmri.discover()
+        lights = list(layout.lights.values())
+        if not lights:
+            pytest.skip("layout has no lights")
+        light = lights[0]
+
+        original = await light.get_state()
+        if original not in {LightState.ON, LightState.OFF}:
+            pytest.skip(f"light {light.name} in non-binary state {original.name}")
+        target = LightState.OFF if original is LightState.ON else LightState.ON
+
+        try:
+            try:
+                await asyncio.wait_for(
+                    light.set_state(target, wait_for_jmri_state=True),
+                    timeout=5.0,
+                )
+                assert light.state is target
+            except TimeoutError:
+                logger.warning(
+                    "light wait_for_jmri_state command accepted but no WS state event "
+                    "observed within 5s — light WS echo unverified on this layout "
+                    "family; treating as informational",
+                    extra={"name": light.name, "commanded": target.name},
+                )
+        finally:
+            with contextlib.suppress(Exception):
+                await light.set_state(original)

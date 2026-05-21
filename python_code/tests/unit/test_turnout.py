@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from typing import Any, cast
 
 import pytest
@@ -235,3 +236,140 @@ async def test_throw_propagates_layout_entity_not_controllable(make_fake_handle:
 
     with pytest.raises(LayoutEntityNotControllable):
         await turnout.throw()
+
+
+# --- Story 4.2: wait_for_jmri_state=True ---
+
+
+def _make_wait_turnout(make_fake_handle: Any) -> tuple[Turnout, Any]:
+    handle = make_fake_handle(lambda _t, _n: _envelope(2))
+    turnout = Turnout(
+        name="NT400",
+        user_name=None,
+        state=TurnoutState.CLOSED,
+        _handle=cast(ClientHandle, handle),
+    )
+    return turnout, handle
+
+
+async def test_throw_wait_default_false_takes_optimistic_path(make_fake_handle: Any) -> None:
+    turnout, handle = _make_wait_turnout(make_fake_handle)
+    await turnout.throw()
+    assert handle.ensure_calls == []
+    assert handle.command_calls == [("turnout", "NT400", {"state": 4})]
+    assert len(turnout._waiters) == 0
+
+
+async def test_throw_wait_true_registers_waiter_before_command(make_fake_handle: Any) -> None:
+    turnout, handle = _make_wait_turnout(make_fake_handle)
+    handle.command_gate = asyncio.Event()
+
+    task = asyncio.create_task(turnout.throw(wait_for_jmri_state=True))
+    await asyncio.sleep(0)  # let task reach the gate
+    await asyncio.sleep(0)
+
+    # Pre-register-wait ordering: ensure done, waiter registered, command NOT yet sent.
+    assert handle.ensure_calls == [("turnout", "NT400")]
+    assert len(turnout._waiters) == 1
+    assert handle.command_calls == []
+
+    # Release the command and fire the WS event to resolve the waiter.
+    handle.command_gate.set()
+    await asyncio.sleep(0)
+    turnout._on_event(TurnoutState.THROWN)
+    await task
+
+    assert handle.command_calls == [("turnout", "NT400", {"state": 4})]
+    assert len(turnout._waiters) == 0
+
+
+async def test_throw_wait_true_resolves_on_ws_event_not_http_response(
+    make_fake_handle: Any,
+) -> None:
+    """The await blocks past the HTTP ack and resolves only on the WS event."""
+    turnout, handle = _make_wait_turnout(make_fake_handle)
+
+    task = asyncio.create_task(turnout.throw(wait_for_jmri_state=True))
+    # Yield enough for ensure → register → command-record to complete.
+    for _ in range(5):
+        await asyncio.sleep(0)
+
+    assert handle.command_calls == [("turnout", "NT400", {"state": 4})]
+    assert not task.done(), "task must still be pending awaiting the WS event"
+    assert len(turnout._waiters) == 1
+
+    turnout._on_event(TurnoutState.THROWN)
+    await task
+    assert len(turnout._waiters) == 0
+
+
+async def test_throw_wait_true_event_during_pre_command_window_resolves_correctly(
+    make_fake_handle: Any,
+) -> None:
+    """Race AC6: state event arrives between ensure and command. Waiter resolves."""
+    turnout, handle = _make_wait_turnout(make_fake_handle)
+    handle.command_gate = asyncio.Event()
+
+    task = asyncio.create_task(turnout.throw(wait_for_jmri_state=True))
+    await asyncio.sleep(0)
+    await asyncio.sleep(0)
+
+    # Waiter is registered; command is gated. Fire the event NOW (pre-command window).
+    assert len(turnout._waiters) == 1
+    assert handle.command_calls == []
+    turnout._on_event(TurnoutState.THROWN)
+    # Waiter list should be drained by fanout.
+    assert len(turnout._waiters) == 0
+
+    # Release the command. The task should complete because the future is already done.
+    handle.command_gate.set()
+    await task
+    assert handle.command_calls == [("turnout", "NT400", {"state": 4})]
+
+
+async def test_throw_wait_true_cancellation_cleans_up_waiter(make_fake_handle: Any) -> None:
+    """AC4: caller-side cancellation removes the waiter, no orphan."""
+    turnout, handle = _make_wait_turnout(make_fake_handle)
+
+    with pytest.raises(TimeoutError):
+        await asyncio.wait_for(turnout.throw(wait_for_jmri_state=True), timeout=0.05)
+    await asyncio.sleep(0)  # let asyncio.shield background task complete before asserting
+
+    # Waiter removed, no orphan future.
+    assert len(turnout._waiters) == 0
+    # The HTTP command was still recorded (shielded — it completed in the background).
+    assert handle.command_calls == [("turnout", "NT400", {"state": 4})]
+
+
+async def test_throw_wait_true_command_error_cleans_up_waiter(make_fake_handle: Any) -> None:
+    """A command error propagates AND removes the waiter."""
+    turnout, handle = _make_wait_turnout(make_fake_handle)
+    handle.command_raises = LayoutEntityNotControllable(
+        entity_type="turnout",
+        name="NT400",
+        jmri_message="locked",
+        status=409,
+    )
+
+    with pytest.raises(LayoutEntityNotControllable):
+        await turnout.throw(wait_for_jmri_state=True)
+
+    assert len(turnout._waiters) == 0
+    # ensure_subscription still ran (it's the first step).
+    assert handle.ensure_calls == [("turnout", "NT400")]
+    # command was sent (recorded before raising).
+    assert handle.command_calls == [("turnout", "NT400", {"state": 4})]
+
+
+async def test_set_state_wait_true_invalid_state_raises_before_subscribe(
+    make_fake_handle: Any,
+) -> None:
+    """Validation happens before any I/O, even in wait-mode."""
+    turnout, handle = _make_wait_turnout(make_fake_handle)
+
+    with pytest.raises(ValueError):
+        await turnout.set_state(TurnoutState.UNKNOWN, wait_for_jmri_state=True)
+
+    assert handle.ensure_calls == []
+    assert handle.command_calls == []
+    assert len(turnout._waiters) == 0

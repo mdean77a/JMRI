@@ -36,7 +36,6 @@ async def test_activate_sends_active_state_code(make_fake_handle: Any) -> None:
     assert handle.command_calls == [("route", "IO:1", {"state": 2})]
 
 
-@pytest.mark.anyio
 async def test_activate_propagates_layout_entity_not_controllable(make_fake_handle: Any) -> None:
     handle = make_fake_handle(lambda _t, _n: {})
     handle.command_raises = LayoutEntityNotControllable(
@@ -49,3 +48,13 @@ async def test_activate_propagates_layout_entity_not_controllable(make_fake_hand
 
     with pytest.raises(LayoutEntityNotControllable):
         await route.activate()
+
+
+async def test_activate_does_not_accept_wait_for_jmri_state_kwarg(make_fake_handle: Any) -> None:
+    """Story 4.2 AC3: routes have no observable post-state, so the kwarg is not in v1."""
+    handle = make_fake_handle(lambda _t, _n: {})
+    route = Route(name="IO:1", user_name=None, _handle=cast(ClientHandle, handle))
+
+    with pytest.raises(TypeError):
+        # Bypass mypy --strict at call site so we exercise the runtime signature guard.
+        await route.activate(wait_for_jmri_state=True)  # type: ignore[call-arg]

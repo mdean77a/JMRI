@@ -158,3 +158,20 @@ async def test_set_value_propagates_layout_entity_not_controllable(make_fake_han
 
     with pytest.raises(LayoutEntityNotControllable):
         await memory.set_value("new")
+
+
+async def test_set_value_does_not_accept_wait_for_jmri_state_kwarg(
+    make_fake_handle: Any,
+) -> None:
+    """Story 4.2 AC3: Memory has no _on_event plumbing, so the kwarg is not in v1."""
+    handle = make_fake_handle(lambda _t, _n: _envelope("stored"))
+    memory = Memory(
+        name="IM42",
+        user_name=None,
+        value="old",
+        _handle=cast(ClientHandle, handle),
+    )
+
+    with pytest.raises(TypeError):
+        # Bypass mypy --strict at call site so we exercise the runtime signature guard.
+        await memory.set_value("new", wait_for_jmri_state=True)  # type: ignore[call-arg]

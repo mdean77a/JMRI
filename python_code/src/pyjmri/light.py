@@ -70,21 +70,39 @@ class Light:
         self._handle = _handle
         self._waiters: WaiterList[LightState] = WaiterList()
 
-    async def set_state(self, state: LightState) -> None:
-        """Command the light to ``state`` (FR19).
+    async def set_state(
+        self,
+        state: LightState,
+        *,
+        wait_for_jmri_state: bool = False,
+    ) -> None:
+        """Command the light to ``state`` (FR19, FR21).
 
-        Returns when JMRI has accepted the command; the library does not
-        confirm physical layout state because NCE is open-loop.
+        With ``wait_for_jmri_state=False`` (the default), returns when
+        JMRI has accepted the command via HTTP. With
+        ``wait_for_jmri_state=True``, returns only after JMRI has
+        reported the post-command state via its WebSocket state-change
+        event.
 
         ``state`` must be ``LightState.ON`` or ``LightState.OFF``.
         Passing ``UNKNOWN`` or ``INCONSISTENT`` raises :class:`ValueError`
         synchronously — those are observable-only states, not
         commandable.
 
-        Note:
-            Story 4.2 adds a ``wait_for_jmri_state=True`` keyword for
-            callers who want to await JMRI's WS-reported post-command
-            state. In this version the method is optimistic only.
+        FR22 honesty: ``wait_for_jmri_state=True`` waits for JMRI's
+        *reported* commanded state, **not** physical layout confirmation.
+        NCE is open-loop; the library cannot promise the physical light
+        actually changed. Light WS state-change echo behavior is
+        **unverified** on Mikey's profile family (Story 4.1 spike could
+        not probe — no lights present). On JMRI configurations where
+        the WS echo does not fire for lights, a
+        ``wait_for_jmri_state=True`` call hangs until cancelled — wrap
+        in ``asyncio.timeout()`` if you cannot tolerate that.
+
+        Cancellation contract: see :meth:`pyjmri.Turnout.set_state` —
+        the in-flight HTTP command is shielded via :func:`asyncio.shield`
+        and allowed to complete in the background on caller-side
+        cancellation. The wait future is removed cleanly.
         """
         from pyjmri._codes import LIGHT_STATE_OUTBOUND
 
@@ -93,23 +111,38 @@ class Light:
                 f"{state!r} is not a commandable light state; "
                 f"use {sorted(s.name for s in LIGHT_STATE_OUTBOUND)!r}"
             )
-        await self._handle.command("light", self.name, {"state": LIGHT_STATE_OUTBOUND[state]})
 
-    async def on(self) -> None:
-        """Alias for ``set_state(LightState.ON)`` (FR19).
+        payload = {"state": LIGHT_STATE_OUTBOUND[state]}
 
-        Returns when JMRI has accepted the command; the library does not
-        confirm physical layout state because NCE is open-loop.
+        if not wait_for_jmri_state:
+            await self._handle.command("light", self.name, payload)
+            return
+
+        # Pre-register-wait pattern (architecture sec. Command / Event
+        # Correlation). See pyjmri.Turnout.set_state for the rationale
+        # — same ordering, same shield, same cleanup.
+        await self._handle.ensure_subscription("light", self.name)
+        future = self._waiters.register(lambda s: s == state)
+        try:
+            await asyncio.shield(self._handle.command("light", self.name, payload))
+            await future
+        except BaseException:
+            self._waiters.remove(future)
+            raise
+
+    async def on(self, *, wait_for_jmri_state: bool = False) -> None:
+        """Alias for ``set_state(LightState.ON, ...)`` (FR19, FR21).
+
+        See :meth:`set_state` for the ``wait_for_jmri_state`` contract.
         """
-        await self.set_state(LightState.ON)
+        await self.set_state(LightState.ON, wait_for_jmri_state=wait_for_jmri_state)
 
-    async def off(self) -> None:
-        """Alias for ``set_state(LightState.OFF)`` (FR19).
+    async def off(self, *, wait_for_jmri_state: bool = False) -> None:
+        """Alias for ``set_state(LightState.OFF, ...)`` (FR19, FR21).
 
-        Returns when JMRI has accepted the command; the library does not
-        confirm physical layout state because NCE is open-loop.
+        See :meth:`set_state` for the ``wait_for_jmri_state`` contract.
         """
-        await self.set_state(LightState.OFF)
+        await self.set_state(LightState.OFF, wait_for_jmri_state=wait_for_jmri_state)
 
     async def get_state(self) -> LightState:
         """Refresh the cached :attr:`state` from JMRI and return it.

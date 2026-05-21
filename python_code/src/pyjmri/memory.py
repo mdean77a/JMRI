@@ -55,6 +55,12 @@ class Memory:
         library does not confirm a state it has not observed, and a
         successful HTTP ack does not yet mean a WS state-change event
         has propagated.
+
+        ``wait_for_jmri_state=True`` is not available on this method in
+        v1 — memory entities have no ``_on_event`` plumbing (no parser
+        entry, no waiter list). If you need confirmed memory writes,
+        call ``set_value`` followed by ``get_value`` and compare. See
+        README §Limitations.
         """
         await self._handle.command("memory", self.name, {"value": value})
 
