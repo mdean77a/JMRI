@@ -539,6 +539,29 @@ class Client:
             }
         )
 
+    async def throttle_update(
+        self,
+        throttle_id: str,
+        payload: dict[str, Any],
+    ) -> None:
+        """Implementation of :class:`pyjmri._protocols.ClientHandle`.
+
+        Fire-and-forget WS state-update envelope. Story 5.2 AC1 documents the
+        contract: returns as soon as the WS bytes are written; no awaiting
+        JMRI's echo. State echoes arrive on the WS dispatcher and fall
+        through :meth:`_dispatch_throttle_envelope` to the ``future is None``
+        path (silently dropped — no pending acquire matches a held
+        throttle's echo).
+        """
+        if self._ws is None:
+            raise RuntimeError("Client is not open; use 'async with Client() as jmri:'")
+        await self._ws.send(
+            {
+                "type": "throttle",
+                "data": {**payload, "throttle": throttle_id},
+            }
+        )
+
     async def throttle_heartbeat(self, throttle_id: str) -> None:
         """Story 5.3 hookpoint — v1 raises :class:`NotImplementedError`.
 

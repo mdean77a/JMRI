@@ -197,3 +197,253 @@ async def test_layout_throttle_factory_raises_when_no_handle() -> None:
     layout = Layout()
     with pytest.raises(RuntimeError, match=r"client\.throttle"):
         layout.throttle(5327, long=True)
+
+
+# ============================================================================
+# Story 5.2: set_speed / set_function control surface
+# ============================================================================
+
+
+# Story 5.2 AC1 + AC9 #1
+async def test_set_speed_sends_single_envelope_with_speed_and_forward(
+    make_fake_handle: Any,
+) -> None:
+    handle = make_fake_handle(lambda _t, _n: {})
+    throttle = _make_throttle(handle)
+    async with throttle as t:
+        await t.set_speed(0.4, forward=True)
+    assert handle.throttle_update_calls == [("pyjmri-5327-fake", {"speed": 0.4, "forward": True})]
+
+
+# Story 5.2 AC1 + AC9 #2
+async def test_set_speed_with_reverse_direction(make_fake_handle: Any) -> None:
+    handle = make_fake_handle(lambda _t, _n: {})
+    throttle = _make_throttle(handle)
+    async with throttle as t:
+        await t.set_speed(0.25, forward=False)
+    assert handle.throttle_update_calls == [("pyjmri-5327-fake", {"speed": 0.25, "forward": False})]
+
+
+# Story 5.2 AC1 + AC9 #3 — closed-range lower bound (emergency stop)
+async def test_set_speed_zero_is_valid(make_fake_handle: Any) -> None:
+    handle = make_fake_handle(lambda _t, _n: {})
+    throttle = _make_throttle(handle)
+    async with throttle as t:
+        await t.set_speed(0.0, forward=True)
+    assert handle.throttle_update_calls == [("pyjmri-5327-fake", {"speed": 0.0, "forward": True})]
+
+
+# Story 5.2 AC1 + AC9 #4 — closed-range upper bound
+async def test_set_speed_one_is_valid(make_fake_handle: Any) -> None:
+    handle = make_fake_handle(lambda _t, _n: {})
+    throttle = _make_throttle(handle)
+    async with throttle as t:
+        await t.set_speed(1.0, forward=True)
+    assert handle.throttle_update_calls == [("pyjmri-5327-fake", {"speed": 1.0, "forward": True})]
+
+
+# Story 5.2 AC1 + AC9 #5 — validation runs before transport
+async def test_set_speed_rejects_negative(make_fake_handle: Any) -> None:
+    handle = make_fake_handle(lambda _t, _n: {})
+    throttle = _make_throttle(handle)
+    async with throttle as t:
+        with pytest.raises(ValueError, match=r"\[0\.0, 1\.0\]"):
+            await t.set_speed(-0.1, forward=True)
+    assert handle.throttle_update_calls == []
+
+
+# Story 5.2 AC1 + AC9 #6
+async def test_set_speed_rejects_above_one(make_fake_handle: Any) -> None:
+    handle = make_fake_handle(lambda _t, _n: {})
+    throttle = _make_throttle(handle)
+    async with throttle as t:
+        with pytest.raises(ValueError, match=r"\[0\.0, 1\.0\]"):
+            await t.set_speed(1.1, forward=True)
+    assert handle.throttle_update_calls == []
+
+
+# Story 5.2 AC1 + AC9 #7 — NaN propagates as out-of-range (0.0 <= NaN is False)
+async def test_set_speed_rejects_nan(make_fake_handle: Any) -> None:
+    handle = make_fake_handle(lambda _t, _n: {})
+    throttle = _make_throttle(handle)
+    async with throttle as t:
+        with pytest.raises(ValueError, match=r"\[0\.0, 1\.0\]"):
+            await t.set_speed(float("nan"), forward=True)
+    assert handle.throttle_update_calls == []
+
+
+# Story 5.2 AC2 + AC9 #8
+async def test_set_function_sends_F_indexed_envelope(make_fake_handle: Any) -> None:
+    handle = make_fake_handle(lambda _t, _n: {})
+    throttle = _make_throttle(handle)
+    async with throttle as t:
+        await t.set_function(2, True)
+    assert handle.throttle_update_calls == [("pyjmri-5327-fake", {"F2": True})]
+
+
+# Story 5.2 AC2 + AC9 #9 — closed-range bounds
+async def test_set_function_zero_and_twentyeight_are_valid(make_fake_handle: Any) -> None:
+    handle = make_fake_handle(lambda _t, _n: {})
+    throttle = _make_throttle(handle)
+    async with throttle as t:
+        await t.set_function(0, True)
+        await t.set_function(28, False)
+    assert handle.throttle_update_calls == [
+        ("pyjmri-5327-fake", {"F0": True}),
+        ("pyjmri-5327-fake", {"F28": False}),
+    ]
+
+
+# Story 5.2 AC2 + AC9 #10
+async def test_set_function_rejects_negative(make_fake_handle: Any) -> None:
+    handle = make_fake_handle(lambda _t, _n: {})
+    throttle = _make_throttle(handle)
+    async with throttle as t:
+        with pytest.raises(ValueError, match=r"\[0, 28\]"):
+            await t.set_function(-1, True)
+    assert handle.throttle_update_calls == []
+
+
+# Story 5.2 AC2 + AC9 #11
+async def test_set_function_rejects_above_twentyeight(make_fake_handle: Any) -> None:
+    handle = make_fake_handle(lambda _t, _n: {})
+    throttle = _make_throttle(handle)
+    async with throttle as t:
+        with pytest.raises(ValueError, match=r"\[0, 28\]"):
+            await t.set_function(29, True)
+    assert handle.throttle_update_calls == []
+
+
+# Story 5.2 AC3 + AC9 #12
+async def test_set_speed_after_release_raises_throttle_released(
+    make_fake_handle: Any,
+) -> None:
+    handle = make_fake_handle(lambda _t, _n: {})
+    throttle = _make_throttle(handle)
+    async with throttle as t:
+        await t.release()
+        with pytest.raises(ThrottleReleased) as excinfo:
+            await t.set_speed(0.4, forward=True)
+        assert excinfo.value.context["dcc_address"] == 5327
+    assert handle.throttle_update_calls == []
+
+
+# Story 5.2 AC3 + AC9 #13
+async def test_set_function_after_release_raises_throttle_released(
+    make_fake_handle: Any,
+) -> None:
+    handle = make_fake_handle(lambda _t, _n: {})
+    throttle = _make_throttle(handle)
+    async with throttle as t:
+        await t.release()
+        with pytest.raises(ThrottleReleased) as excinfo:
+            await t.set_function(2, True)
+        assert excinfo.value.context["dcc_address"] == 5327
+    assert handle.throttle_update_calls == []
+
+
+# Story 5.2 AC4 + AC9 #14
+async def test_set_speed_on_never_acquired_throttle_raises_runtime_error(
+    make_fake_handle: Any,
+) -> None:
+    handle = make_fake_handle(lambda _t, _n: {})
+    throttle = _make_throttle(handle)
+    with pytest.raises(RuntimeError, match=r"not acquired"):
+        await throttle.set_speed(0.4, forward=True)
+    assert handle.throttle_update_calls == []
+
+
+# Story 5.2 AC3 + AC9 #15 — released check beats arg validation
+async def test_set_speed_with_invalid_value_on_released_throttle_raises_throttle_released(
+    make_fake_handle: Any,
+) -> None:
+    handle = make_fake_handle(lambda _t, _n: {})
+    throttle = _make_throttle(handle)
+    async with throttle as t:
+        await t.release()
+        with pytest.raises(ThrottleReleased) as excinfo:
+            await t.set_speed(-0.1, forward=True)
+        assert excinfo.value.context["dcc_address"] == 5327
+    assert handle.throttle_update_calls == []
+
+
+# ============================================================================
+# Review fixes (code review 2026-05-21)
+# ============================================================================
+
+
+# P1 — bool is a subtype of int; `set_function(True, True)` must be rejected
+async def test_set_function_rejects_bool_as_n(make_fake_handle: Any) -> None:
+    handle = make_fake_handle(lambda _t, _n: {})
+    throttle = _make_throttle(handle)
+    async with throttle as t:
+        with pytest.raises(ValueError, match=r"must be an int"):
+            await t.set_function(True, True)
+    assert handle.throttle_update_calls == []
+
+
+# P1 — float passes range guard but produces a malformed key like "F2.5"
+async def test_set_function_rejects_float_as_n(make_fake_handle: Any) -> None:
+    handle = make_fake_handle(lambda _t, _n: {})
+    throttle = _make_throttle(handle)
+    async with throttle as t:
+        with pytest.raises(ValueError, match=r"must be an int"):
+            await t.set_function(2.5, True)  # type: ignore[arg-type]
+    assert handle.throttle_update_calls == []
+
+
+# P3 — AC4 covers "set_speed or set_function"; only set_speed had test #14
+async def test_set_function_on_never_acquired_throttle_raises_runtime_error(
+    make_fake_handle: Any,
+) -> None:
+    handle = make_fake_handle(lambda _t, _n: {})
+    throttle = _make_throttle(handle)
+    with pytest.raises(RuntimeError, match=r"not acquired"):
+        await throttle.set_function(2, True)
+    assert handle.throttle_update_calls == []
+
+
+# P5 — AC1: INFO log carries correct extra fields for set_speed
+async def test_set_speed_logs_info_with_extra_fields(
+    make_fake_handle: Any, caplog: pytest.LogCaptureFixture
+) -> None:
+    handle = make_fake_handle(lambda _t, _n: {})
+    throttle = _make_throttle(handle)
+    caplog.set_level("INFO", logger="pyjmri.throttle")
+    async with throttle as t:
+        await t.set_speed(0.4, forward=True)
+    speed_logs = [r for r in caplog.records if "speed updated" in r.message]
+    assert len(speed_logs) == 1
+    rec = speed_logs[0]
+    assert rec.dcc_address == 5327  # type: ignore[attr-defined]
+    assert rec.throttle_id == "pyjmri-5327-fake"  # type: ignore[attr-defined]
+    assert rec.speed == pytest.approx(0.4)  # type: ignore[attr-defined]
+    assert rec.forward is True  # type: ignore[attr-defined]
+
+
+# P5 — AC2: INFO log carries correct extra fields for set_function
+async def test_set_function_logs_info_with_extra_fields(
+    make_fake_handle: Any, caplog: pytest.LogCaptureFixture
+) -> None:
+    handle = make_fake_handle(lambda _t, _n: {})
+    throttle = _make_throttle(handle)
+    caplog.set_level("INFO", logger="pyjmri.throttle")
+    async with throttle as t:
+        await t.set_function(2, True)
+    fn_logs = [r for r in caplog.records if "function updated" in r.message]
+    assert len(fn_logs) == 1
+    rec = fn_logs[0]
+    assert rec.dcc_address == 5327  # type: ignore[attr-defined]
+    assert rec.throttle_id == "pyjmri-5327-fake"  # type: ignore[attr-defined]
+    assert rec.function == 2  # type: ignore[attr-defined]
+    assert rec.on is True  # type: ignore[attr-defined]
+
+
+# P7 — throttle_update_raises knob: transport error propagates from set_speed
+async def test_set_speed_propagates_transport_error(make_fake_handle: Any) -> None:
+    handle = make_fake_handle(lambda _t, _n: {})
+    handle.throttle_update_raises = JMRIConnectionError(host="localhost", port=12080)
+    throttle = _make_throttle(handle)
+    with pytest.raises(JMRIConnectionError):
+        async with throttle as t:
+            await t.set_speed(0.4, forward=True)

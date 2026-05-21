@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-05-07
-last_updated: 2026-05-21  # Story 5.1 code review complete → done
+last_updated: 2026-05-21  # Story 5.2 code review complete → done
 project: JMRI
 project_key: NOKEY
 tracking_system: file-system
@@ -76,7 +76,7 @@ development_status:
   # Epic 5: Drive Locomotives via Throttles
   epic-5: in-progress
   5-1-throttle-async-context-manager-acquire-release-lifecycle-keep-alive-supervision: done
-  5-2-throttle-speed-direction-function-controls: backlog
+  5-2-throttle-speed-direction-function-controls: done
   5-3-multi-throttle-integration-test-plumbing-on-simulator-physical-correctness-on-hardware: backlog
   epic-5-retrospective: optional
 

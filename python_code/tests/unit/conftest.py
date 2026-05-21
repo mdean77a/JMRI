@@ -80,11 +80,14 @@ def make_fake_handle() -> Callable[[Callable[[str, str], dict[str, Any]]], Any]:
                 self.throttle_release_calls: list[str] = []
                 self.throttle_heartbeat_calls: list[str] = []
                 self.spawned_coros: list[asyncio.Task[None]] = []
+                # Story 5.2: state-update plumbing observability.
+                self.throttle_update_calls: list[tuple[str, dict[str, Any]]] = []
                 # Knobs that tests flip to drive the throttle code paths.
                 self.throttle_acquire_returns: str | None = None
                 self.throttle_acquire_raises: BaseException | None = None
                 self.throttle_release_raises: BaseException | None = None
                 self.throttle_heartbeat_raises: BaseException | None = None
+                self.throttle_update_raises: BaseException | None = None
                 # Optional gate for acquire; mirrors ``command_gate``. When
                 # set, ``throttle_acquire`` blocks on ``wait()`` after
                 # recording the call but before returning, so tests can
@@ -131,6 +134,17 @@ def make_fake_handle() -> Callable[[Callable[[str, str], dict[str, Any]]], Any]:
                 self.throttle_heartbeat_calls.append(throttle_id)
                 if self.throttle_heartbeat_raises is not None:
                     raise self.throttle_heartbeat_raises
+
+            async def throttle_update(
+                self,
+                throttle_id: str,
+                payload: dict[str, Any],
+            ) -> None:
+                # dict(payload) snapshots so a caller mutating after the call
+                # cannot retroactively corrupt the recorded value.
+                self.throttle_update_calls.append((throttle_id, dict(payload)))
+                if self.throttle_update_raises is not None:
+                    raise self.throttle_update_raises
 
             def spawn_supervised(
                 self,

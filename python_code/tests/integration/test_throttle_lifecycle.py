@@ -80,3 +80,20 @@ async def test_throttle_acquire_failure_raises_throttle_acquire_failed(
         # JMRI's error envelope is surfaced in .context.
         assert excinfo.value.context.get("code") == 400
         assert "invalid" in str(excinfo.value.context.get("jmri_message", "")).lower()
+
+
+async def test_set_speed_and_set_function_plumbing(jmri_available: None) -> None:
+    """Story 5.2 plumbing test: send set_speed / set_function updates over
+    WS without raising. JMRI accepts the envelopes; the simulator has no
+    virtual decoder, so no physical loco motion is asserted. Story 5.3
+    covers physical correctness on hardware."""
+    async with Client() as jmri:
+        throttle = jmri.throttle(3, long=False)
+        async with throttle as t:
+            # Drive forward, headlight on, then stop, headlight off. Each
+            # call writes a single WS envelope; JMRI's per-field delta echoes
+            # are silently consumed by the dispatcher.
+            await t.set_speed(0.1, forward=True)
+            await t.set_function(0, True)
+            await t.set_speed(0.0, forward=True)
+            await t.set_function(0, False)

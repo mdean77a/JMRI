@@ -134,14 +134,119 @@ class Throttle:
     async def release(self) -> None:
         """Cancel the keep-alive and send the WS release envelope.
 
-        After ``release()``, all control methods (in v1: ``__aenter__``,
-        any Story 5.2 control methods) raise :class:`ThrottleReleased`.
-        Release is idempotent — a second call returns without re-issuing
-        the WS envelope.
+        After ``release()``, all control methods (``__aenter__``,
+        :meth:`set_speed`, :meth:`set_function`) raise
+        :class:`ThrottleReleased`. Release is idempotent — a second call
+        returns without re-issuing the WS envelope.
         """
         if self._released:
             return
         await self._release_impl(suppress_errors=False)
+
+    async def set_speed(self, value: float, *, forward: bool) -> None:
+        """Set speed and direction in a single fire-and-forget WS update (FR25).
+
+        Sends ``{"type":"throttle","data":{"throttle":<id>,"speed":<value>,
+        "forward":<forward>}}`` and returns as soon as the bytes are written;
+        does NOT await JMRI's state-echo. JMRI emits per-field delta echoes
+        which the WS dispatcher silently drops.
+
+        FR28 / NCE open-loop reminder: this method commands JMRI's view of
+        the throttle's state. It does NOT confirm the physical locomotive
+        responded — NCE has no DCC-bus feedback. A ghost throttle (an absent
+        DCC address) silently accepts updates.
+
+        Args:
+            value: Throttle setting in the closed range ``[0.0, 1.0]``. NaN
+                and ``±inf`` are all rejected — the guard ``0.0 <= value
+                <= 1.0`` evaluates ``False`` for NaN and for ``-inf``;
+                ``inf > 1.0`` catches positive infinity. ``0.0`` is a
+                valid emergency stop.
+            forward: ``True`` for forward, ``False`` for reverse.
+
+        Raises:
+            ThrottleReleased: when called after :meth:`release` (carries
+                ``dcc_address`` in ``.context``). No WS traffic is sent.
+            RuntimeError: when called on a never-acquired ``Throttle``
+                (the ``async with`` block has not been entered).
+            ValueError: when ``value`` is outside ``[0.0, 1.0]`` or is NaN.
+            JMRIConnectionError: surfaced from the WS transport.
+        """
+        if self._released:
+            raise ThrottleReleased(
+                "throttle is released; cannot send updates",
+                dcc_address=self.dcc_address,
+            )
+        if self._throttle_id is None:
+            raise RuntimeError(
+                f"Throttle for DCC address {self.dcc_address} is not acquired; "
+                "enter the 'async with' block before calling set_speed"
+            )
+        if not (0.0 <= value <= 1.0):
+            raise ValueError(f"speed value must be in [0.0, 1.0]; got {value!r}")
+        await self._handle.throttle_update(
+            self._throttle_id,
+            {"speed": value, "forward": forward},
+        )
+        logger.info(
+            "throttle speed updated",
+            extra={
+                "dcc_address": self.dcc_address,
+                "throttle_id": self._throttle_id,
+                "speed": value,
+                "forward": forward,
+            },
+        )
+
+    async def set_function(self, n: int, on: bool) -> None:
+        """Set one function bit via a fire-and-forget WS update (FR26).
+
+        Sends ``{"type":"throttle","data":{"throttle":<id>,"F<n>":<on>}}``
+        and returns as soon as the bytes are written; does NOT await JMRI's
+        state-echo.
+
+        Higher function bits (F29+, used by some decoders such as
+        ScaleTrains) are deferred to Growth (FR26).
+
+        Args:
+            n: Function index in the closed range ``[0, 28]``. F0 is
+                conventionally the headlight on most decoders.
+            on: ``True`` to assert the bit, ``False`` to clear it.
+
+        Raises:
+            ThrottleReleased: when called after :meth:`release` (carries
+                ``dcc_address`` in ``.context``). No WS traffic is sent.
+            RuntimeError: when called on a never-acquired ``Throttle``.
+            ValueError: when ``n`` is outside ``[0, 28]``.
+            JMRIConnectionError: surfaced from the WS transport.
+        """
+        if self._released:
+            raise ThrottleReleased(
+                "throttle is released; cannot send updates",
+                dcc_address=self.dcc_address,
+            )
+        if self._throttle_id is None:
+            raise RuntimeError(
+                f"Throttle for DCC address {self.dcc_address} is not acquired; "
+                "enter the 'async with' block before calling set_function"
+            )
+        if isinstance(n, bool) or not isinstance(n, int):
+            raise ValueError(f"function bit n must be an int; got {n!r}")
+        if not (0 <= n <= 28):
+            raise ValueError(f"function bit n must be in [0, 28]; got {n!r}")
+        await self._handle.throttle_update(
+            self._throttle_id,
+            {f"F{n}": on},
+        )
+        logger.info(
+            "throttle function updated",
+            extra={
+                "dcc_address": self.dcc_address,
+                "throttle_id": self._throttle_id,
+                "function": n,
+                "on": on,
+            },
+        )
 
     async def _release_impl(self, *, suppress_errors: bool) -> None:
         """Shared teardown: cancel keep-alive, send WS release, mark released.

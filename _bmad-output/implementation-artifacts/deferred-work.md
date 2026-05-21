@@ -1,5 +1,11 @@
 # Deferred Work
 
+## Deferred from: code review of story-5-2-throttle-speed-direction-function-controls (2026-05-21)
+
+- **TOCTOU race between `set_speed`/`set_function` and concurrent `release()`** — Guard checks pass synchronously; a concurrent `release()` can fire between the guards passing and `throttle_update` completing. Post-`throttle_update` INFO log may fire after `_released` is `True`. Acknowledged as by-design lock-free architecture in Dev Notes R4. [`throttle.py`]
+- **`RuntimeError` from client-not-open path undocumented in `set_speed`/`set_function`** — If `Client._ws is None` (client torn down but throttle not released), `throttle_update` raises `RuntimeError`, which propagates through `set_speed`/`set_function` un-caught. Docstrings list only `JMRIConnectionError`. Same pre-existing gap in all Story 5.1 methods. [`throttle.py`, `client.py`]
+- **Reconnect-window silent command loss undocumented** — Fire-and-forget `set_speed`/`set_function` calls that arrive mid-reconnect lose the WS envelope with no notification. Pre-existing concern for all fire-and-forget operations since Story 5.1 `throttle_release`. [`client.py`]
+
 ## Deferred from: code review of story-5-1-throttle-lifecycle (2026-05-21)
 
 - **WS reconnect mid-acquire creates JMRI-side ghost throttle** — If the WS drops immediately after `throttle_acquire` sends the acquire envelope, JMRI may have held the session while pyjmri times out and never sends a release. Inherent in the WS fire-and-forget model; no safe cleanup path. Revisit in Story 5.3 hardware testing. [`python_code/src/pyjmri/client.py`, `throttle_acquire`]

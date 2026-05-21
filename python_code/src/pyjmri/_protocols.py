@@ -90,6 +90,23 @@ class ClientHandle(Protocol):
         """
         ...
 
+    async def throttle_update(
+        self,
+        throttle_id: str,
+        payload: dict[str, Any],
+    ) -> None:
+        """Send a fire-and-forget WS state-update envelope for ``throttle_id``.
+
+        Wraps ``payload`` in ``{"type":"throttle","data":{"throttle":<id>,
+        **payload}}`` and writes it to the WS connection. Returns as soon as
+        the bytes are written; does NOT await JMRI's state-echo (Story 5.2
+        AC1 — symmetric with :meth:`throttle_release`'s fire-and-forget
+        design). State-echo envelopes arrive on the WS dispatcher and fall
+        through the ``future is None`` path in
+        :meth:`pyjmri.Client._dispatch_throttle_envelope` (silently dropped).
+        """
+        ...
+
     def spawn_supervised(
         self,
         coro: Coroutine[Any, Any, None],
