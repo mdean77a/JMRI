@@ -79,16 +79,19 @@ def test_client_default_config_has_expected_defaults() -> None:
     assert client._config.request_timeout == 10.0
     assert isinstance(client._config.reconnect, ReconnectConfig)
     assert client._config.subscription_replay_timeout == 30.0
+    assert client._config.throttle_keepalive_interval == 15.0
 
 
 def test_client_accepts_custom_config() -> None:
     cfg = ClientConfig(
         request_timeout=2.5,
         reconnect=ReconnectConfig(max_attempts=5),
+        throttle_keepalive_interval=7.5,
     )
     client = Client("localhost:12080", config=cfg)
     assert client._config.request_timeout == 2.5
     assert client._config.reconnect.max_attempts == 5
+    assert client._config.throttle_keepalive_interval == 7.5
 
 
 @pytest.mark.parametrize(

@@ -27,6 +27,7 @@ from pyjmri.power import PowerState
 from pyjmri.route import Route, RouteState
 from pyjmri.sensor import Sensor, SensorState
 from pyjmri.signal import SignalHead, SignalHeadAppearance, SignalMast, SignalMastAspect
+from pyjmri.throttle import Throttle
 from pyjmri.turnout import Turnout, TurnoutState
 
 logging.getLogger("pyjmri").addHandler(logging.NullHandler())
@@ -59,6 +60,7 @@ __all__ = [
     "SignalHeadAppearance",
     "SignalMast",
     "SignalMastAspect",
+    "Throttle",
     "ThrottleAcquireFailed",
     "ThrottleError",
     "ThrottleReleased",

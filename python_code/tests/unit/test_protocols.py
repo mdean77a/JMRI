@@ -15,6 +15,14 @@ def test_client_handle_has_command_member() -> None:
     assert hasattr(ClientHandle, "command")
 
 
+def test_client_handle_has_throttle_members() -> None:
+    assert hasattr(ClientHandle, "throttle_acquire")
+    assert hasattr(ClientHandle, "throttle_release")
+    assert hasattr(ClientHandle, "throttle_heartbeat")
+    assert hasattr(ClientHandle, "spawn_supervised")
+    assert hasattr(ClientHandle, "throttle_keepalive_interval")
+
+
 async def test_structurally_conforming_class_satisfies_protocol() -> None:
     class Conforming:
         async def get_entity(self, entity_type: str, name: str) -> dict[str, Any]:

@@ -7,11 +7,16 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from collections.abc import Callable
+import uuid
+from collections import deque
+from collections.abc import Callable, Coroutine
 from dataclasses import dataclass, field
 from types import TracebackType
-from typing import Any, Self
+from typing import TYPE_CHECKING, Any, Self
 from urllib.parse import quote, urlparse
+
+if TYPE_CHECKING:
+    from pyjmri.throttle import Throttle
 
 from pyjmri._parsing import (
     parse_block,
@@ -31,7 +36,9 @@ from pyjmri.block import Block
 from pyjmri.exceptions import (
     JMRIConnectionError,
     JMRIProtocolError,
+    JMRIRequestTimeout,
     JMRIVersionUnsupported,
+    ThrottleAcquireFailed,
 )
 from pyjmri.layout import EntityCollection, Layout
 from pyjmri.light import Light
@@ -79,6 +86,17 @@ class ClientConfig:
     :meth:`Client.__aenter__`. Story 3.2 may also use this for
     subscription-replay or ``wait_*`` deadlines tied to reconnect.
     """
+    throttle_keepalive_interval: float = 15.0
+    """Per-throttle keep-alive interval in seconds (matches JMRI WiThrottle
+    convention). v1 ships with a no-op keep-alive body — Story 5.1 Task 0
+    spike found JMRI's WS-level heartbeat (10 s ping_interval, well under
+    JMRI's 13.5 s server-advertised heartbeat) is sufficient to hold
+    throttles. Story 5.3 (hardware integration) confirms whether per-throttle
+    heartbeat is needed in practice. This knob is for users who want to tune
+    the interval if a future hardware finding flips the keep-alive body to
+    active; set to a very large number if you want to functionally disable
+    it. The v1 no-op body ignores this value.
+    """
 
 
 class Client:
@@ -117,6 +135,13 @@ class Client:
         self._ws_connected: asyncio.Event | None = None
         self._supervisor_task: asyncio.Task[None] | None = None
         self._entities: dict[tuple[str, str], Waitable] = {}
+        # Story 5.1: name-keyed pending throttle acquires (Throttle's WS
+        # correlation). Lives across the Client lifetime; cleared in __aexit__.
+        self._pending_throttle: dict[str, asyncio.Future[dict[str, Any]]] = {}
+        # FIFO queue for un-named JMRI `type:error` correlation (JMRI's error
+        # envelope omits the throttle name, so we attribute to the oldest
+        # pending acquire). See Story 5.1 AC9.
+        self._pending_throttle_error_queue: deque[asyncio.Future[dict[str, Any]]] = deque()
 
     async def __aenter__(self) -> Self:
         if self._http is not None:
@@ -221,6 +246,8 @@ class Client:
             self._supervisor_task = None
             self._entities = {}
             self._version_checked = False
+            self._pending_throttle = {}
+            self._pending_throttle_error_queue.clear()
 
     async def _teardown_on_aenter_failure(self, first_exc: BaseException) -> None:
         """Tear down the half-open Client when first-connect fails.
@@ -280,6 +307,12 @@ class Client:
         entity_type = envelope.get("type")
         if not isinstance(entity_type, str):
             logger_transport.debug("WS dispatch: drop", extra={"reason": "no type field"})
+            return None
+        if entity_type == "throttle":
+            self._dispatch_throttle_envelope(envelope)
+            return None
+        if entity_type == "error":
+            self._dispatch_error_envelope(envelope)
             return None
         parser_entry = _DISPATCH_PARSERS.get(entity_type)
         if parser_entry is None:
@@ -378,6 +411,188 @@ class Client:
         if self._http is None:
             raise RuntimeError("Client is not open; use 'async with Client() as jmri:'")
         await self._http.command(entity_type, name, payload)
+
+    def _dispatch_throttle_envelope(self, envelope: dict[str, Any]) -> None:
+        """Route an inbound ``type:throttle`` envelope to a pending acquire.
+
+        Per Story 5.1 Task 0 spike, JMRI's throttle API is WS-only.
+        Acquire responses (and incidental state-broadcast envelopes for
+        held throttles) carry ``data.throttle`` matching the
+        client-chosen name. If a pending acquire is waiting on that
+        name, resolve its future; otherwise drop silently — release
+        echoes and concurrent client-count updates fall through here.
+        """
+        data = envelope.get("data")
+        if not isinstance(data, dict):
+            return
+        name = data.get("throttle") or data.get("name")
+        if not isinstance(name, str):
+            return
+        future = self._pending_throttle.get(name)
+        if future is None or future.done():
+            return
+        # Acquire success: full state echo (address, speed, F0...). Release
+        # echoes (`{"release": null, ...}`) arrive on the same envelope shape
+        # but only after the pending future has already been popped during
+        # release(), so they hit the `future is None` path above.
+        future.set_result(data)
+
+    def _dispatch_error_envelope(self, envelope: dict[str, Any]) -> None:
+        """Route an inbound ``type:error`` envelope to the oldest pending throttle op.
+
+        JMRI's error envelopes omit any throttle name, so the only
+        correlation possible is FIFO: the next error is assumed to
+        belong to the oldest in-flight throttle acquire. Best-effort
+        attribution under concurrent acquires (Story 5.1 AC9).
+
+        Limitation: if JMRI sends a ``type:error`` for a non-throttle
+        reason (subscription rejection, power command error, etc.) while
+        a throttle acquire is pending, the oldest pending future will be
+        spuriously attributed that error. JMRI's protocol does not
+        include a source field on error envelopes; this is an
+        acknowledged limitation of the FIFO design.
+        """
+        data = envelope.get("data")
+        if not isinstance(data, dict):
+            return
+        while self._pending_throttle_error_queue:
+            future = self._pending_throttle_error_queue.popleft()
+            if future.done():
+                continue
+            message = data.get("message")
+            code = data.get("code")
+            future.set_exception(
+                ThrottleAcquireFailed(
+                    "JMRI rejected throttle acquire",
+                    jmri_message=message if isinstance(message, str) else None,
+                    code=code if isinstance(code, int) else None,
+                )
+            )
+            return
+
+    async def throttle_acquire(self, dcc_address: int, *, long: bool) -> str:
+        """Implementation of :class:`pyjmri._protocols.ClientHandle`.
+
+        Generates an internal throttle name (``pyjmri-<addr>-<8-hex>``),
+        sends a WS acquire envelope, and awaits a name-correlated
+        response (resolved by :meth:`_dispatch_throttle_envelope` or
+        failed via :meth:`_dispatch_error_envelope`). Returns the
+        internal name on success; the caller (Throttle.__aenter__)
+        stores it as the throttle id for subsequent release.
+
+        Raises:
+            ThrottleAcquireFailed: when JMRI emits a ``type:error``
+                envelope while this acquire is pending.
+            JMRIConnectionError: when no WS connection is active.
+            JMRIRequestTimeout: when the timeout fires before any
+                envelope correlates to this acquire.
+            RuntimeError: when the Client is not open.
+        """
+        if self._ws is None:
+            raise RuntimeError("Client is not open; use 'async with Client() as jmri:'")
+        name = f"pyjmri-{dcc_address}-{uuid.uuid4().hex[:8]}"
+        future: asyncio.Future[dict[str, Any]] = asyncio.get_running_loop().create_future()
+        self._pending_throttle[name] = future
+        self._pending_throttle_error_queue.append(future)
+        try:
+            await self._ws.send(
+                {
+                    "type": "throttle",
+                    "data": {
+                        "throttle": name,
+                        "address": dcc_address,
+                        "isLongAddress": long,
+                    },
+                }
+            )
+            try:
+                async with asyncio.timeout(self._config.request_timeout):
+                    await future
+            except TimeoutError as exc:
+                raise JMRIRequestTimeout(
+                    "throttle acquire timed out",
+                    dcc_address=dcc_address,
+                    request_timeout=self._config.request_timeout,
+                ) from exc
+        finally:
+            self._pending_throttle.pop(name, None)
+            try:
+                self._pending_throttle_error_queue.remove(future)
+            except ValueError:
+                pass
+        return name
+
+    async def throttle_release(self, throttle_id: str) -> None:
+        """Implementation of :class:`pyjmri._protocols.ClientHandle`.
+
+        Fire-and-forget WS release envelope (Story 5.1 AC4). The
+        release-confirmation envelope (`{"release": null, ...}`) arrives
+        on the WS dispatcher but is not awaited — release returns as
+        soon as the envelope is written to the socket.
+        """
+        if self._ws is None:
+            raise RuntimeError("Client is not open; use 'async with Client() as jmri:'")
+        await self._ws.send(
+            {
+                "type": "throttle",
+                "data": {"throttle": throttle_id, "release": None},
+            }
+        )
+
+    async def throttle_heartbeat(self, throttle_id: str) -> None:
+        """Story 5.3 hookpoint — v1 raises :class:`NotImplementedError`.
+
+        Story 5.1 Task 0 spike found JMRI's WS-level heartbeat keeps held
+        throttles alive (the WS connection IS the keepalive). The keep-alive
+        coroutine body is a no-op stub in v1 and never calls this method.
+        If Story 5.3 hardware observation shows JMRI does expire per-throttle
+        on hardware-mode, populate this method with a JMRI-specific heartbeat
+        envelope and switch the keep-alive body to call it.
+        """
+        raise NotImplementedError(
+            "per-throttle heartbeat is a Story 5.3 hookpoint; v1 keep-alive "
+            "body is a no-op per Task 0 spike — JMRI's WS-level heartbeat is "
+            "sufficient. Throttle id: " + throttle_id,
+        )
+
+    def spawn_supervised(
+        self,
+        coro: Coroutine[Any, Any, None],
+        *,
+        name: str | None = None,
+    ) -> asyncio.Task[None]:
+        """Implementation of :class:`pyjmri._protocols.ClientHandle`.
+
+        Spawns ``coro`` in the Client's supervising TaskGroup (architecture
+        sec. Concurrency Model: "the library never uses bare
+        ``asyncio.create_task`` outside the supervising TaskGroup").
+        """
+        if self._tg is None:
+            raise RuntimeError("Client is not open; use 'async with Client() as jmri:'")
+        return self._tg.create_task(coro, name=name)
+
+    @property
+    def throttle_keepalive_interval(self) -> float:
+        """Return the configured per-throttle keep-alive interval (seconds)."""
+        return self._config.throttle_keepalive_interval
+
+    def throttle(self, dcc_address: int, *, long: bool) -> Throttle:
+        """Create a :class:`Throttle` bound to this Client.
+
+        Equivalent to ``(await client.discover()).throttle(...)`` when you
+        don't need the full Layout. The returned :class:`Throttle` has not
+        yet acquired — acquire happens on ``async with`` entry.
+
+        Args:
+            dcc_address: DCC decoder address (1..10293 typical; JMRI rejects
+                addresses outside its valid range).
+            long: ``True`` for long (4-digit) addressing, ``False`` for short.
+        """
+        # Lazy import to avoid the throttle module pulling in client at
+        # module load (Throttle imports ClientHandle via TYPE_CHECKING).
+        from pyjmri.throttle import Throttle
+
+        return Throttle(self, dcc_address=dcc_address, long=long)
 
     async def get_entity(self, entity_type: str, name: str) -> dict[str, Any]:
         """Implementation of :class:`pyjmri._protocols.ClientHandle`.
@@ -606,6 +821,7 @@ class Client:
             routes=EntityCollection(routes, entity_type="route"),
             signal_heads=EntityCollection(signal_heads, entity_type="signalHead"),
             signal_masts=EntityCollection(signal_masts, entity_type="signalMast"),
+            handle=self,
         )
 
     async def power_state(self) -> PowerState:

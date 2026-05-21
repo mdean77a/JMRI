@@ -1,5 +1,12 @@
 # Deferred Work
 
+## Deferred from: code review of story-5-1-throttle-lifecycle (2026-05-21)
+
+- **WS reconnect mid-acquire creates JMRI-side ghost throttle** — If the WS drops immediately after `throttle_acquire` sends the acquire envelope, JMRI may have held the session while pyjmri times out and never sends a release. Inherent in the WS fire-and-forget model; no safe cleanup path. Revisit in Story 5.3 hardware testing. [`python_code/src/pyjmri/client.py`, `throttle_acquire`]
+- **Concurrent acquire FIFO error mis-attribution** — JMRI `type:error` envelopes carry no throttle name, so error-to-acquire correlation is FIFO. Under concurrent in-flight acquires, a JMRI error for address B may be attributed to address A's future. Acknowledged in AC9 as best-effort; not actionable without JMRI protocol changes. [`python_code/src/pyjmri/client.py`, `_dispatch_error_envelope`]
+- **Duplicate JMRI `type:error` envelope drains two pending futures** — If JMRI emits the same error twice (e.g., reconnect-replay), two pending acquire futures are failed. Low probability in practice; not reproducible on the simulator. [`python_code/src/pyjmri/client.py`, `_dispatch_error_envelope`]
+- **DCC address range not validated (deferred from Story 2.2)** — Story 2.2 review deferred range checking (`dcc_address >= 1`, `isLongAddress` vs numeric range cross-validation) to Story 5.1. Story 5.1 does not implement it. No AC formally requires it. Carry forward to Story 5.2 or a hardening pass. [`python_code/src/pyjmri/throttle.py`, `__init__` / `Client.throttle`]
+
 ## Deferred from: code review of 4-2-wait-for-jmri-state (2026-05-20)
 
 - **asyncio.shield comment rationale misleading for common cancellation scenario** — Comment/docstring says shield protects the command on "caller-side cancellation," which is accurate only if cancellation arrives during the HTTP request. In the common case (fast command, slow WS echo), cancel fires at `await future` where shield is no longer active. The protection is real but the stated rationale is misleading. [turnout.py + light.py, `asyncio.shield` comment]

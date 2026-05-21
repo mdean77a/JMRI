@@ -75,6 +75,23 @@ def make_fake_handle() -> Callable[[Callable[[str, str], dict[str, Any]]], Any]:
                 # ``command``. When ``None`` (default), ``command`` returns
                 # synchronously as in Story 4.1.
                 self.command_gate: asyncio.Event | None = None
+                # Story 5.1: throttle plumbing observability.
+                self.throttle_acquire_calls: list[tuple[int, bool]] = []
+                self.throttle_release_calls: list[str] = []
+                self.throttle_heartbeat_calls: list[str] = []
+                self.spawned_coros: list[asyncio.Task[None]] = []
+                # Knobs that tests flip to drive the throttle code paths.
+                self.throttle_acquire_returns: str | None = None
+                self.throttle_acquire_raises: BaseException | None = None
+                self.throttle_release_raises: BaseException | None = None
+                self.throttle_heartbeat_raises: BaseException | None = None
+                # Optional gate for acquire; mirrors ``command_gate``. When
+                # set, ``throttle_acquire`` blocks on ``wait()`` after
+                # recording the call but before returning, so tests can
+                # inspect intermediate state (e.g., the keep-alive task
+                # has not yet been spawned because acquire hasn't returned).
+                self.throttle_acquire_gate: asyncio.Event | None = None
+                self._throttle_keepalive_interval: float = 0.01
 
             async def get_entity(self, entity_type: str, name: str) -> dict[str, Any]:
                 self.calls.append((entity_type, name))
@@ -94,6 +111,44 @@ def make_fake_handle() -> Callable[[Callable[[str, str], dict[str, Any]]], Any]:
                 self.command_calls.append((entity_type, name, payload))
                 if self.command_raises is not None:
                     raise self.command_raises
+
+            async def throttle_acquire(self, dcc_address: int, *, long: bool) -> str:
+                self.throttle_acquire_calls.append((dcc_address, long))
+                if self.throttle_acquire_gate is not None:
+                    await self.throttle_acquire_gate.wait()
+                if self.throttle_acquire_raises is not None:
+                    raise self.throttle_acquire_raises
+                if self.throttle_acquire_returns is not None:
+                    return self.throttle_acquire_returns
+                return f"pyjmri-{dcc_address}-fake"
+
+            async def throttle_release(self, throttle_id: str) -> None:
+                self.throttle_release_calls.append(throttle_id)
+                if self.throttle_release_raises is not None:
+                    raise self.throttle_release_raises
+
+            async def throttle_heartbeat(self, throttle_id: str) -> None:
+                self.throttle_heartbeat_calls.append(throttle_id)
+                if self.throttle_heartbeat_raises is not None:
+                    raise self.throttle_heartbeat_raises
+
+            def spawn_supervised(
+                self,
+                coro: Any,
+                *,
+                name: str | None = None,
+            ) -> asyncio.Task[None]:
+                # Test fakes legitimately use bare ``asyncio.create_task`` —
+                # the production rule (architecture sec. Concurrency Model)
+                # applies to library code, not to test harness fakes that
+                # own and clean up their own tasks.
+                task: asyncio.Task[None] = asyncio.create_task(coro, name=name)
+                self.spawned_coros.append(task)
+                return task
+
+            @property
+            def throttle_keepalive_interval(self) -> float:
+                return self._throttle_keepalive_interval
 
         return _FakeHandle()
 

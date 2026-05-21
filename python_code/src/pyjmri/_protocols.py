@@ -14,6 +14,8 @@ auto-subscription. They do not import ``_transport`` or
 
 from __future__ import annotations
 
+import asyncio
+from collections.abc import Coroutine
 from typing import Any, Protocol
 
 
@@ -53,6 +55,62 @@ class ClientHandle(Protocol):
         contract; no WS-event confirmation). Story 4.2 layers
         ``wait_for_jmri_state=True`` over per-entity command methods.
         See architecture sec. Command / Event Correlation.
+        """
+        ...
+
+    async def throttle_acquire(self, dcc_address: int, *, long: bool) -> str:
+        """Acquire a JMRI throttle for ``dcc_address``; return the internal name.
+
+        Per Story 5.1 Task 0 spike, JMRI's throttle API is WS-only. The
+        implementation generates an internal correlation name
+        (``pyjmri-<addr>-<8-hex>``), sends a WS acquire envelope, and
+        awaits a name-keyed response future. Raises
+        :class:`ThrottleAcquireFailed` if JMRI emits a ``type:error``
+        envelope while this acquire is pending (FIFO correlation queue).
+        The returned string is the internal name; users never see it.
+        """
+        ...
+
+    async def throttle_release(self, throttle_id: str) -> None:
+        """Release a throttle by its internal name (fire-and-forget WS).
+
+        Sends ``{"type":"throttle","data":{"throttle":<id>,"release":null}}``
+        and returns immediately. The release-echo envelope is consumed by
+        the WS dispatcher but not awaited (Story 5.1 AC4).
+        """
+        ...
+
+    async def throttle_heartbeat(self, throttle_id: str) -> None:
+        """Per-throttle heartbeat hookpoint — Story 5.3.
+
+        v1 implementation raises :class:`NotImplementedError`. JMRI's WS-level
+        heartbeat (Story 3.1 transport, ``ping_interval=10 s``) keeps the
+        connection — and therefore all held throttles — alive; no per-throttle
+        application heartbeat is needed in v1 (Story 5.1 AC3, Task 0 spike).
+        """
+        ...
+
+    def spawn_supervised(
+        self,
+        coro: Coroutine[Any, Any, None],
+        *,
+        name: str | None = None,
+    ) -> asyncio.Task[None]:
+        """Spawn ``coro`` in the Client's supervising TaskGroup.
+
+        Raises :class:`RuntimeError` if the Client is not in an active
+        ``async with`` context (architecture sec. Concurrency Model — no
+        bare ``asyncio.create_task`` outside the supervising TaskGroup).
+        """
+        ...
+
+    @property
+    def throttle_keepalive_interval(self) -> float:
+        """The configured keep-alive interval in seconds.
+
+        Story 5.1 ships with a no-op keep-alive body, so this value is
+        currently unused by the loop itself. Reserved for Story 5.3 if
+        hardware observation finds a heartbeat is needed.
         """
         ...
 

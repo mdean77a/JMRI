@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Iterable, Iterator, Mapping
-from typing import Generic, Protocol, TypeVar
+from typing import TYPE_CHECKING, Generic, Protocol, TypeVar
 
 from pyjmri.block import Block
 from pyjmri.exceptions import LayoutEntityNotFound
@@ -17,6 +17,10 @@ from pyjmri.route import Route
 from pyjmri.sensor import Sensor
 from pyjmri.signal import SignalHead, SignalMast
 from pyjmri.turnout import Turnout
+
+if TYPE_CHECKING:
+    from pyjmri._protocols import ClientHandle
+    from pyjmri.throttle import Throttle
 
 logger = logging.getLogger(__name__)
 
@@ -201,7 +205,9 @@ class Layout:
         routes: EntityCollection[Route] | None = None,
         signal_heads: EntityCollection[SignalHead] | None = None,
         signal_masts: EntityCollection[SignalMast] | None = None,
+        handle: ClientHandle | None = None,
     ) -> None:
+        self._handle: ClientHandle | None = handle
         self.turnouts: EntityCollection[Turnout] = (
             turnouts if turnouts is not None else EntityCollection([], entity_type="turnout")
         )
@@ -230,3 +236,28 @@ class Layout:
             if signal_masts is not None
             else EntityCollection([], entity_type="signalMast")
         )
+
+    def throttle(self, dcc_address: int, *, long: bool) -> Throttle:
+        """Create a :class:`Throttle` bound to this layout's Client.
+
+        Args:
+            dcc_address: DCC decoder address.
+            long: ``True`` for long (4-digit) addressing, ``False`` for short.
+
+        Raises:
+            RuntimeError: when this :class:`Layout` was constructed without a
+                Client handle (e.g., ``Layout()`` for tests). Call
+                ``client.throttle(...)`` directly or obtain a Layout via
+                ``await client.discover()``.
+        """
+        if self._handle is None:
+            raise RuntimeError(
+                "Layout was constructed without a Client handle; call "
+                "client.throttle(...) directly or use 'await client.discover()' "
+                "to get a Layout with throttle support."
+            )
+        # Lazy import to keep layout.py independent of throttle.py at load
+        # time (Throttle pulls in _protocols.ClientHandle via TYPE_CHECKING).
+        from pyjmri.throttle import Throttle
+
+        return Throttle(self._handle, dcc_address=dcc_address, long=long)
