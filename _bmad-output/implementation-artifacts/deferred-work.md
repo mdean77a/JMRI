@@ -1,5 +1,10 @@
 # Deferred Work
 
+## Deferred from: code review of story-5-3-multi-throttle-integration-test (2026-05-22)
+
+- **`_fetch_test_dcc_addresses` unchecked JSON key access** — `envelope["data"]`, `data["address"]`, and `data["isLongAddress"]` accessed without guard; a malformed roster entry raises `KeyError` rather than a clean skip. Pre-existing pattern in the codebase (5 other integration tests do identical unchecked roster/entity JSON access). If JMRI changes wire format, all affected tests surface loudly. [`python_code/tests/integration/test_throttle_lifecycle.py`]
+- **Partial-acquire test: single `asyncio.sleep(0)` may not drain in-flight gather siblings** — `asyncio.gather` propagates the first exception without cancelling sibling tasks; one event-loop tick may not complete WS round-trips still in-flight. By-design per Story 5.3 spec Dev Notes: the test asserts on the leak invariant ("all `_throttle_id is not None` throttles are `_released`"), not on timing outcomes. Harmless unless a future refactor changes the acquire-path latency characteristics significantly. [`python_code/tests/integration/test_throttle_lifecycle.py`]
+
 ## Deferred from: code review of story-5-2-throttle-speed-direction-function-controls (2026-05-21)
 
 - **TOCTOU race between `set_speed`/`set_function` and concurrent `release()`** — Guard checks pass synchronously; a concurrent `release()` can fire between the guards passing and `throttle_update` completing. Post-`throttle_update` INFO log may fire after `_released` is `True`. Acknowledged as by-design lock-free architecture in Dev Notes R4. [`throttle.py`]

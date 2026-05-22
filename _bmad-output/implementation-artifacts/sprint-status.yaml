@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-05-07
-last_updated: 2026-05-21  # Story 5.2 code review complete → done
+last_updated: 2026-05-22  # Story 6.1 created → ready-for-dev; epic-6 → in-progress
 project: JMRI
 project_key: NOKEY
 tracking_system: file-system
@@ -77,12 +77,12 @@ development_status:
   epic-5: in-progress
   5-1-throttle-async-context-manager-acquire-release-lifecycle-keep-alive-supervision: done
   5-2-throttle-speed-direction-function-controls: done
-  5-3-multi-throttle-integration-test-plumbing-on-simulator-physical-correctness-on-hardware: backlog
+  5-3-multi-throttle-integration-test-plumbing-on-simulator-physical-correctness-on-hardware: done
   epic-5-retrospective: optional
 
   # Epic 6: Ship to the Community
-  epic-6: backlog
-  6-1-readme-5-minute-quickstart: backlog
+  epic-6: in-progress
+  6-1-readme-5-minute-quickstart: ready-for-dev
   6-2-readme-limitations-section: backlog
   6-3-readme-jython-to-pyjmri-migration-table: backlog
   6-4-three-shipped-examples-hello-jmri-py-back-and-forth-py-multi-train-session-py: backlog
