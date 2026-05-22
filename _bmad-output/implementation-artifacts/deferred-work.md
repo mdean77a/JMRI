@@ -1,5 +1,14 @@
 # Deferred Work
 
+## Deferred from: code review of story 6-1-readme-5-minute-quickstart (2026-05-22)
+
+- **`python` command may not resolve to Python 3.11+** — `python quickstart.py` is the intentional documented invocation per spec AC1(d); prerequisite specifies Python 3.11+. On systems where `python` maps to 2.x or 3.10, the script fails with no clear version error. Acceptable for now; a future docs-polish story could recommend `python3` or `uv run python`. [`python_code/README.md`]
+- **`StopIteration` on empty `layout.turnouts` gives no guidance** — By design per scope notes ("Do NOT add defensive branches"); prerequisite specifies "at least one turnout." A future Limitations or troubleshooting section could enumerate common startup errors. [`python_code/README.md`]
+- **`discover()` partial failure raises `ExceptionGroup`** — Pre-existing library behavior; unexpected for users who have never seen `ExceptionGroup`. A future "Error handling" section or the Limitations story (6.2) could document the error hierarchy. [`python_code/src/pyjmri/client.py`]
+- **WebSocket timeout is a distinct failure mode from HTTP connection** — The Prerequisites web-server check only verifies HTTP; a firewall or proxy that allows HTTP but blocks WS upgrades causes a confusing timeout inside `async with Client()`. Out of Quickstart scope; could be addressed in Limitations (Story 6.2). [`python_code/src/pyjmri/client.py`]
+- **`pip install` may silently install into wrong Python version** — Users who skip `uv` and run bare `pip install pyjmri` may install into Python < 3.11 with no install-time error; the script then fails at runtime. Standard pip limitation; prerequisite note covers the version requirement. [`python_code/README.md`]
+- **`/json/v5/version` verification URL checks JSON API version, not JMRI app version** — A JMRI < 5.14 instance may serve a `v5` JSON API, passing the Prerequisites check, then fail at runtime with `JMRIVersionUnsupported` from `discover()`. The runtime check handles this correctly; the verification URL is still useful for confirming the server is up. [`python_code/README.md`]
+
 ## Deferred from: code review of story-5-3-multi-throttle-integration-test (2026-05-22)
 
 - **`_fetch_test_dcc_addresses` unchecked JSON key access** — `envelope["data"]`, `data["address"]`, and `data["isLongAddress"]` accessed without guard; a malformed roster entry raises `KeyError` rather than a clean skip. Pre-existing pattern in the codebase (5 other integration tests do identical unchecked roster/entity JSON access). If JMRI changes wire format, all affected tests surface loudly. [`python_code/tests/integration/test_throttle_lifecycle.py`]
