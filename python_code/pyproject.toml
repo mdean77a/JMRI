@@ -1,6 +1,6 @@
 [project]
 name = "pyjmri"
-version = "0.1.0"
+version = "1.0.0"
 description = "Async Python client for the JMRI web server"
 readme = "README.md"
 authors = [
@@ -9,10 +9,31 @@ authors = [
 license = "MIT"
 license-files = ["LICENSE"]
 requires-python = ">=3.11"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: System :: Hardware",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Framework :: AsyncIO",
+    "Typing :: Typed",
+]
 dependencies = [
     "httpx>=0.28.1",
     "websockets>=16.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/mdean77a/JMRI"
+Source = "https://github.com/mdean77a/JMRI"
+Issues = "https://github.com/mdean77a/JMRI/issues"
+Documentation = "https://github.com/mdean77a/JMRI/blob/master/python_code/README.md"
 
 [build-system]
 requires = ["uv_build>=0.7.6,<0.8"]
