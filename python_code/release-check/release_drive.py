@@ -10,13 +10,13 @@ async def main(dcc: int, url: str) -> None:
         async with layout.throttle(dcc, long=True) as t:
             await t.set_speed(0.3, forward=True)
             await asyncio.sleep(8)
-            await t.set_speed(0.0, forward=True)   # stop before reversing
+            await t.set_speed(0.0, forward=True)  # stop before reversing
             await asyncio.sleep(3)
             await t.set_speed(0.3, forward=False)
             await asyncio.sleep(8)
             await t.set_function(0, True)
             await asyncio.sleep(3)
-            await t.set_function(0, False)         # restore headlight state
+            await t.set_function(0, False)  # restore headlight state
             await t.set_speed(0.0, forward=True)
 
 
