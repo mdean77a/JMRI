@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-05-07
-last_updated: 2026-05-26  # v1.0.0 published; epic-6 done; epic-6 retro done; epic-4/5 status drift fixed
+last_updated: 2026-05-26  # v1.0.0 published; Epic 7 (v1.0.x maintenance) opened with Story 7.1 from Epic 6 retro C3
 project: JMRI
 project_key: NOKEY
 tracking_system: file-system
@@ -89,3 +89,8 @@ development_status:
   6-5-contributing-md-with-release-checklist: done
   6-6-first-pypi-publication-of-pyjmri-v1: done
   epic-6-retrospective: done
+
+  # Epic 7: v1.0.x Maintenance (post-PRD, opened 2026-05-26)
+  epic-7: in-progress
+  7-1-fix-integration-test-inter-test-interference: ready-for-dev
+  epic-7-retrospective: optional

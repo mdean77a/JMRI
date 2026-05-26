@@ -1090,3 +1090,19 @@ So that FR38 is satisfied end-to-end and the JMRI community can actually try the
 **Then** `from pyjmri import Client, Layout, Turnout, TurnoutState, ...` resolves all v1 public types
 **And** no underscore-prefixed module appears in the import path of any user-facing example or docstring
 **And** the architecture's three boundary lines (public/private, transport/domain, JMRI integration) are visibly maintained in the published source
+
+## Epic 7: v1.0.x Maintenance
+
+**Status:** Post-PRD maintenance track. Opened 2026-05-26 after v1.0.0 shipped. Not part of the original v1 PRD scope; collects bugfixes and small quality improvements that warrant a patch release.
+
+**Scope policy:** every story in Epic 7 must satisfy *all* of: (a) no public-API change, (b) no `pyproject.toml [project].version` bump within the story (the bump is its own discrete commit when a patch release is cut), (c) every quality gate (`ruff check`, `ruff format --check`, `mypy --strict`, unit pytest) passes, (d) the v1.0.0 functional and non-functional requirements remain unchanged.
+
+When enough Epic 7 stories accumulate to warrant a v1.0.1 release, follow the same Phase A / Phase B pattern as Story 6.6 — version bump in a discrete commit, gates 1–5 green, hardware-mode validation if anything touches throttles, TestPyPI dry-run, production publish, tag at the build SHA, RELEASES.md entry.
+
+### Story 7.1: Fix integration-test inter-test interference on shared first-entity
+
+Originates from Epic 6 retrospective action item C3. Two flake events observed on 2026-05-26: `test_sensor_wait_change_median_latency_under_100ms` on `IS1`, and `test_turnout_wait_for_jmri_state_round_trip` on the first turnout (under pytest-cov instrumentation). Both share the same root cause: integration tests pick `sensors[0]` / `turnouts[0]` from `discover()` and therefore all target the same JMRI entity, suffering inter-test state leakage and rate-limit interactions.
+
+The story scope: pin each shared-first-entity test to an explicit JMRI system name, force a known starting state per test via the existing raw-httpx pattern, calibrate timeouts against suite-load reality (5 s for the NFR1 sensor `wait_change`, 10 s for the AC10 turnout round-trip), and verify two consecutive `pytest -m "integration and not slow"` runs pass plus one `pytest --with pytest-cov`. No production source change; tests only.
+
+See `_bmad-output/implementation-artifacts/7-1-fix-integration-test-inter-test-interference.md` for full acceptance criteria.
