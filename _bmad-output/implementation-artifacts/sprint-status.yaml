@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-05-07
-last_updated: 2026-05-26  # Story 6.6 Phase B complete → v1.0.0 published to PyPI; epic-6 done
+last_updated: 2026-05-26  # v1.0.0 published; epic-6 done; epic-6 retro done; epic-4/5 status drift fixed
 project: JMRI
 project_key: NOKEY
 tracking_system: file-system
@@ -68,13 +68,13 @@ development_status:
   epic-3-retrospective: done
 
   # Epic 4: Command Layout Entities
-  epic-4: in-progress
+  epic-4: done
   4-1-http-command-path-per-entity-command-methods-optimistic-by-default: done
   4-2-wait-for-jmri-state-true-opt-in-via-pre-register-wait-pattern: done
   epic-4-retrospective: optional
 
   # Epic 5: Drive Locomotives via Throttles
-  epic-5: in-progress
+  epic-5: done
   5-1-throttle-async-context-manager-acquire-release-lifecycle-keep-alive-supervision: done
   5-2-throttle-speed-direction-function-controls: done
   5-3-multi-throttle-integration-test-plumbing-on-simulator-physical-correctness-on-hardware: done
@@ -88,4 +88,4 @@ development_status:
   6-4-three-shipped-examples-hello-jmri-py-back-and-forth-py-multi-train-session-py: done
   6-5-contributing-md-with-release-checklist: done
   6-6-first-pypi-publication-of-pyjmri-v1: done
-  epic-6-retrospective: optional
+  epic-6-retrospective: done
