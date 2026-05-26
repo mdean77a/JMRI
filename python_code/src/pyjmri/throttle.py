@@ -322,20 +322,11 @@ class Throttle:
     # structurally per architecture sec. Concurrency Model (line 543-547):
     # "Per-throttle keep-alive coroutine, one per active Throttle".
     #
-    # If Story 5.3 hardware observation shows JMRI does expire idle
-    # throttles on hardware-mode (which the simulator doesn't), populate
-    # the body with:
-    #
-    #     while True:
-    #         await asyncio.sleep(self._handle.throttle_keepalive_interval)
-    #         assert self._throttle_id is not None
-    #         try:
-    #             await self._handle.throttle_heartbeat(self._throttle_id)
-    #         except Exception as e:
-    #             logger.warning("heartbeat failed; retry next iteration", ...)
-    #
-    # and record the verification: "Confirmed necessary on JMRI X.Y / NCE /
-    # 20YY-MM-DD".
+    # Confirmed unnecessary on JMRI 5.14.1 / NCE USB / 2026-05-26 by Mikey
+    # — hardware-mode validation per CONTRIBUTING.md release checklist:
+    # 30 s silent hold did not drop the throttle; subsequent set_speed(0.1)
+    # moved DCC 1032 on real hardware. The simulator finding above extends
+    # to hardware-mode on this JMRI x NCE USB combination.
     async def _keepalive(self) -> None:
         """No-op supervised stub; cancels cleanly on release."""
         try:
