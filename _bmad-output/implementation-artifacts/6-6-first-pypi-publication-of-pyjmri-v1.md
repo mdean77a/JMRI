@@ -1,6 +1,6 @@
 # Story 6.6: First PyPI publication of `pyjmri` v1
 
-Status: review
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -628,6 +628,7 @@ claude-opus-4-7 (Opus 4.7, 1M context) via Claude Code
 | --- | --- |
 | 2026-05-25 | Story 6.6 Phase A: bumped `pyproject.toml` version to 1.0.0; produced and verified `dist/pyjmri-1.0.0-py3-none-any.whl` and `dist/pyjmri-1.0.0.tar.gz`. Phase B (PyPI publish, fresh-env install, git tag) is Mikey-runtime. |
 | 2026-05-25 | Code review completed (3 parallel layers: Blind Hunter, Edge Case Hunter, Acceptance Auditor). Triage: 2 decision-needed, 10 patch action items, 6 deferred, 3 dismissed. See Review Findings section below. |
+| 2026-05-26 | Phase B executed top-to-bottom against JMRI 5.14.1: gates 1–5 green (long-run PASS rss_delta=-5.1MB, 5/5 disconnects clean); hardware-mode validated on NCE USB (DCC 1032, keep-alive=keeps); throttle.py:316-345 comment updated with confirmed observation; TestPyPI dry-run rendered correctly; production `uv publish` succeeded; fresh-venv smoke install on Python 3.13 passed end-to-end (NT100 CLOSED → THROWN); tag `v1.0.0` pushed pointing at `bd4435d`; RELEASES.md publish-date set to 2026-05-26. Status → done. |
 
 ### Review Findings
 
