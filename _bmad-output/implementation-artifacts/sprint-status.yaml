@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-05-07
-last_updated: 2026-05-25  # Story 6.6 Phase A complete → review
+last_updated: 2026-05-26  # Story 6.6 Phase B complete → v1.0.0 published to PyPI; epic-6 done
 project: JMRI
 project_key: NOKEY
 tracking_system: file-system
@@ -81,11 +81,11 @@ development_status:
   epic-5-retrospective: optional
 
   # Epic 6: Ship to the Community
-  epic-6: in-progress
+  epic-6: done
   6-1-readme-5-minute-quickstart: done
   6-2-readme-limitations-section: done
   6-3-readme-jython-to-pyjmri-migration-table: done
   6-4-three-shipped-examples-hello-jmri-py-back-and-forth-py-multi-train-session-py: done
   6-5-contributing-md-with-release-checklist: done
-  6-6-first-pypi-publication-of-pyjmri-v1: review
+  6-6-first-pypi-publication-of-pyjmri-v1: done
   epic-6-retrospective: optional
