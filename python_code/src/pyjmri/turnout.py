@@ -5,11 +5,10 @@ Architecture sec. Domain State Modeling.
 
 from __future__ import annotations
 
-import asyncio
 from enum import Enum
 from typing import TYPE_CHECKING
 
-from pyjmri._wait_helpers import wait_for_change, wait_for_target
+from pyjmri._wait_helpers import command_then_wait, wait_for_change, wait_for_target
 from pyjmri._waiters import WaiterList
 
 if TYPE_CHECKING:
@@ -121,36 +120,15 @@ class Turnout:
         """
         from pyjmri._codes import TURNOUT_STATE_OUTBOUND
 
-        if state not in TURNOUT_STATE_OUTBOUND:
-            raise ValueError(
-                f"{state!r} is not a commandable turnout state; "
-                f"use {sorted(s.name for s in TURNOUT_STATE_OUTBOUND)!r}"
-            )
-
-        payload = {"state": TURNOUT_STATE_OUTBOUND[state]}
-
-        if not wait_for_jmri_state:
-            await self._handle.command("turnout", self.name, payload)
-            return
-
-        # Pre-register-wait pattern (architecture sec. Command / Event
-        # Correlation). Order matters: ensure subscription, register
-        # waiter, send command, await event. If the waiter were
-        # registered AFTER the command went out, a fast post-ack state
-        # event could race ahead of registration and be silently dropped.
-        await self._handle.ensure_subscription("turnout", self.name)
-        future = self._waiters.register(lambda s: s == state)
-        try:
-            # asyncio.shield: a caller-side cancel must not abort the
-            # in-flight HTTP command. JMRI would be left uncertain
-            # whether the command was received. The outer await raises
-            # CancelledError immediately; the inner task finishes in
-            # the background.
-            await asyncio.shield(self._handle.command("turnout", self.name, payload))
-            await future
-        except BaseException:
-            self._waiters.remove(future)
-            raise
+        await command_then_wait(
+            handle=self._handle,
+            entity_type="turnout",
+            name=self.name,
+            waiters=self._waiters,
+            state=state,
+            outbound_map=TURNOUT_STATE_OUTBOUND,
+            wait_for_jmri_state=wait_for_jmri_state,
+        )
 
     async def throw(self, *, wait_for_jmri_state: bool = False) -> None:
         """Alias for ``set_state(TurnoutState.THROWN, ...)`` (FR17, FR21).

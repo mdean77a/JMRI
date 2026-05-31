@@ -5,11 +5,10 @@ Architecture sec. Domain State Modeling.
 
 from __future__ import annotations
 
-import asyncio
 from enum import Enum
 from typing import TYPE_CHECKING
 
-from pyjmri._wait_helpers import wait_for_change, wait_for_target
+from pyjmri._wait_helpers import command_then_wait, wait_for_change, wait_for_target
 from pyjmri._waiters import WaiterList
 
 if TYPE_CHECKING:
@@ -103,29 +102,15 @@ class Light:
         """
         from pyjmri._codes import LIGHT_STATE_OUTBOUND
 
-        if state not in LIGHT_STATE_OUTBOUND:
-            raise ValueError(
-                f"{state!r} is not a commandable light state; "
-                f"use {sorted(s.name for s in LIGHT_STATE_OUTBOUND)!r}"
-            )
-
-        payload = {"state": LIGHT_STATE_OUTBOUND[state]}
-
-        if not wait_for_jmri_state:
-            await self._handle.command("light", self.name, payload)
-            return
-
-        # Pre-register-wait pattern (architecture sec. Command / Event
-        # Correlation). See pyjmri.Turnout.set_state for the rationale
-        # — same ordering, same shield, same cleanup.
-        await self._handle.ensure_subscription("light", self.name)
-        future = self._waiters.register(lambda s: s == state)
-        try:
-            await asyncio.shield(self._handle.command("light", self.name, payload))
-            await future
-        except BaseException:
-            self._waiters.remove(future)
-            raise
+        await command_then_wait(
+            handle=self._handle,
+            entity_type="light",
+            name=self.name,
+            waiters=self._waiters,
+            state=state,
+            outbound_map=LIGHT_STATE_OUTBOUND,
+            wait_for_jmri_state=wait_for_jmri_state,
+        )
 
     async def on(self, *, wait_for_jmri_state: bool = False) -> None:
         """Alias for ``set_state(LightState.ON, ...)`` (FR19, FR21).

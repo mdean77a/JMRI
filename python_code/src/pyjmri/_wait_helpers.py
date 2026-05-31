@@ -18,7 +18,7 @@ runtime ``getattr``.
 from __future__ import annotations
 
 import asyncio
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from enum import Enum
 from typing import TYPE_CHECKING, TypeVar
 
@@ -30,7 +30,7 @@ if TYPE_CHECKING:
 
 StateT = TypeVar("StateT", bound=Enum)
 
-__all__ = ["wait_for_change", "wait_for_target"]
+__all__ = ["command_then_wait", "wait_for_change", "wait_for_target"]
 
 
 async def wait_for_target(
@@ -107,3 +107,47 @@ async def wait_for_change(
         ) from e
     finally:
         waiters.remove(future)
+
+
+async def command_then_wait(
+    *,
+    handle: ClientHandle,
+    entity_type: str,
+    name: str,
+    waiters: WaiterList[StateT],
+    state: StateT,
+    outbound_map: Mapping[StateT, int],
+    wait_for_jmri_state: bool,
+) -> None:
+    """Common body of Turnout/Light ``set_state`` (FR17, FR19, FR21, FR22).
+
+    Validates ``state`` against ``outbound_map`` and raises
+    :class:`ValueError` for non-commandable members (e.g. ``UNKNOWN``,
+    ``INCONSISTENT``). With ``wait_for_jmri_state=False`` issues the
+    HTTP command fire-and-forget. With ``wait_for_jmri_state=True``
+    uses the pre-register-wait pattern: ensure the subscription is
+    live, register a waiter, send the command under
+    :func:`asyncio.shield` (so a caller-side cancel cannot abort an
+    in-flight HTTP command and leave JMRI uncertain whether the command
+    was received), then await the waiter future. On any exception —
+    including :class:`asyncio.CancelledError` — the waiter is removed
+    from the WaiterList; on success the future is already pruned by
+    fanout.
+    """
+    if state not in outbound_map:
+        raise ValueError(
+            f"{state!r} is not a commandable {entity_type} state; "
+            f"use {sorted(s.name for s in outbound_map)!r}"
+        )
+    payload = {"state": outbound_map[state]}
+    if not wait_for_jmri_state:
+        await handle.command(entity_type, name, payload)
+        return
+    await handle.ensure_subscription(entity_type, name)
+    future = waiters.register(lambda s: s == state)
+    try:
+        await asyncio.shield(handle.command(entity_type, name, payload))
+        await future
+    except BaseException:
+        waiters.remove(future)
+        raise
