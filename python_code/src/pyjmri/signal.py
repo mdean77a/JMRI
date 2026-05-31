@@ -16,12 +16,11 @@ signal-mast read. Story 6.2 (README Limitations) must surface this.
 
 from __future__ import annotations
 
-import asyncio
 from enum import Enum
 from typing import TYPE_CHECKING
 
+from pyjmri._wait_helpers import wait_for_change, wait_for_target
 from pyjmri._waiters import WaiterList
-from pyjmri.exceptions import WaitTimeout
 
 if TYPE_CHECKING:
     from pyjmri._protocols import ClientHandle
@@ -147,25 +146,15 @@ class SignalHead:
             RuntimeError: if the owning :class:`~pyjmri.Client` is closed
                 while this call is suspended inside ``ensure_subscription``.
         """
-        if self.appearance == target:
-            return self.appearance
-        await self._handle.ensure_subscription("signalHead", self.name)
-        if self.appearance == target:
-            return self.appearance
-        future = self._waiters.register(lambda a: a == target)
-        try:
-            if timeout is None:
-                return await future
-            async with asyncio.timeout(timeout):
-                return await future
-        except TimeoutError as e:
-            raise WaitTimeout(
-                entity_type="signalHead",
-                name=self.name,
-                target=target.name,
-            ) from e
-        finally:
-            self._waiters.remove(future)
+        return await wait_for_target(
+            handle=self._handle,
+            entity_type="signalHead",
+            name=self.name,
+            waiters=self._waiters,
+            read_state=lambda: self.appearance,
+            target=target,
+            timeout=timeout,
+        )
 
     async def wait_change(
         self,
@@ -183,22 +172,14 @@ class SignalHead:
             RuntimeError: if the owning :class:`~pyjmri.Client` is closed
                 while this call is suspended inside ``ensure_subscription``.
         """
-        await self._handle.ensure_subscription("signalHead", self.name)
-        starting = self.appearance
-        future = self._waiters.register(lambda a: a != starting)
-        try:
-            if timeout is None:
-                return await future
-            async with asyncio.timeout(timeout):
-                return await future
-        except TimeoutError as e:
-            raise WaitTimeout(
-                entity_type="signalHead",
-                name=self.name,
-                from_state=starting.name,
-            ) from e
-        finally:
-            self._waiters.remove(future)
+        return await wait_for_change(
+            handle=self._handle,
+            entity_type="signalHead",
+            name=self.name,
+            waiters=self._waiters,
+            read_state=lambda: self.appearance,
+            timeout=timeout,
+        )
 
 
 class SignalMast:
@@ -283,25 +264,15 @@ class SignalMast:
             RuntimeError: if the owning :class:`~pyjmri.Client` is closed
                 while this call is suspended inside ``ensure_subscription``.
         """
-        if self.aspect == target:
-            return self.aspect
-        await self._handle.ensure_subscription("signalMast", self.name)
-        if self.aspect == target:
-            return self.aspect
-        future = self._waiters.register(lambda a: a == target)
-        try:
-            if timeout is None:
-                return await future
-            async with asyncio.timeout(timeout):
-                return await future
-        except TimeoutError as e:
-            raise WaitTimeout(
-                entity_type="signalMast",
-                name=self.name,
-                target=target.name,
-            ) from e
-        finally:
-            self._waiters.remove(future)
+        return await wait_for_target(
+            handle=self._handle,
+            entity_type="signalMast",
+            name=self.name,
+            waiters=self._waiters,
+            read_state=lambda: self.aspect,
+            target=target,
+            timeout=timeout,
+        )
 
     async def wait_change(
         self,
@@ -319,19 +290,11 @@ class SignalMast:
         so the "starting" reference cannot be invalidated by an event
         that arrives during the subscribe await.
         """
-        await self._handle.ensure_subscription("signalMast", self.name)
-        starting = self.aspect
-        future = self._waiters.register(lambda a: a != starting)
-        try:
-            if timeout is None:
-                return await future
-            async with asyncio.timeout(timeout):
-                return await future
-        except TimeoutError as e:
-            raise WaitTimeout(
-                entity_type="signalMast",
-                name=self.name,
-                from_state=starting.name,
-            ) from e
-        finally:
-            self._waiters.remove(future)
+        return await wait_for_change(
+            handle=self._handle,
+            entity_type="signalMast",
+            name=self.name,
+            waiters=self._waiters,
+            read_state=lambda: self.aspect,
+            timeout=timeout,
+        )

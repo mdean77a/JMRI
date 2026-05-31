@@ -9,8 +9,8 @@ import asyncio
 from enum import Enum
 from typing import TYPE_CHECKING
 
+from pyjmri._wait_helpers import wait_for_change, wait_for_target
 from pyjmri._waiters import WaiterList
-from pyjmri.exceptions import WaitTimeout
 
 if TYPE_CHECKING:
     from pyjmri._protocols import ClientHandle
@@ -173,25 +173,15 @@ class Light:
             RuntimeError: if the owning :class:`~pyjmri.Client` is closed
                 while this call is suspended inside ``ensure_subscription``.
         """
-        if self.state == target:
-            return self.state
-        await self._handle.ensure_subscription("light", self.name)
-        if self.state == target:
-            return self.state
-        future = self._waiters.register(lambda s: s == target)
-        try:
-            if timeout is None:
-                return await future
-            async with asyncio.timeout(timeout):
-                return await future
-        except TimeoutError as e:
-            raise WaitTimeout(
-                entity_type="light",
-                name=self.name,
-                target=target.name,
-            ) from e
-        finally:
-            self._waiters.remove(future)
+        return await wait_for_target(
+            handle=self._handle,
+            entity_type="light",
+            name=self.name,
+            waiters=self._waiters,
+            read_state=lambda: self.state,
+            target=target,
+            timeout=timeout,
+        )
 
     async def wait_change(
         self,
@@ -209,19 +199,11 @@ class Light:
             RuntimeError: if the owning :class:`~pyjmri.Client` is closed
                 while this call is suspended inside ``ensure_subscription``.
         """
-        await self._handle.ensure_subscription("light", self.name)
-        starting = self.state
-        future = self._waiters.register(lambda s: s != starting)
-        try:
-            if timeout is None:
-                return await future
-            async with asyncio.timeout(timeout):
-                return await future
-        except TimeoutError as e:
-            raise WaitTimeout(
-                entity_type="light",
-                name=self.name,
-                from_state=starting.name,
-            ) from e
-        finally:
-            self._waiters.remove(future)
+        return await wait_for_change(
+            handle=self._handle,
+            entity_type="light",
+            name=self.name,
+            waiters=self._waiters,
+            read_state=lambda: self.state,
+            timeout=timeout,
+        )
