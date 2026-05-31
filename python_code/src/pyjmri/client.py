@@ -29,7 +29,7 @@ from pyjmri._parsing import (
     parse_signal_mast,
     parse_turnout,
 )
-from pyjmri._protocols import Waitable
+from pyjmri._protocols import ClientHandle, Waitable
 from pyjmri._subscriptions import SubscriptionRegistry
 from pyjmri._transport import HTTPClient, WSConnection
 from pyjmri.block import Block
@@ -314,15 +314,14 @@ class Client:
         if entity_type == "error":
             self._dispatch_error_envelope(envelope)
             return None
-        parser_entry = _DISPATCH_PARSERS.get(entity_type)
-        if parser_entry is None:
+        spec = _ENTITY_SPECS.get(entity_type)
+        if spec is None or spec.primary_attr is None:
             logger_transport.debug("WS dispatch: drop", extra={"type": entity_type})
             return None
-        parser, primary_attr = parser_entry
         try:
-            parsed = parser(envelope)
+            parsed = spec.parser(envelope)
             name = parsed.name
-            primary = getattr(parsed, primary_attr)
+            primary = getattr(parsed, spec.primary_attr)
         except Exception as e:
             logger_transport.warning(
                 "WS dispatch: parse failed",
@@ -712,127 +711,42 @@ class Client:
             self._version_checked = True
 
         async with asyncio.TaskGroup() as tg:
-            t_turnout = tg.create_task(_fetch_collection(http, "turnout"))
-            t_sensor = tg.create_task(_fetch_collection(http, "sensor"))
-            t_block = tg.create_task(_fetch_collection(http, "block"))
-            t_light = tg.create_task(_fetch_collection(http, "light"))
-            t_memory = tg.create_task(_fetch_collection(http, "memory"))
-            t_route = tg.create_task(_fetch_collection(http, "route"))
-            t_sighead = tg.create_task(_fetch_collection(http, "signalHead"))
-            t_sigmast = tg.create_task(_fetch_collection(http, "signalMast"))
+            fetch_tasks = {
+                entity_type: tg.create_task(_fetch_collection(http, entity_type))
+                for entity_type in _ENTITY_SPECS
+            }
 
-        turnouts: list[Turnout] = []
-        for envelope in t_turnout.result():
-            parsed_t = parse_turnout(envelope)
-            turnouts.append(
-                Turnout(
-                    name=parsed_t.name,
-                    user_name=parsed_t.user_name,
-                    state=parsed_t.state,
-                    _handle=self,
-                )
-            )
+        # Walk the registry once to build per-type lists. Each spec.build
+        # is a typed lambda that constructs the right domain class from a
+        # _Parsed<Kind> dataclass; the dict carries list[Any] because the
+        # spec table is heterogeneous, and the per-variable list[...] type
+        # annotations below pin the concrete element type back down.
+        results: dict[str, list[Any]] = {
+            entity_type: [
+                spec.build(spec.parser(env), self) for env in fetch_tasks[entity_type].result()
+            ]
+            for entity_type, spec in _ENTITY_SPECS.items()
+        }
+        turnouts: list[Turnout] = results["turnout"]
+        sensors: list[Sensor] = results["sensor"]
+        blocks: list[Block] = results["block"]
+        lights: list[Light] = results["light"]
+        memories: list[Memory] = results["memory"]
+        routes: list[Route] = results["route"]
+        signal_heads: list[SignalHead] = results["signalHead"]
+        signal_masts: list[SignalMast] = results["signalMast"]
 
-        sensors: list[Sensor] = []
-        for envelope in t_sensor.result():
-            parsed_s = parse_sensor(envelope)
-            sensors.append(
-                Sensor(
-                    name=parsed_s.name,
-                    user_name=parsed_s.user_name,
-                    state=parsed_s.state,
-                    _handle=self,
-                )
-            )
-
-        blocks: list[Block] = []
-        for envelope in t_block.result():
-            parsed_b = parse_block(envelope)
-            blocks.append(
-                Block(
-                    name=parsed_b.name,
-                    user_name=parsed_b.user_name,
-                    state=parsed_b.state,
-                    value=parsed_b.value,
-                    _handle=self,
-                )
-            )
-
-        lights: list[Light] = []
-        for envelope in t_light.result():
-            parsed_l = parse_light(envelope)
-            lights.append(
-                Light(
-                    name=parsed_l.name,
-                    user_name=parsed_l.user_name,
-                    state=parsed_l.state,
-                    _handle=self,
-                )
-            )
-
-        memories: list[Memory] = []
-        for envelope in t_memory.result():
-            parsed_m = parse_memory(envelope)
-            memories.append(
-                Memory(
-                    name=parsed_m.name,
-                    user_name=parsed_m.user_name,
-                    value=parsed_m.value,
-                    _handle=self,
-                )
-            )
-
-        routes: list[Route] = []
-        for envelope in t_route.result():
-            parsed_r = parse_route(envelope)
-            routes.append(Route(name=parsed_r.name, user_name=parsed_r.user_name, _handle=self))
-
-        signal_heads: list[SignalHead] = []
-        for envelope in t_sighead.result():
-            parsed_sh = parse_signal_head(envelope)
-            signal_heads.append(
-                SignalHead(
-                    name=parsed_sh.name,
-                    user_name=parsed_sh.user_name,
-                    appearance=parsed_sh.appearance,
-                    held=parsed_sh.held,
-                    lit=parsed_sh.lit,
-                    _handle=self,
-                )
-            )
-
-        signal_masts: list[SignalMast] = []
-        for envelope in t_sigmast.result():
-            parsed_sm = parse_signal_mast(envelope)
-            signal_masts.append(
-                SignalMast(
-                    name=parsed_sm.name,
-                    user_name=parsed_sm.user_name,
-                    aspect=parsed_sm.aspect,
-                    held=parsed_sm.held,
-                    lit=parsed_sm.lit,
-                    _handle=self,
-                )
-            )
-
-        # Rebuild the WS-dispatch entity index from this discovery.
-        # Memory and Route entities are skipped (no _on_event in v1).
-        # Stale Layouts returned by prior discover() calls keep their
-        # waiters but those waiters will never resolve via dispatch —
-        # see discover() docstring.
+        # Rebuild the WS-dispatch entity index from this discovery. Entity
+        # types whose spec.primary_attr is None (memory, route in v1) are
+        # skipped — they have no _on_event in v1. Stale Layouts returned by
+        # prior discover() calls keep their waiters but those waiters will
+        # never resolve via dispatch — see discover() docstring.
         new_index: dict[tuple[str, str], Waitable] = {}
-        for t in turnouts:
-            new_index[("turnout", t.name)] = t
-        for s in sensors:
-            new_index[("sensor", s.name)] = s
-        for b in blocks:
-            new_index[("block", b.name)] = b
-        for la in lights:
-            new_index[("light", la.name)] = la
-        for sh in signal_heads:
-            new_index[("signalHead", sh.name)] = sh
-        for sm in signal_masts:
-            new_index[("signalMast", sm.name)] = sm
+        for entity_type, spec in _ENTITY_SPECS.items():
+            if spec.primary_attr is None:
+                continue
+            for entity in results[entity_type]:
+                new_index[(entity_type, entity.name)] = entity
         self._entities = new_index
 
         return Layout(
@@ -888,23 +802,93 @@ class Client:
         return parsed.state
 
 
-_DISPATCH_PARSERS: dict[
-    str,
-    tuple[Callable[[dict[str, Any]], Any], str],
-] = {
-    "turnout": (parse_turnout, "state"),
-    "sensor": (parse_sensor, "state"),
-    "block": (parse_block, "state"),
-    "light": (parse_light, "state"),
-    "signalHead": (parse_signal_head, "appearance"),
-    "signalMast": (parse_signal_mast, "aspect"),
-}
-"""Per-entity-type ``(parser_fn, primary_attr)`` table.
+@dataclass(frozen=True, slots=True)
+class _EntitySpec:
+    """Per-entity-type registry entry for :meth:`Client.discover` and the WS dispatcher.
 
-The six entries are the waitable entity types. ``memory`` and ``route``
-are intentionally absent — their envelopes drop at the dispatch layer.
-Adding a seventh waitable entity is one line here plus the entity's
-own ``_on_event``/``_waiters`` plumbing.
+    ``parser`` consumes one JMRI envelope and returns a ``_Parsed<Kind>``
+    dataclass. ``build`` constructs the matching public domain object
+    from that dataclass and the owning :class:`ClientHandle`.
+    ``primary_attr`` names the field on the parsed dataclass that the
+    WS dispatcher passes into ``entity._on_event`` — ``None`` for entity
+    types that are not modelled as waitable in v1 (``memory``, ``route``).
+    """
+
+    parser: Callable[[dict[str, Any]], Any]
+    build: Callable[[Any, ClientHandle], Any]
+    primary_attr: str | None
+
+
+_ENTITY_SPECS: dict[str, _EntitySpec] = {
+    "turnout": _EntitySpec(
+        parser=parse_turnout,
+        build=lambda p, h: Turnout(name=p.name, user_name=p.user_name, state=p.state, _handle=h),
+        primary_attr="state",
+    ),
+    "sensor": _EntitySpec(
+        parser=parse_sensor,
+        build=lambda p, h: Sensor(name=p.name, user_name=p.user_name, state=p.state, _handle=h),
+        primary_attr="state",
+    ),
+    "block": _EntitySpec(
+        parser=parse_block,
+        build=lambda p, h: Block(
+            name=p.name,
+            user_name=p.user_name,
+            state=p.state,
+            value=p.value,
+            _handle=h,
+        ),
+        primary_attr="state",
+    ),
+    "light": _EntitySpec(
+        parser=parse_light,
+        build=lambda p, h: Light(name=p.name, user_name=p.user_name, state=p.state, _handle=h),
+        primary_attr="state",
+    ),
+    "memory": _EntitySpec(
+        parser=parse_memory,
+        build=lambda p, h: Memory(name=p.name, user_name=p.user_name, value=p.value, _handle=h),
+        primary_attr=None,
+    ),
+    "route": _EntitySpec(
+        parser=parse_route,
+        build=lambda p, h: Route(name=p.name, user_name=p.user_name, _handle=h),
+        primary_attr=None,
+    ),
+    "signalHead": _EntitySpec(
+        parser=parse_signal_head,
+        build=lambda p, h: SignalHead(
+            name=p.name,
+            user_name=p.user_name,
+            appearance=p.appearance,
+            held=p.held,
+            lit=p.lit,
+            _handle=h,
+        ),
+        primary_attr="appearance",
+    ),
+    "signalMast": _EntitySpec(
+        parser=parse_signal_mast,
+        build=lambda p, h: SignalMast(
+            name=p.name,
+            user_name=p.user_name,
+            aspect=p.aspect,
+            held=p.held,
+            lit=p.lit,
+            _handle=h,
+        ),
+        primary_attr="aspect",
+    ),
+}
+"""Single source of truth for every entity type pyjmri knows about.
+
+Driven by :meth:`Client.discover` (uses ``parser`` + ``build``) and by
+:meth:`Client._on_ws_message` (uses ``parser`` + ``primary_attr``).
+Adding a new entity type is one entry here plus the domain class.
+Entries with ``primary_attr=None`` are built and surfaced in the
+:class:`~pyjmri.Layout` but excluded from the WS dispatch index — their
+state changes are not modelled as waitable events in v1.
 """
 
 
