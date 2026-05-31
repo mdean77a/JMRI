@@ -9,7 +9,6 @@ ignored; missing required keys raise ``JMRIProtocolError``.
 
 from __future__ import annotations
 
-import logging
 from collections.abc import Mapping
 from dataclasses import dataclass
 from enum import Enum
@@ -23,8 +22,6 @@ from pyjmri.power import PowerState
 from pyjmri.sensor import SensorState
 from pyjmri.signal import SignalHeadAppearance, SignalMastAspect
 from pyjmri.turnout import TurnoutState
-
-logger = logging.getLogger(__name__)
 
 EnumT = TypeVar("EnumT", bound=Enum)
 

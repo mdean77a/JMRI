@@ -2,13 +2,10 @@
 
 from __future__ import annotations
 
-import logging
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from pyjmri._protocols import ClientHandle
-
-logger = logging.getLogger(__name__)
 
 __all__ = ["Memory"]
 

@@ -5,7 +5,6 @@ Architecture sec. Layout Container & Dual-Name Lookup.
 
 from __future__ import annotations
 
-import logging
 from collections.abc import Iterable, Iterator, Mapping
 from typing import TYPE_CHECKING, Generic, Protocol, TypeVar
 
@@ -21,8 +20,6 @@ from pyjmri.turnout import Turnout
 if TYPE_CHECKING:
     from pyjmri._protocols import ClientHandle
     from pyjmri.throttle import Throttle
-
-logger = logging.getLogger(__name__)
 
 __all__ = ["EntityCollection", "Layout"]
 

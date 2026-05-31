@@ -17,7 +17,6 @@ signal-mast read. Story 6.2 (README Limitations) must surface this.
 from __future__ import annotations
 
 import asyncio
-import logging
 from enum import Enum
 from typing import TYPE_CHECKING
 
@@ -26,8 +25,6 @@ from pyjmri.exceptions import WaitTimeout
 
 if TYPE_CHECKING:
     from pyjmri._protocols import ClientHandle
-
-logger = logging.getLogger(__name__)
 
 __all__ = ["SignalHead", "SignalHeadAppearance", "SignalMast", "SignalMastAspect"]
 

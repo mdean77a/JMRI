@@ -10,7 +10,6 @@ Architecture sec. Domain State Modeling and JSON <-> Python Translation.
 
 from __future__ import annotations
 
-import logging
 from collections.abc import Mapping
 from types import MappingProxyType
 
@@ -21,9 +20,6 @@ from pyjmri.route import RouteState
 from pyjmri.sensor import SensorState
 from pyjmri.signal import SignalHeadAppearance
 from pyjmri.turnout import TurnoutState
-
-logger = logging.getLogger(__name__)
-
 
 # JMRI Turnout: UNKNOWN=1, CLOSED=2, THROWN=4, INCONSISTENT=8.
 # Live observation: idle/never-commanded turnouts emit state=0 -> UNKNOWN.

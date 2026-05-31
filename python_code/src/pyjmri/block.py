@@ -6,7 +6,6 @@ Architecture sec. Domain State Modeling.
 from __future__ import annotations
 
 import asyncio
-import logging
 from enum import Enum
 from typing import TYPE_CHECKING
 
@@ -15,8 +14,6 @@ from pyjmri.exceptions import WaitTimeout
 
 if TYPE_CHECKING:
     from pyjmri._protocols import ClientHandle
-
-logger = logging.getLogger(__name__)
 
 __all__ = ["Block", "BlockState"]
 
