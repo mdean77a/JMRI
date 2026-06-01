@@ -220,21 +220,15 @@ class Client:
                 try:
                     await self._tg.__aexit__(exc_type, exc, tb)
                 except BaseExceptionGroup as eg:
-                    non_cancelled = [
-                        e for e in eg.exceptions if not isinstance(e, asyncio.CancelledError)
-                    ]
-                    if len(non_cancelled) == 1 and non_cancelled[0] is exc:
-                        # The TaskGroup re-wrapped the body exception in a
-                        # group with no other failures. Let the original
-                        # body exception propagate (it's already on its
-                        # way out via Python's context-manager protocol).
+                    unwrapped = _unwrap_exception_group(eg, body_exc=exc)
+                    if unwrapped is None:
+                        # Either only CancelledErrors during clean teardown,
+                        # or the lone non-cancellation IS the body exception
+                        # already propagating via the context-manager protocol.
                         return
-                    if len(non_cancelled) == 1:
-                        raise non_cancelled[0] from None
-                    if non_cancelled:
+                    if unwrapped is eg:
                         raise
-                    # ExceptionGroup carried only CancelledErrors —
-                    # expected during clean teardown; swallow.
+                    raise unwrapped from None
         finally:
             self._tg = None
             if self._http is not None:
@@ -265,13 +259,12 @@ class Client:
                 try:
                     await self._tg.__aexit__(type(first_exc), first_exc, first_exc.__traceback__)
                 except BaseExceptionGroup as eg:
-                    non_cancelled = [
-                        e for e in eg.exceptions if not isinstance(e, asyncio.CancelledError)
-                    ]
-                    if len(non_cancelled) == 1:
-                        raise non_cancelled[0] from None
-                    if non_cancelled:
+                    unwrapped = _unwrap_exception_group(eg)
+                    if unwrapped is eg:
                         raise
+                    if unwrapped is not None:
+                        raise unwrapped from None
+                    # only cancellations — fall through to finally cleanup.
         finally:
             self._tg = None
             if self._http is not None:
@@ -890,6 +883,40 @@ Entries with ``primary_attr=None`` are built and surfaced in the
 :class:`~pyjmri.Layout` but excluded from the WS dispatch index — their
 state changes are not modelled as waitable events in v1.
 """
+
+
+def _unwrap_exception_group(
+    eg: BaseExceptionGroup,
+    *,
+    body_exc: BaseException | None = None,
+) -> BaseException | None:
+    """Filter cancellations out of a TaskGroup ExceptionGroup.
+
+    The two call sites — :meth:`Client.__aexit__` and
+    :meth:`Client._teardown_on_aenter_failure` — share the same need to
+    extract the meaningful exception from a TaskGroup's wrapped result.
+    Returns:
+
+    - ``None`` when the group should be suppressed. Two cases: the group
+      contained only :class:`asyncio.CancelledError` (clean teardown), or
+      the lone non-cancellation IS ``body_exc`` (already propagating via
+      the context-manager protocol — used only by ``__aexit__``).
+    - A :class:`BaseException` distinct from ``body_exc`` when there is
+      exactly one non-cancellation. The caller raises it with
+      ``from None`` to keep the traceback focused on the underlying
+      cause rather than the TaskGroup wrapping.
+    - ``eg`` itself when there is more than one non-cancellation. The
+      caller (inside ``except BaseExceptionGroup as eg``) should
+      bare-``raise`` to preserve the original group.
+    """
+    non_cancelled = [e for e in eg.exceptions if not isinstance(e, asyncio.CancelledError)]
+    if len(non_cancelled) == 1 and non_cancelled[0] is body_exc:
+        return None
+    if len(non_cancelled) == 1:
+        return non_cancelled[0]
+    if non_cancelled:
+        return eg
+    return None
 
 
 def _parse_url(url: str) -> tuple[str, int, str]:

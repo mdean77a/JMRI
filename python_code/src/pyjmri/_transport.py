@@ -98,23 +98,8 @@ class HTTPClient:
         """
         try:
             response = await self._http.get(path)
-        except httpx.ConnectError as e:
-            raise JMRIConnectionError(host=self._host, port=self._port) from e
-        except httpx.TimeoutException as e:
-            raise JMRIRequestTimeout(
-                "HTTP request exceeded request_timeout",
-                host=self._host,
-                port=self._port,
-                path=path,
-            ) from e
         except httpx.TransportError as e:
-            # Covers ReadError, WriteError, CloseError, ProxyError,
-            # ProtocolError, DecodingError, TooManyRedirects, etc.
-            raise JMRIConnectionError(
-                host=self._host,
-                port=self._port,
-                error_type=type(e).__name__,
-            ) from e
+            raise self._translate_httpx_error(e, path=path) from e
 
         if response.status_code != 200:
             raise JMRIProtocolError(
@@ -188,21 +173,8 @@ class HTTPClient:
         body = {"type": entity_type, "data": {"name": name, **payload}}
         try:
             response = await self._http.post(path, json=body)
-        except httpx.ConnectError as e:
-            raise JMRIConnectionError(host=self._host, port=self._port) from e
-        except httpx.TimeoutException as e:
-            raise JMRIRequestTimeout(
-                "HTTP request exceeded request_timeout",
-                host=self._host,
-                port=self._port,
-                path=path,
-            ) from e
         except httpx.TransportError as e:
-            raise JMRIConnectionError(
-                host=self._host,
-                port=self._port,
-                error_type=type(e).__name__,
-            ) from e
+            raise self._translate_httpx_error(e, path=path) from e
 
         status = response.status_code
         if 200 <= status < 300:
@@ -246,6 +218,42 @@ class HTTPClient:
     async def aclose(self) -> None:
         """Close the underlying httpx client. Idempotent."""
         await self._http.aclose()
+
+    def _translate_httpx_error(
+        self,
+        e: httpx.TransportError,
+        *,
+        path: str,
+    ) -> JMRIConnectionError | JMRIRequestTimeout:
+        """Translate an :class:`httpx.TransportError` into the matching JMRIError subclass.
+
+        Three branches, ordered to honor the httpx class hierarchy
+        (``ConnectError`` and ``TimeoutException`` are both
+        ``TransportError`` subclasses):
+
+        - :class:`httpx.ConnectError` → :class:`JMRIConnectionError` (plain).
+        - :class:`httpx.TimeoutException` → :class:`JMRIRequestTimeout` with ``path``.
+        - Any other ``TransportError`` subclass (``ReadError``, ``WriteError``,
+          ``ProxyError``, ``ProtocolError``, ``DecodingError``, ``TooManyRedirects``,
+          ...) → :class:`JMRIConnectionError` with ``error_type`` captured in context.
+
+        Callers must preserve cause chaining:
+        ``raise self._translate_httpx_error(e, path=path) from e``.
+        """
+        if isinstance(e, httpx.ConnectError):
+            return JMRIConnectionError(host=self._host, port=self._port)
+        if isinstance(e, httpx.TimeoutException):
+            return JMRIRequestTimeout(
+                "HTTP request exceeded request_timeout",
+                host=self._host,
+                port=self._port,
+                path=path,
+            )
+        return JMRIConnectionError(
+            host=self._host,
+            port=self._port,
+            error_type=type(e).__name__,
+        )
 
 
 class WSConnection:
