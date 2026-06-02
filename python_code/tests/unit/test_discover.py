@@ -141,6 +141,29 @@ async def test_discover_version_check_passes_for_5_14_with_patch(
     assert isinstance(layout, Layout)
 
 
+async def test_discover_version_check_accepts_build_suffixed_version(
+    patch_http_factory: list[Any],
+) -> None:
+    """JMRI sometimes emits versions like ``5.14+Rdea51dcccf`` — accept the prefix."""
+    async with Client() as jmri:
+        fake = patch_http_factory[0]
+        fake.next_response = _responder(version="5.14+Rdea51dcccf")
+        layout = await jmri.discover()
+
+    assert isinstance(layout, Layout)
+
+
+async def test_discover_version_check_rejects_non_numeric_version(
+    patch_http_factory: list[Any],
+) -> None:
+    """A version with no leading numeric prefix raises ``JMRIProtocolError``."""
+    async with Client() as jmri:
+        fake = patch_http_factory[0]
+        fake.next_response = _responder(version="not-a-version")
+        with pytest.raises(JMRIProtocolError):
+            await jmri.discover()
+
+
 async def test_discover_version_check_skipped_on_second_call(
     patch_http_factory: list[Any],
 ) -> None:

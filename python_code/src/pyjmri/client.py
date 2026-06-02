@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import re
 import uuid
 from collections import deque
 from collections.abc import Callable, Coroutine
@@ -110,6 +111,14 @@ class Client:
 
     The default URL is ``localhost:12080``. The ``url`` argument accepts
     ``host:port``, ``http://host:port``, or ``ws://host:port/path``.
+
+    A bare ``host:port`` (no scheme) is treated as plaintext ``http://``
+    and ``ws://``. JMRI's web server has no authentication and is
+    intended for the local network, so HTTP is the right default for a
+    basement layout. If you expose JMRI beyond a trusted LAN, pass an
+    explicit ``https://host:port`` or ``wss://host:port`` URL so the
+    connection is TLS-encrypted; the certificate is verified by the
+    underlying ``httpx``/``websockets`` defaults.
 
     Args:
         url: JMRI URL or host:port string. Defaults to ``localhost:12080``.
@@ -955,6 +964,11 @@ def _parse_url(url: str) -> tuple[str, int, str]:
 _MIN_JMRI_VERSION: tuple[int, int] = (5, 14)
 _MIN_JMRI_VERSION_STR: str = "5.14"
 
+# JMRI's networkService envelope sometimes carries a build-suffixed version
+# string like "5.14+Rdea51dcccf"; only the leading dotted-numeric prefix is
+# the version we gate on. Anchored at start; the suffix is ignored.
+_JMRI_VERSION_PREFIX_RE = re.compile(r"^(\d+)\.(\d+)(?:\.(\d+))?")
+
 
 async def _fetch_collection(http: HTTPClient, entity_type: str) -> list[dict[str, Any]]:
     """Fetch a collection endpoint and validate that the response is a list.
@@ -1005,14 +1019,14 @@ def _check_jmri_version(payload: dict[str, Any] | list[dict[str, Any]]) -> None:
             path=_VERSION_PATH,
             field="jmri",
         )
-    try:
-        detected = tuple(int(part) for part in version.split("."))
-    except ValueError as exc:
+    match = _JMRI_VERSION_PREFIX_RE.match(version)
+    if match is None:
         raise JMRIProtocolError(
-            "networkService response 'jmri' field is not dot-separated integers",
+            "networkService response 'jmri' field has no leading numeric version",
             path=_VERSION_PATH,
             field="jmri",
             value=version,
-        ) from exc
+        )
+    detected = tuple(int(part) for part in match.groups() if part is not None)
     if detected < _MIN_JMRI_VERSION:
         raise JMRIVersionUnsupported(detected=version, required=_MIN_JMRI_VERSION_STR)
