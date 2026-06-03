@@ -57,7 +57,7 @@ name=NT400 user_name=North Yard Lead initial state=CLOSED
 final state=THROWN
 ```
 
-The two states are intentionally opposite — the script reads the current state, then commands the opposite. Run it again and the values will swap. The `final state` line means JMRI accepted the command — see the Limitations section below for what "accepted" does and does not imply on NCE hardware. If `initial state=UNKNOWN` appears instead of `CLOSED` or `THROWN`, that is normal — JMRI reports `UNKNOWN` for any turnout not yet commanded in the current session.
+The two states are intentionally opposite — the script reads the current state, then commands the opposite. Run it again and the values will swap. The `final state` line means JMRI accepted the command — see the Limitations section below for what "accepted" does and does not imply at the layout. If `initial state=UNKNOWN` appears instead of `CLOSED` or `THROWN`, that is normal — JMRI reports `UNKNOWN` for any turnout not yet commanded in the current session.
 
 ### Try it in a notebook
 
@@ -73,19 +73,25 @@ Re-running the `await main()` cell will flip the same turnout back and forth, si
 
 ## Limitations
 
-`pyjmri` is honest about what it does and does not know. JMRI exposes a JSON web API on top of DCC hardware that is fundamentally open-loop on the NCE platform `pyjmri` targets; the library faithfully relays what JMRI reports. Read this section before writing code that assumes a returned `await` implies a moved turnout, a powered locomotive, or a confirmed route.
+`pyjmri` is honest about what it does and does not know. DCC itself is an open-loop control protocol: the command station broadcasts packets onto the rails, but accessory and locomotive decoders do not push anything back. Virtually every DCC system in common use behaves this way. Layouts that add auxiliary feedback hardware — block-occupancy detectors, transponding receivers — regain a real upstream signal for the entities those sensors cover, and `pyjmri` surfaces that signal through `Sensor`s (see "Sensors are the real feedback path" below). For everything else, `pyjmri` faithfully relays what JMRI reports, which is in turn what DCC tells JMRI.
 
-### NCE is open-loop — JMRI reports last-commanded, not observed
+Read this section before writing code that assumes a returned `await` implies a moved turnout, a powered locomotive, or a confirmed route.
 
-There is no feedback path from any commanded accessory (turnout, route, light) or any decoder back to JMRI on the NCE platform that `pyjmri` is tested against. JMRI knows what it *commanded*, not what physically happened — the state it reports for a turnout, light, or route is the last-commanded state, not an observed one. `pyjmri` does not raise an exception when reported state diverges from physical reality; it has no second signal to compare against. Visual confirmation at the layout is the only ground truth.
+### Hardware scope
+
+`pyjmri` talks to JMRI's JSON web server, not to any specific DCC hardware. Anything JMRI can drive, `pyjmri` should be able to drive. v1 has been tested only against the maintainer's layout, which uses an NCE command station (USB and simulator); the rest of the limitations in this section are DCC-protocol properties that apply to any JMRI-supported DCC system, not NCE-specific quirks. If you exercise `pyjmri` against different DCC hardware, please open a GitHub issue with what worked and what didn't so the tested-hardware footprint can grow.
+
+### DCC is open-loop — JMRI reports last-commanded, not observed
+
+There is no DCC-bus feedback from a commanded accessory (turnout, route, light) or locomotive decoder back to the command station: the rails carry packets outbound but not inbound. JMRI knows what it *commanded*, not what physically happened — the state it reports for a turnout, light, or route is the last-commanded state, not an observed one. This is a DCC protocol property, not a JMRI or `pyjmri` choice. `pyjmri` does not raise an exception when reported state diverges from physical reality; it has no second signal to compare against. Visual confirmation at the layout, or an auxiliary sensor (next subsection), is the only ground truth.
 
 ### "Command acknowledged" means JMRI accepted the command, not that the layout moved
 
-When `await turnout.set_state(TurnoutState.THROWN)` returns, the library has confirmed that JMRI's JSON web server accepted the request and updated its internal model. The DCC bus may not have delivered the packet; the turnout coil may have failed; the decoder may be unpowered. `pyjmri` does not raise for any of these — it has no signal to detect a turnout that physically failed to move. This holds on the NCE simulator and on real NCE hardware alike. A successful `await` confirms intent reached JMRI, nothing more.
+When `await turnout.set_state(TurnoutState.THROWN)` returns, the library has confirmed that JMRI's JSON web server accepted the request and updated its internal model. The DCC bus may not have delivered the packet; the turnout coil may have failed; the decoder may be unpowered. `pyjmri` does not raise for any of these — it has no signal to detect a turnout that physically failed to move. This holds against a JMRI simulator and against any real DCC hardware alike. A successful `await` confirms intent reached JMRI, nothing more.
 
 ### Layout power is hardware-controlled — `pyjmri` exposes read-only `power_state()`
 
-The booster's physical power switch is the source of truth for whether the rails are energized. JMRI can *observe* the booster's power state, and `pyjmri` surfaces that observation via `jmri.power_state()`, which returns `PowerState.ON`, `PowerState.OFF`, or `PowerState.UNKNOWN`. `pyjmri` does not expose a power-write method because the NCE platform has no JMRI-controllable power-on; turning the layout on or off is a physical action at the booster. `pyjmri` does not raise if a script keeps commanding entities while the layout is unpowered.
+The booster's physical power switch is the source of truth for whether the rails are energized. JMRI can *observe* the booster's power state, and `pyjmri` surfaces that observation via `jmri.power_state()`, which returns `PowerState.ON`, `PowerState.OFF`, or `PowerState.UNKNOWN`. `pyjmri` does not expose a power-write method by design — the library will not synthesize a software `power_on()` that could mislead a script into believing it controls layout energization. `pyjmri` does not raise if a script keeps commanding entities while the layout is unpowered.
 
 ### Throttle acquire is best-effort — it reserves a slot, not a locomotive
 
