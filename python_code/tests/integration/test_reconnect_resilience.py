@@ -25,8 +25,9 @@ entities whose commands demonstrably work (always at least the sensor;
 the turnout path is skipped gracefully when commands time out).
 
 Requires JMRI on localhost:12080; skipped via the ``jmri_available``
-session fixture when unreachable.  Layout-agnostic: picks the first
-sensor and first turnout from ``discover()``, skips if either is absent.
+session fixture when unreachable.  Layout-agnostic via skip-if-missing:
+targets the pinned internal sensor ``IS2`` and turnout ``NT106`` by
+system name (Story 7.1 AC2), skipping cleanly if either is absent.
 """
 
 from __future__ import annotations
@@ -34,49 +35,28 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import logging
-from urllib.parse import quote
 
 import httpx
 import pytest
+from _entity_state import JMRI_BASE_URL, force_sensor_state, force_turnout_state
 
-from pyjmri import Client, SensorState, TurnoutState
+from pyjmri import Client, LayoutEntityNotFound, SensorState, TurnoutState
 
-# JMRI integer state codes (mirrors _codes.py, intentionally inlined per project convention).
-_SENSOR_INT_ACTIVE = 2
-_SENSOR_INT_INACTIVE = 4
-_TURNOUT_INT_THROWN = 2
-_TURNOUT_INT_CLOSED = 4
+# Pinned, non-overlapping targets (Story 7.1 AC2): IS2 (an internal
+# sensor distinct from the NFR1 latency test's IS1) and NT106 (distinct
+# from the other turnout tests' NT100/NT102/NT104).
+_SENSOR_NAME = "IS2"
+_TURNOUT_NAME = "NT106"
 
 _RECONNECT_WAIT_S = 15.0
 _RECONNECT_POLL_INTERVAL_S = 0.2
 _RECONNECT_INFO_MSG = "WebSocket reconnected; replaying subscriptions"
-_COMMAND_TIMEOUT_S = 5.0  # generous; reduces on sim where commands don't echo back
-
-
-async def _post_sensor_state(
-    raw_http: httpx.AsyncClient,
-    sensor_name: str,
-    target: SensorState,
-) -> None:
-    code = _SENSOR_INT_ACTIVE if target is SensorState.ACTIVE else _SENSOR_INT_INACTIVE
-    resp = await raw_http.post(
-        f"/json/v5/sensor/{quote(sensor_name, safe='')}",
-        json={"type": "sensor", "data": {"name": sensor_name, "state": code}},
-    )
-    resp.raise_for_status()
-
-
-async def _post_turnout_state(
-    raw_http: httpx.AsyncClient,
-    turnout_name: str,
-    target: TurnoutState,
-) -> None:
-    code = _TURNOUT_INT_THROWN if target is TurnoutState.THROWN else _TURNOUT_INT_CLOSED
-    resp = await raw_http.post(
-        f"/json/v5/turnout/{quote(turnout_name, safe='')}",
-        json={"type": "turnout", "data": {"name": turnout_name, "state": code}},
-    )
-    resp.raise_for_status()
+# 5.0 s < 10 s, justified (Story 7.1 AC4): caps the wait for a WS ack
+# AFTER commanding the turnout's opposite state. On NCE Simulator layouts
+# a turnout command may never echo back over WS, so this path is allowed
+# to time out and skip the turnout assertion — the sensor path is the
+# authoritative NFR5 proof. A looser ceiling would only slow the skip.
+_COMMAND_TIMEOUT_S = 5.0
 
 
 def _opposite_sensor(state: SensorState) -> SensorState:
@@ -120,21 +100,25 @@ async def test_in_flight_wait_survives_forced_disconnect(
     """
     async with Client() as jmri:
         layout = await jmri.discover()
-        sensors = list(layout.sensors.values())
-        turnouts = list(layout.turnouts.values())
+        try:
+            sensor = layout.sensors.by_system_name(_SENSOR_NAME)
+        except LayoutEntityNotFound:
+            pytest.skip(
+                f"sensor {_SENSOR_NAME!r} not on this layout — "
+                "required for the reconnect-resilience test"
+            )
+        try:
+            turnout = layout.turnouts.by_system_name(_TURNOUT_NAME)
+        except LayoutEntityNotFound:
+            pytest.skip(
+                f"turnout {_TURNOUT_NAME!r} not on this layout — "
+                "required for the reconnect-resilience test"
+            )
 
-        if not sensors:
-            pytest.skip("layout has no sensors — cannot run reconnect resilience test")
-        if not turnouts:
-            pytest.skip("layout has no turnouts — cannot run reconnect resilience test")
-
-        sensor = sensors[0]
-        turnout = turnouts[0]
-
-        async with httpx.AsyncClient(base_url="http://localhost:12080") as raw_http:
+        async with httpx.AsyncClient(base_url=JMRI_BASE_URL) as raw_http:
             # ── Step 1: Establish known starting states ──────────────────────
             # Sensor: force to INACTIVE (internal sensors always echo back).
-            await _post_sensor_state(raw_http, sensor.name, SensorState.INACTIVE)
+            await force_sensor_state(raw_http, sensor.name, SensorState.INACTIVE)
             await sensor.wait_state(SensorState.INACTIVE, timeout=10.0)
             sensor_starting = sensor.state  # SensorState.INACTIVE
 
@@ -221,7 +205,7 @@ async def test_in_flight_wait_survives_forced_disconnect(
                 sensor_resolved_via_command = False
                 if not sensor_already_resolved:
                     sensor_target = _opposite_sensor(sensor.state)
-                    await _post_sensor_state(raw_http, sensor.name, sensor_target)
+                    await force_sensor_state(raw_http, sensor.name, sensor_target)
                     sensor_result = await sensor_task
                     assert sensor_result is sensor_target, (
                         f"expected {sensor_target!r}; got {sensor_result!r}"
@@ -232,7 +216,7 @@ async def test_in_flight_wait_survives_forced_disconnect(
                 # (hardware limitation — NCE Simulator may not echo back).
                 if not turnout_already_resolved:
                     turnout_target = _opposite_turnout(turnout.state)
-                    await _post_turnout_state(raw_http, turnout.name, turnout_target)
+                    await force_turnout_state(raw_http, turnout.name, turnout_target)
                     try:
                         turnout_result = await asyncio.wait_for(
                             asyncio.shield(turnout_task), timeout=_COMMAND_TIMEOUT_S

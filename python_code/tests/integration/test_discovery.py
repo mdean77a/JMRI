@@ -10,7 +10,13 @@ import time
 
 import pytest
 
-from pyjmri import Client, Layout, TurnoutState
+from pyjmri import Client, Layout, LayoutEntityNotFound, TurnoutState
+
+# Read-only probe target (Story 7.1 AC2): pin by system name rather than
+# next(iter(...)) positional access. This test only reads NT100's
+# attributes — it never commands or waits — so sharing the name with the
+# mutating turnout tests is safe; any TurnoutState satisfies the assert.
+_TURNOUT_PROBE_NAME = "NT100"
 
 
 @pytest.mark.integration
@@ -35,7 +41,10 @@ async def test_discover_layout_has_turnouts_sensors_and_blocks(
     assert len(layout.sensors) > 0, "Basement layout should expose sensors"
     assert len(layout.blocks) > 0, "Basement layout should expose blocks"
 
-    turnout = next(iter(layout.turnouts.values()))
+    try:
+        turnout = layout.turnouts.by_system_name(_TURNOUT_PROBE_NAME)
+    except LayoutEntityNotFound:
+        pytest.skip(f"turnout {_TURNOUT_PROBE_NAME!r} not on this layout — cannot probe attributes")
     assert isinstance(turnout.name, str) and turnout.name
     assert turnout.user_name is None or isinstance(turnout.user_name, str)
     assert isinstance(turnout.state, TurnoutState)

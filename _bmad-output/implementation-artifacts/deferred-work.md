@@ -1,5 +1,12 @@
 # Deferred Work
 
+## Deferred from: code review of 7-1-fix-integration-test-inter-test-interference (2026-06-09)
+
+- **`JMRI_BASE_URL` hardcodes `localhost`** — pre-existing across all test files; all previously used `http://localhost:12080` directly. A future story could make this configurable via env var. [`_entity_state.py:30`]
+- **`max_ms < _WAIT_CHANGE_TIMEOUT_S * 1000.0` assertion vacuously true** — the max latency assertion is bounded by the per-trial timeout by construction; original `max_ms < 2000.0` had the same property. A future story could add a meaningful P99 budget (e.g., `< 500 ms`). [`test_wait_primitives_latency.py:144`]
+- **`statistics.median` on empty `call_totals_ms` in `test_command_latency.py`** — pre-existing gap; if an exception exits the timed loop early, median raises `StatisticsError`. A future story could guard with an empty-check and `pytest.fail`.
+- **Negative overhead values possible in latency test** — `overhead_ms = call_total - jmri_http_baseline_ms` can go negative if HTTP baseline is faster than individual pyjmri calls (e.g., JIT warmup in the pyjmri path). Pre-existing; not introduced here.
+
 ## Deferred from: code review of 6-6-first-pypi-publication-of-pyjmri-v1 (2026-05-25)
 
 - **AC5.2 audit narrowness** — `^(import|from)` regex anchor misses indented imports inside `if TYPE_CHECKING:` blocks, lazy imports inside functions, etc. Audit scope is `README.md CONTRIBUTING.md examples/*.py` only — does not catch `src/pyjmri/` internal cross-imports of underscore-prefixed modules. `examples/*.py` glob silently fails (exit 2) if examples/ is ever empty. A future story could harden with `shopt -s nullglob` / `find -name '*.py'` and broader scope. [Story 6.6 AC5.2, Task 4]

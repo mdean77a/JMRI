@@ -31,10 +31,16 @@ from urllib.parse import quote
 
 import httpx
 import pytest
+from _entity_state import JMRI_BASE_URL, force_turnout_state
 
-from pyjmri import Client, TurnoutState
+from pyjmri import Client, LayoutEntityNotFound, TurnoutState
 
 pytestmark = [pytest.mark.integration, pytest.mark.slow]
+
+# Pinned target (Story 7.1 AC2): NT108 — distinct from the turnouts used
+# by the (non-slow) turnout tests, so even a full slow+non-slow run never
+# has two tests contending for one turnout.
+_TURNOUT_NAME = "NT108"
 
 _TRIALS = 20
 _WARMUP = 20
@@ -44,19 +50,23 @@ _OVERHEAD_BUDGET_MS = 20.0
 async def test_turnout_command_overhead_median_under_20ms(jmri_available: None) -> None:
     async with Client() as jmri:
         layout = await jmri.discover()
-        turnouts = list(layout.turnouts.values())
-        if not turnouts:
-            pytest.skip("layout has no turnouts — cannot measure command latency")
-        turnout = turnouts[0]
+        try:
+            turnout = layout.turnouts.by_system_name(_TURNOUT_NAME)
+        except LayoutEntityNotFound:
+            pytest.skip(
+                f"turnout {_TURNOUT_NAME!r} not on this layout — "
+                "required for the command-overhead microbenchmark"
+            )
 
-        original = await turnout.get_state()
-        if original not in {TurnoutState.CLOSED, TurnoutState.THROWN}:
-            pytest.skip(f"turnout {turnout.name} in non-binary state {original.name}")
-
-        url = f"http://localhost:12080/json/v5/turnout/{quote(turnout.name, safe='')}"
+        url = f"/json/v5/turnout/{quote(turnout.name, safe='')}"
 
         try:
-            async with httpx.AsyncClient() as raw_http:
+            async with httpx.AsyncClient(base_url=JMRI_BASE_URL) as raw_http:
+                # AC3: force CLOSED and confirm via authoritative HTTP GET
+                # before measuring — never trust leaked state.
+                await force_turnout_state(raw_http, turnout.name, TurnoutState.CLOSED)
+                assert await turnout.get_state() is TurnoutState.CLOSED
+
                 # Warm-up phase: measure JMRI's raw HTTP response time
                 # independently of the library calls.  Alternating codes
                 # so JMRI processes a real state change each time.
@@ -81,7 +91,7 @@ async def test_turnout_command_overhead_median_under_20ms(jmri_available: None) 
 
         finally:
             try:
-                await turnout.set_state(original)
+                await turnout.set_state(TurnoutState.CLOSED)
             except Exception:
                 pass
 

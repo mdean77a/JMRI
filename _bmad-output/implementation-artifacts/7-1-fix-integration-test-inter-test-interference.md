@@ -1,6 +1,6 @@
 # Story 7.1: Fix integration-test inter-test interference on shared first-entity
 
-Status: ready-for-dev
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -81,44 +81,56 @@ Coverage of integration tests that follow this pattern (from `grep -l "sensors\[
 
 ## Tasks / Subtasks
 
-- [ ] **Task 1 — Audit and enumerate** (AC: 1)
-  - [ ] Run `grep -nE "(sensors|turnouts|lights|blocks|routes|signal_heads|signal_masts)\\[0\\]|next\\(iter\\(layout" tests/integration/*.py`
-  - [ ] Open each match and record: file, test name, entity collection, mutating vs read-only, timeout
-  - [ ] Add the enumeration to this story's "Notes" section under a new "## Enumeration" heading
+- [x] **Task 1 — Audit and enumerate** (AC: 1)
+  - [x] Run `grep -nE "(sensors|turnouts|lights|blocks|routes|signal_heads|signal_masts)\\[0\\]|next\\(iter\\(layout" tests/integration/*.py`
+  - [x] Open each match and record: file, test name, entity collection, mutating vs read-only, timeout
+  - [x] Add the enumeration to this story's "Notes" section under a new "## Enumeration" heading
 
-- [ ] **Task 2 — Pick non-overlapping entity targets per test** (AC: 2)
-  - [ ] For sensors: use `IS1` (already used by NFR1 test) for one test; pick a different *internal* sensor (`IS2`, `IS3`, etc., or whichever is available on the basement layout) for any other sensor-mutating test
-  - [ ] For turnouts: pick from the NCE-provided turnouts (`NT100`, `NT102`, `NT104`, etc.); never pick a turnout that's also used by a route the layout depends on
-  - [ ] For lights/blocks/signals: only relevant if the layout has them (basement layout has 0 lights, 93 blocks, 12 signal heads/masts) — most current tests skip these anyway; document the pinned choice if a test uses them
-  - [ ] Replace every `layout.X[0]` / `next(iter(layout.X))` with `layout.X.by_system_name("...")` calls
-  - [ ] Add `pytest.skip(...)` fallback if the named entity is missing (preserves FR43 layout-agnosticism)
+- [x] **Task 2 — Pick non-overlapping entity targets per test** (AC: 2)
+  - [x] For sensors: use `IS1` (already used by NFR1 test) for one test; pick a different *internal* sensor (`IS2`, `IS3`, etc., or whichever is available on the basement layout) for any other sensor-mutating test
+  - [x] For turnouts: pick from the NCE-provided turnouts (`NT100`, `NT102`, `NT104`, etc.); never pick a turnout that's also used by a route the layout depends on
+  - [x] For lights/blocks/signals: only relevant if the layout has them (basement layout has 0 lights, 93 blocks, 12 signal heads/masts) — most current tests skip these anyway; document the pinned choice if a test uses them
+  - [x] Replace every `layout.X[0]` / `next(iter(layout.X))` with `layout.X.by_system_name("...")` calls
+  - [x] Add `pytest.skip(...)` fallback if the named entity is missing (preserves FR43 layout-agnosticism)
 
-- [ ] **Task 3 — Force known starting state in each affected test** (AC: 3)
-  - [ ] Each test that mutates an entity begins with a raw-httpx POST to set the entity to a known starting state (use the `_post_sensor_state` / equivalent pattern from `test_wait_primitives_latency.py`)
-  - [ ] Each test asserts the starting state is correct (via `await entity.wait_state(starting, timeout=3.0)`) before proceeding to measurement
-  - [ ] After the test's assertions, optionally reset the entity to a documented "default" state (e.g., sensor INACTIVE, turnout CLOSED) — improves the *next* test's clean-start probability but is not required if AC2's non-overlap holds
+- [x] **Task 3 — Force known starting state in each affected test** (AC: 3)
+  - [x] Each test that mutates an entity begins with a raw-httpx POST to set the entity to a known starting state (shared `force_sensor_state` / `force_turnout_state` helpers in `tests/integration/_entity_state.py`, extracted per the "3+ tests share it" rule)
+  - [x] Each test asserts the starting state is correct (turnouts via authoritative HTTP `get_state()`; sensor via `wait_state(...)`) before proceeding to measurement
+  - [x] After the test's assertions, reset the entity to a documented "default" state (sensor INACTIVE, turnout CLOSED) in teardown
 
-- [ ] **Task 4 — Calibrate timeouts against suite-load reality** (AC: 4)
-  - [ ] Bump `test_sensor_wait_change_median_latency_under_100ms` per-trial `wait_change(timeout=...)` from `2.0` to `5.0`; keep NFR1's median assertion at 100 ms
-  - [ ] Bump `test_turnout_wait_for_jmri_state_round_trip` `asyncio.timeout(5.0)` to `asyncio.timeout(10.0)`
-  - [ ] Add inline comments justifying each timeout value with the calibration rationale (NFR budget, AC reference, or empirical P99 observation)
-  - [ ] Survey remaining integration tests for any other `timeout` value under 10 s that lacks a justification comment; add one or widen the timeout as appropriate
+- [x] **Task 4 — Calibrate timeouts against suite-load reality** (AC: 4)
+  - [x] Bump `test_sensor_wait_change_median_latency_under_100ms` per-trial `wait_change(timeout=...)` from `2.0` to `5.0`; keep NFR1's median assertion at 100 ms
+  - [x] Bump `test_turnout_wait_for_jmri_state_round_trip` `asyncio.wait_for(..., timeout=5.0)` to `10.0`
+  - [x] Add inline comments justifying each timeout value with the calibration rationale (NFR budget, AC reference, or empirical P99 observation)
+  - [x] Survey remaining integration tests for any other `timeout` value under 10 s that lacks a justification comment; add one or widen the timeout as appropriate
 
-- [ ] **Task 5 — Verify on simulator** (AC: 5)
-  - [ ] From `python_code/`, run `uv run --no-sync pytest -m "integration and not slow"` twice consecutively
-  - [ ] From `python_code/`, run `uv run --with pytest-cov pytest -m "not slow" --cov=pyjmri --cov-report=term` once
-  - [ ] All three runs must report `0 failed`
-  - [ ] Paste the summary lines (passes / skips / runtime) into this story's Completion Notes
+- [x] **Task 5 — Verify on simulator** (AC: 5)
+  - [x] From `python_code/`, run `uv run --no-sync pytest -m "integration and not slow"` twice consecutively
+  - [x] From `python_code/`, run `uv run --with pytest-cov pytest -m "not slow" --cov=pyjmri --cov-report=term` once
+  - [x] All three runs must report `0 failed`
+  - [x] Paste the summary lines (passes / skips / runtime) into this story's Completion Notes
 
-- [ ] **Task 6 — Update memory** (AC: 6)
-  - [ ] Write or update a memory entry capturing the "pin by system name + force starting state" discipline for future integration test work
-  - [ ] Link from `MEMORY.md` if a new file is created
+- [x] **Task 6 — Update memory** (AC: 6)
+  - [x] Write or update a memory entry capturing the "pin by system name + force starting state" discipline for future integration test work
+  - [x] Link from `MEMORY.md` if a new file is created
 
-- [ ] **Task 7 — Quality gates pass** (release-checklist Step 1)
-  - [ ] `uv run --no-sync ruff check` clean
-  - [ ] `uv run --no-sync ruff format --check` clean (do NOT skip per `feedback_ruff_format_gate.md`)
-  - [ ] `uv run --no-sync mypy --strict src/pyjmri` clean
-  - [ ] `uv run --no-sync pytest -m "not integration"` clean (unit suite unchanged)
+- [x] **Task 7 — Quality gates pass** (release-checklist Step 1)
+  - [x] `uv run --no-sync ruff check` clean
+  - [x] `uv run --no-sync ruff format --check` clean (do NOT skip per `feedback_ruff_format_gate.md`)
+  - [x] `uv run --no-sync mypy --strict src/pyjmri` clean
+  - [x] `uv run --no-sync pytest -m "not integration"` clean (unit suite unchanged)
+
+### Review Findings
+
+- [x] \[Review\]\[Decision\] **AC2 doc gap: entity pins live in module-level comments, not per-function docstrings** — Accepted: module-level comment table satisfies AC2's intent. No per-function docstrings required.
+- [x] \[Review\]\[Decision\] **AC3 gap: light tests don't force a known starting state** — Accepted: light tests always skip (0 lights on this layout); AC3 exemption for skip-only entities documented. No force_light_state needed.
+- [x] \[Review\]\[Patch\] **`_entity_state.py`: force helpers silently map unsupported states** `_entity_state.py:49,63` — Fixed: both helpers now raise `ValueError` for any state other than the two supported values.
+- [x] \[Review\]\[Patch\] **`test_command_wait_reconnect.py`: `raw_http` opened outside `try` — resource leak + aclose not suppressed** `test_command_wait_reconnect.py:73-134` — Fixed: restructured to use `async with httpx.AsyncClient(...) as raw_http:` matching all other test files; explicit `aclose()` call removed.
+- [x] \[Review\]\[Patch\] **`test_wait_primitives_latency.py`: inner and outer timeouts use the same value** `test_wait_primitives_latency.py:82-88` — Fixed: added `_STARTING_STATE_INNER_TIMEOUT_S = 4.5` s; outer remains 5.0 s.
+- [x] \[Review\]\[Defer\] **`JMRI_BASE_URL` hardcodes `localhost`** `_entity_state.py:30` — pre-existing; all test files previously hardcoded `http://localhost:12080`. Out of scope for this maintenance story.
+- [x] \[Review\]\[Defer\] **`max_ms < _WAIT_CHANGE_TIMEOUT_S * 1000.0` vacuously true** `test_wait_primitives_latency.py:144` — a trial that exceeded the per-trial timeout would have already cancelled the waiter, not contributed to `samples_ms`. Pre-existing; original assertion `max_ms < 2000.0` had the same property.
+- [x] \[Review\]\[Defer\] **`statistics.median` on empty list in `test_command_latency.py`** — pre-existing structural gap; not introduced by this diff.
+- [x] \[Review\]\[Defer\] **Negative overhead values possible in latency test** — pre-existing; overhead is computed as `call_total - jmri_http_baseline_ms` which can go negative if the HTTP baseline was measured faster than individual calls. Out of scope.
 
 ## Dev Notes
 
@@ -147,8 +159,84 @@ Coverage of integration tests that follow this pattern (from `grep -l "sensors\[
 - Memory: `feedback_use_uv.md` — uv run --no-sync discipline
 - Memory: `feedback_polish_matters.md` — markdownlint self-scan before done
 
+## Enumeration
+
+AC1: every integration test that obtained its target entity positionally
+(`collection[0]` or `next(iter(layout.X))`). Markers determine whether a
+test runs in the AC5 verification runs (`integration and not slow`) — the
+two `slow` tests do not.
+
+| File | Test | Marker | Collection | Original access | Mutates? | Original timeout | Resolution |
+|---|---|---|---|---|---|---|---|
+| `test_wait_primitives_latency.py` | `test_sensor_wait_change_median_latency_under_100ms` | integration | sensors | `sensors[0]` | yes | `wait_change` 2.0 s | pin `IS1`; force INACTIVE; 2.0→5.0 s |
+| `test_command_round_trip.py` | `test_turnout_round_trip` | integration | turnouts | `turnouts[0]` | yes | none (optimistic) | pin `NT100`; force CLOSED |
+| `test_command_round_trip.py` | `test_light_round_trip` | integration | lights | `lights[0]` | yes (skips: 0 lights) | none | pin `IL1`; skip-if-missing |
+| `test_command_round_trip.py` | `test_memory_round_trip` | integration | memories | `memories[0]` | yes | none | pin `IM:AUTO:0001` (deterministic) |
+| `test_command_round_trip.py` | `test_route_activate_round_trip` | integration | routes | `routes[0]` | trigger | none | pin `IO:AUTO:0001` (no state) |
+| `test_command_round_trip.py` | `test_turnout_wait_for_jmri_state_round_trip` | integration | turnouts | `turnouts[0]` | yes | `wait_for` 5.0 s | pin `NT102`; force CLOSED; 5.0→10.0 s |
+| `test_command_round_trip.py` | `test_light_wait_for_jmri_state_round_trip` | integration | lights | `lights[0]` | yes (skips: 0 lights) | `wait_for` 5.0 s | pin `IL1`; skip; 5.0 s justified |
+| `test_command_wait_reconnect.py` | `test_wait_for_jmri_state_resolves_after_ws_reconnect` | integration | turnouts | `turnouts[0]` | yes | `wait_for` 15.0 s | pin `NT104`; force CLOSED |
+| `test_reconnect_resilience.py` | `test_in_flight_wait_survives_forced_disconnect` | integration | sensors + turnouts | `sensors[0]`, `turnouts[0]` | yes | `_COMMAND_TIMEOUT_S` 5.0 s | pin `IS2` + `NT106`; force states; 5.0 s justified |
+| `test_discovery.py` | `test_discover_layout_has_turnouts_sensors_and_blocks` | integration | turnouts | `next(iter(...))` | no (read-only) | n/a | pin `NT100` (read-only probe) |
+| `test_command_latency.py` | `test_turnout_command_overhead_median_under_20ms` | integration, **slow** | turnouts | `turnouts[0]` | yes | n/a (perf budget) | pin `NT108`; force CLOSED |
+| `test_long_run.py` | `test_long_run_stability` | integration, **slow** | sensors | `sensors[0]` | yes | own strategy | **out of scope** (story §Out of scope) — left as-is |
+
+`test_ws_connect.py`, `test_connection_lifecycle.py`, and
+`test_throttle_lifecycle.py` were checked and do **not** select layout
+entities positionally (throttle uses DCC addresses from the roster), so
+they are not shared-first-entity tests.
+
+## Dev Agent Record
+
+### Completion Notes
+
+Root cause confirmed and fixed: the two v1.0.0 release flakes were both
+on the **first entity** of a discovered collection (`IS1`, first turnout)
+under suite/coverage load. Every mutating integration test now (a) pins
+its target by **system name** via `by_system_name(...)` with a clean
+skip-if-missing fallback (FR43), (b) targets a **distinct** entity so no
+two tests contend for one JMRI object in a run, and (c) **forces a known
+starting state** via raw `httpx` before measuring. Shared force-state
+helpers were extracted to `tests/integration/_entity_state.py` (5 tests
+share the turnout helper — above the "3+ → extract" threshold).
+
+**Real bug found (not in the original task list):** forcing a turnout to
+a known starting state surfaced a long-latent **inverted turnout state
+code** copied from `test_reconnect_resilience.py` (`THROWN=2, CLOSED=4`).
+JMRI's actual codes are `CLOSED=2, THROWN=4` (see
+`pyjmri._codes.TURNOUT_STATE_OUTBOUND`). The inversion never failed
+before because the reconnect test's turnout path always skipped on the
+NCE simulator (no WS echo). The shared helper now uses the correct codes.
+This is exactly the AC4 "investigate as a real bug, not silently widen"
+case.
+
+**AC5 verification (2026-06-09):**
+
+- Run 1 — `uv run --no-sync pytest -m "integration and not slow"`: **18 passed, 2 skipped, 415 deselected in 3.76s**, exit 0. NFR1 median 44.9 ms (p95 157.9 ms).
+- Run 2 (consecutive) — same command: **18 passed, 2 skipped, 415 deselected in 3.41s**, exit 0. NFR1 median 40.9 ms (p95 51.2 ms).
+- Coverage — `uv run --with pytest-cov pytest -m "not slow" --cov=pyjmri --cov-report=term`: **431 passed, 2 skipped, 2 deselected in 4.63s**, exit 0. TOTAL coverage 92%.
+
+The 2 skips each run are the two light tests (basement layout has 0
+lights — clean skip-by-name). No production source (`src/pyjmri/**`) was
+modified; v1.0.0 ships unchanged. Quality gates (Task 7): `ruff check`
+clean, `ruff format --check` clean (60 files), `mypy --strict src/pyjmri`
+clean, unit suite **413 passed** (baseline unchanged).
+
+### File List
+
+- `python_code/tests/integration/_entity_state.py` — **new**; shared raw-httpx force-state helpers + JMRI state codes
+- `python_code/tests/integration/test_wait_primitives_latency.py` — pin `IS1`, force INACTIVE, timeout 2.0→5.0 s, use shared helper
+- `python_code/tests/integration/test_command_round_trip.py` — pin `NT100`/`NT102`/`IL1`/`IM:AUTO:0001`/`IO:AUTO:0001`, force states, AC10 timeout 5.0→10.0 s
+- `python_code/tests/integration/test_command_wait_reconnect.py` — pin `NT104`, force CLOSED, use shared helper
+- `python_code/tests/integration/test_reconnect_resilience.py` — pin `IS2`+`NT106`, drop duplicate helpers for shared module
+- `python_code/tests/integration/test_command_latency.py` — pin `NT108`, force CLOSED, use shared helper
+- `python_code/tests/integration/test_discovery.py` — pin `NT100` read-only probe by name
+- `_bmad-output/implementation-artifacts/sprint-status.yaml` — story 7.1 status transitions
+- `~/.claude/.../memory/feedback_integration_test_entity_pinning.md` — **new** memory + `MEMORY.md` pointer (AC6)
+
 ## Change Log
 
 | Date | Note |
 |---|---|
 | 2026-05-26 | Story created from Epic 6 retro action item C3; first story of v1.0.x maintenance epic (Epic 7) |
+| 2026-06-09 | Implemented AC1–AC6: pinned all shared-first-entity tests by system name, added force-starting-state discipline (shared `_entity_state.py` helpers), calibrated timeouts, fixed a latent inverted turnout-code bug. AC5 verified (2 consecutive clean runs + coverage). Status → review. |
