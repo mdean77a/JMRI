@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="/xml/XSLT/operations-routes.xsl" type="text/xsl"?>
+<!DOCTYPE operations-config SYSTEM "/xml/DTD/operations-routes.dtd">
+<operations-config>
+  <!--Written by JMRI version 5.14+Rdea51dcccf on Tue Jun 09 16:07:32 MDT 2026-->
+  <routes>
+    <route id="1" name="Test_Route" comment="From NW staging to South Interchange">
+      <location id="1r2" name="NW_Staging_Yard" locationId="2" sequenceId="1" trainDirection="1" maxTrainLength="1000" grade="0.0" maxCarMoves="50" randomControl="Off" pickups="yes" drops="yes" localMoves="yes" wait="0" departTime="" order="0" trainIconX="0" trainIconY="0" commentColor="black" comment="" />
+      <location id="1r3" name="South Interchange" locationId="3" sequenceId="2" trainDirection="1" maxTrainLength="1000" grade="0.0" maxCarMoves="5" randomControl="Off" pickups="yes" drops="yes" localMoves="yes" wait="0" departTime="" order="0" trainIconX="0" trainIconY="0" commentColor="black" comment="" />
+      <location id="1r4" name="East Interchange" locationId="4" sequenceId="3" trainDirection="1" maxTrainLength="1000" grade="0.0" maxCarMoves="5" randomControl="Off" pickups="yes" drops="yes" localMoves="yes" wait="0" departTime="" order="0" trainIconX="0" trainIconY="0" commentColor="black" comment="" />
+    </route>
+  </routes>
+</operations-config>
