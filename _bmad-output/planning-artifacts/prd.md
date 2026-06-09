@@ -1,10 +1,12 @@
 ---
 stepsCompleted: ['step-01-init', 'step-02-discovery', 'step-02b-vision', 'step-02c-executive-summary', 'step-03-success', 'step-04-journeys', 'step-05-domain-skipped', 'step-06-innovation-skipped', 'step-07-project-type', 'step-08-scoping', 'step-09-functional', 'step-10-nonfunctional', 'step-11-polish', 'step-12-complete']
 date: '2026-05-05'
-lastEdited: '2026-05-06'
+lastEdited: '2026-06-09'
 editHistory:
   - date: '2026-05-06'
     changes: 'Validation polish: lifted date into frontmatter; reframed httpx/websockets implementation hints; sharpened NFR9 CI-scope contract; added Assumed JMRI JSON Contract subsection.'
+  - date: '2026-06-09'
+    changes: 'Promoted read-only Operations discovery (locations, trains, cars, engines) from Vision to active v1.1 Growth scope. Added FR45–FR50, Journey 5, Operations JSON-contract endpoints, NFR2 Operations bound; narrowed Exec Summary/Vision deferral to Operations command features only. Roster-vs-Operations distinction made explicit.'
 releaseMode: phased
 inputDocuments: []
 documentCounts:
@@ -41,8 +43,12 @@ The target user is a JMRI layout owner who wants to automate their layout in
 modern Python rather than the deprecated Jython 2.7 that JMRI currently
 embeds. v1 covers the primitives needed to write programs analogous to the
 existing `jython/Mike*.py` examples (route traversal, multi-loco
-sequencing, sensor-driven back-and-forth running). Operations module,
-Warrants, LogixNG, and full Dispatcher integration are explicitly deferred.
+sequencing, sensor-driven back-and-forth running). A post-v1.0
+increment adds **read-only discovery of JMRI's Operations subsystem**
+(locations, trains, cars, engines) as its own typed surface, distinct
+from the layout model and from the roster. Operations *command*
+features (train build, car movement, manifest generation), Warrants,
+LogixNG, and full Dispatcher integration remain deferred.
 
 The library is the author's tool first and a JMRI-community release second.
 It is layout-agnostic by construction: it carries zero assumptions about the
@@ -164,6 +170,10 @@ requiring any change to JMRI itself.
 - API coverage (v1): turnout, sensor, block, light, memory, route,
   signalHead, signalMast (read-only), throttle, power, roster,
   rosterEntry — read paths and (where applicable) command paths.
+- API coverage (post-v1.0, read-only): Operations `location`, `train`,
+  `car`, `engine` — enumerated as a typed subsystem distinct from the
+  roster, exposing operational state (e.g., a car's current location
+  and train assignment). Read paths only; no build, move, or manifest.
 - `unknown` state is round-tripped correctly through the typed model
   for every entity that JMRI can report as unknown.
 - Test suite: unit tests for all primitives; integration tests run
@@ -254,7 +264,14 @@ requiring any change to JMRI itself.
 ### Growth Features (Post-MVP)
 
 - Additional entity coverage: oblock, layoutBlock, reporter, idTag,
-  audio, configProfile, time, panel, train, engine, location, consist
+  audio, configProfile, time, panel, consist
+- **Read-only Operations discovery (active v1.1 increment):** enumerate
+  JMRI's Operations subsystem — locations, trains, cars, engines — as
+  typed read-only objects carrying operational state. Distinct from the
+  roster, which catalogs every DecoderPro-programmed engine the user
+  owns; Operations entities are the operationally-active subset actually
+  on the layout. Command, build, move, and manifest operations stay in
+  Vision.
 - Higher-level patterns library: asyncio analogs of common Jython
   automation patterns (back-and-forth, route-traversal, multi-loco
   sequencer)
@@ -269,8 +286,9 @@ requiring any change to JMRI itself.
 
 ### Vision (Future)
 
-- Operations module integration (trains, manifests, schedules) as a
-  first-class subsystem
+- Operations *command* integration — train build, car movement,
+  manifest generation, schedules — as a first-class subsystem, building
+  on the read-only Operations discovery delivered in Growth
 - Warrants integration via `oblock` + `signalMast` types
 - LogixNG bridge or modern-Python replacement
 - Dispatcher integration (sections, automatic block control) — sections
@@ -452,6 +470,53 @@ class `unknown` state in enums; documented limitations as a real
 README section explaining the open-loop NCE reality, not an apology
 buried at the bottom.
 
+### Journey 5 — Mike inspects his Operations session from Python
+
+**Who:** Same Mike, now running a prototypical operating session. He
+has JMRI's Operations module configured: locations (his yards, towns,
+and staging), a fleet of cars, the engines actually on the layout, and
+several trains with assigned routes. He wants to *see* the operational
+picture from Python — not from JMRI's GUI tables — so he can build his
+own reports and, later, feed automation decisions.
+
+**Opening:** Mike opens a Python REPL against his running JMRI. His
+roster has ~45 engines (everything he ever programmed in DecoderPro),
+but only a handful are on the layout tonight. He doesn't want the
+roster — he wants what's *operating*.
+
+**Action:** He writes:
+
+```python
+async with Client() as jmri:
+    layout = await jmri.discover()
+    ops = await jmri.discover_operations()
+    print(f"{len(ops.locations)} locations, {len(ops.trains)} trains, "
+          f"{len(ops.cars)} cars, {len(ops.engines)} engines")
+    for train in ops.trains:
+        print(train.name, "→", train.current_location)
+    for car in ops.cars:
+        print(car.road_number, "at", car.location, "on", car.train)
+```
+
+**Climax:** It prints the *operational* truth: four engines on the
+layout (not the 45 in the roster), each car's current location and
+train assignment, each train's position along its route. The roster
+never knew which engines were deployed; Operations does. Mike now has
+the live operating state as plain typed Python objects.
+
+**Resolution:** He writes a 20-line script that prints a "where is
+every car" report at the start of each session. He notes the obvious
+next want — *moving* cars and *building* trains from Python — and is
+content that read-only inspection shipped first and is solid.
+
+**Capabilities revealed:** `discover_operations()` returning a typed
+Operations container distinct from `Layout`; read-only enumeration of
+locations, trains, cars, engines; operational state per entity
+(location, train assignment, route position) that the roster cannot
+provide; empty collections (not errors) when no Operations data is
+configured; clear read-only boundary — no build/move surface in this
+increment.
+
 ### Journey Requirements Summary
 
 | Capability | From journeys |
@@ -470,6 +535,9 @@ buried at the bottom.
 | Documented limitations (open-loop NCE, no presence detection, no command-bus feedback at all) as README content | 4 |
 | Structured logging at WARN/INFO levels | 2 |
 | One-hour unattended stability target | 2 |
+| Read-only Operations discovery (locations, trains, cars, engines) as a typed subsystem distinct from the roster | 5 |
+| Operational state per entity (location, train assignment, route position) the roster cannot provide | 5 |
+| Empty Operations collections (not errors) when no Operations data is configured | 5 |
 
 ## Developer Tool Specific Requirements
 
@@ -626,6 +694,9 @@ exposed by JMRI's web server:
 - `power` — read layout-power state
 - `throttle` — acquire by DCC address, set speed / direction /
   function bits, release
+- `location`, `train`, `car`, `engine` — read-only Operations
+  subsystem discovery (post-v1.0); enumerate and read operational
+  state. Not subscribed to or commanded in this increment.
 
 If a future JMRI release renames, removes, or changes the JSON shape
 of any of these endpoints, the library fails at the affected
@@ -690,13 +761,15 @@ Minimum Viable Product** above. Mapped to the journeys it supports:
 ### Post-MVP Features
 
 **Phase 2 — Growth:** specified in **Product Scope → Growth
-Features** above. Covers additional entity types (oblock,
-layoutBlock, reporter, idTag, audio, configProfile, time, panel,
-train, engine, location, consist), higher-level patterns library,
-CLI utilities, hosted documentation site, and ergonomic refinements.
+Features** above. Covers read-only Operations discovery (locations,
+trains, cars, engines — the active v1.1 increment), additional entity
+types (oblock, layoutBlock, reporter, idTag, audio, configProfile,
+time, panel, consist), higher-level patterns library, CLI utilities,
+hosted documentation site, and ergonomic refinements.
 
 **Phase 3 — Vision:** specified in **Product Scope → Vision (Future)**
-above. Covers Operations integration, Warrants, LogixNG, Dispatcher,
+above. Covers Operations *command* integration (train build, car
+movement, manifests, schedules), Warrants, LogixNG, Dispatcher,
 Jupyter integration, layout-codegen, sensor recording/replay, and
 multi-JMRI federation.
 
@@ -821,6 +894,15 @@ The dominant risk. Solo developer, hobby time. Mitigations:
 - FR43: A user can run three shipped example programs (`hello_jmri.py`, `back_and_forth.py`, `multi_train_session.py`) against `Basement_Revised_2024.jmri` without modification.
 - FR44: A developer can use the library against their own user scripts under `mypy --strict` and have all public types resolve cleanly (the library ships a `py.typed` marker).
 
+### Operations (Read-Only Discovery)
+
+- FR45: A user script can enumerate JMRI Operations locations and access each location by both system and user name, receiving a typed read-only object.
+- FR46: A user script can enumerate JMRI Operations trains and read each train's read-only operational state (e.g., assigned route and current location) as exposed by JMRI.
+- FR47: A user script can enumerate JMRI Operations cars (rolling stock) and read each car's read-only operational state (e.g., current location, assigned train, destination) as exposed by JMRI.
+- FR48: A user script can enumerate JMRI Operations engines and read their read-only operational state. Operations engines are a distinct subsystem from the roster (FR12): the roster catalogs every engine the user has programmed in DecoderPro, whereas Operations engines are the operationally-active subset actually deployed on the layout.
+- FR49: Operations discovery is read-only in this increment. The library exposes no operation to build a train, move or assign a car, or generate a manifest; those are deferred to Vision (see Product Scope).
+- FR50: A layout whose JMRI has no Operations data configured discovers empty Operations collections rather than raising an error; Operations support is layout-agnostic in the same way as the layout-entity discovery in FR8–FR12.
+
 ## Non-Functional Requirements
 
 ### Performance
@@ -832,7 +914,10 @@ The dominant risk. Solo developer, hobby time. Mitigations:
 - NFR2: Layout discovery against a layout the size of the author's
   basement (~370 entities across the supported types) completes
   within 2 seconds on a current macOS or Linux laptop, against a
-  JMRI instance running on the same machine.
+  JMRI instance running on the same machine. Read-only Operations
+  discovery, where Operations data is configured, completes within an
+  additional 1 second for an Operations roster of comparable size
+  (up to ~200 cars, ~50 engines, ~25 trains, ~25 locations).
 - NFR3: Library overhead on a single command round-trip
   (`await turnout.throw()` → JMRI ack → caller resumes) does not
   exceed 20 ms beyond what JMRI's HTTP response itself takes.
