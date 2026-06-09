@@ -2,7 +2,7 @@
 <?xml-stylesheet href="/xml/XSLT/operations-locations.xsl" type="text/xsl"?>
 <!DOCTYPE operations-config SYSTEM "/xml/DTD/operations-locations.dtd">
 <operations-config>
-  <!--Written by JMRI version 5.14+Rdea51dcccf on Tue Jun 09 16:12:17 MDT 2026-->
+  <!--Written by JMRI version 5.14+Rdea51dcccf on Tue Jun 09 16:42:36 MDT 2026-->
   <divisions />
   <locations>
     <location id="2" name="NW_Staging_Yard" ops="2" dir="15" switchList="true" comment="" switchListComment="">
@@ -286,7 +286,7 @@
         <locoType name="Steam-pass" />
         <locoType name="Switcher" />
       </types>
-      <track id="3s1" name="Arrival_Departure" trackType="Yard" dir="15" length="1000" moves="0">
+      <track id="3s1" name="Arrival_Departure" trackType="Yard" dir="15" length="1000" moves="2">
         <types>
           <carType name="Baggage" />
           <carType name="Boxcar" />

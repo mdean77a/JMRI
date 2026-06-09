@@ -2,7 +2,7 @@
 <?xml-stylesheet href="/xml/XSLT/operations-cars.xsl" type="text/xsl"?>
 <!DOCTYPE operations-config SYSTEM "/xml/DTD/operations-cars.dtd">
 <operations-config>
-  <!--Written by JMRI version 5.14+Rdea51dcccf on Tue Jun 09 16:05:42 MDT 2026-->
+  <!--Written by JMRI version 5.14+Rdea51dcccf on Tue Jun 09 16:42:36 MDT 2026-->
   <roads>
     <road name="AA" />
     <road name="ACL" />
@@ -210,8 +210,8 @@
   <newKernels />
   <options />
   <cars>
-    <car id="AA123" roadName="AA" roadNumber="123" type="Boxcar" length="40" color="Black" weight="0.9" weightTons="72" moves="0" date="" selected="false" load="E" />
-    <car id="AA134" roadName="AA" roadNumber="134" type="Boxcar" length="40" color="Black" weight="0.9" weightTons="72" moves="0" date="" selected="false" load="E" />
-    <car id="AA145" roadName="AA" roadNumber="145" type="Boxcar" length="40" color="Black" weight="0.9" weightTons="72" moves="0" date="" selected="false" load="E" />
+    <car id="AA123" roadName="AA" roadNumber="123" type="Boxcar" length="40" color="Black" weight="0.9" weightTons="72" locationId="2" routeLocationId="1r2" secLocationId="2s1" destinationId="3" routeDestinationId="1r3" secDestinationId="3s1" moves="0" date="" selected="false" train="TestTrainOne" trainId="1" pickupTime="0:00:00" setoutTime="0:00:13" load="E" />
+    <car id="AA134" roadName="AA" roadNumber="134" type="Boxcar" length="40" color="Black" weight="0.9" weightTons="72" locationId="2" routeLocationId="1r2" secLocationId="2s1" destinationId="3" routeDestinationId="1r3" secDestinationId="3s1" moves="0" date="" selected="false" train="TestTrainOne" trainId="1" pickupTime="0:00:00" setoutTime="0:00:13" load="E" />
+    <car id="AA145" roadName="AA" roadNumber="145" type="Boxcar" length="40" color="Black" weight="0.9" weightTons="72" locationId="2" routeLocationId="1r2" secLocationId="2s1" destinationId="3" routeDestinationId="1r3" secDestinationId="3s1" moves="0" date="" selected="false" train="TestTrainOne" trainId="1" pickupTime="0:00:00" setoutTime="0:00:13" load="E" />
   </cars>
 </operations-config>

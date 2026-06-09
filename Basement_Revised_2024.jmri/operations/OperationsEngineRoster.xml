@@ -2,7 +2,7 @@
 <?xml-stylesheet href="/xml/XSLT/operations-engines.xsl" type="text/xsl"?>
 <!DOCTYPE operations-config SYSTEM "/xml/DTD/operations-engines.dtd">
 <operations-config>
-  <!--Written by JMRI version 5.14+Rdea51dcccf on Tue Jun 09 16:04:08 MDT 2026-->
+  <!--Written by JMRI version 5.14+Rdea51dcccf on Tue Jun 09 16:42:36 MDT 2026-->
   <models>
     <model name="E8" />
     <model name="ES44AC" />
@@ -82,6 +82,6 @@
     <engine id="UP2570" roadName="UP" roadNumber="2570" type="Diesel" length="70" locationId="2" secLocationId="2s4" moves="0" date="" selected="false" model="ES44AC" hp="" bUnit="false" />
     <engine id="UP5488" roadName="UP" roadNumber="5488" type="Diesel" length="70" locationId="2" secLocationId="2s4" moves="0" date="" selected="false" model="ES44AC" hp="" bUnit="false" />
     <engine id="UP8096" roadName="UP" roadNumber="8096" type="Diesel" length="70" locationId="2" secLocationId="2s4" moves="0" date="" selected="false" model="ES44AC" hp="" bUnit="false" />
-    <engine id="UP8997" roadName="UP" roadNumber="8997" type="Diesel" length="70" locationId="2" secLocationId="2s4" moves="0" date="" selected="false" model="SD40" hp="" bUnit="false" />
+    <engine id="UP8997" roadName="UP" roadNumber="8997" type="Diesel" length="70" locationId="2" routeLocationId="1r2" secLocationId="2s1" destinationId="3" routeDestinationId="1r3" secDestinationId="3s1" moves="0" date="" selected="false" train="TestTrainOne" trainId="1" model="SD40" hp="" bUnit="false" />
   </engines>
 </operations-config>

@@ -2,9 +2,9 @@
 <?xml-stylesheet href="/xml/XSLT/operations-trains.xsl" type="text/xsl"?>
 <!DOCTYPE operations-config SYSTEM "/xml/DTD/operations-trains.dtd">
 <operations-config>
-  <!--Written by JMRI version 5.14+Rdea51dcccf on Tue Jun 09 16:14:53 MDT 2026-->
+  <!--Written by JMRI version 5.14+Rdea51dcccf on Tue Jun 09 16:42:36 MDT 2026-->
   <options>
-    <trainOptions buildMessages="true" buildReport="false" printPreview="true" openFile="false" runFile="false" trainAction="Move" />
+    <trainOptions buildMessages="true" buildReport="false" printPreview="true" openFile="false" runFile="false" trainAction="Reset" />
     <conductorOptions showHyphenName="false" />
     <rowColorOptions rowColorManual="true" rowColorBuidFailed="" rowColorBuilt="" rowColorTrainEnRoute="" rowColorTerminated="" rowColorReset="" />
     <manifestCreator>
@@ -19,9 +19,11 @@
     </switchlistCreator>
   </options>
   <trains>
-    <train id="1" name="TestTrainOne" description="" departHour="00" departMinute="00" builtStartYear="" builtEndYear="" numberEngines="1" engineRoad="UP" engineModel="ES44AC" requires="0" cabooseRoad="" buildNormal="false" toTerminal="false" allowLocalMoves="true" allowReturn="false" allowThroughCars="true" serviceAll="false" sendCustomStaging="false" buildConsist="false" built="false" build="true" buildFailed="true" buildFailedMessage="Could not find a departure staging track at NW_Staging_Yard that meets the train requirements" printed="false" modified="false" switchListStatus="" status="Build Failed" TerminationDate="06/09/2026 16:14:46" RequestedCars="30" statusCode="2" oldStatusCode="65535" comment="" showTimes="true">
+    <train id="1" name="TestTrainOne" description="" departHour="00" departMinute="00" current="1r2" departureTrack="2s1" builtStartYear="" builtEndYear="" numberEngines="1" engineRoad="UP" engineModel="SD40" requires="0" cabooseRoad="" buildNormal="false" toTerminal="false" allowLocalMoves="true" allowReturn="false" allowThroughCars="true" serviceAll="false" sendCustomStaging="false" buildConsist="false" built="true" build="true" buildFailed="false" buildFailedMessage="" printed="false" modified="false" switchListStatus="" leadEngine="UP8997" status="Partial 3/27 cars" TerminationDate="06/09/2026 16:42:25" RequestedCars="27" statusCode="20" oldStatusCode="65535" comment="" showTimes="true">
       <rowColor name="" resetRowColor="" />
-      <route name="Test_Route" id="1" />
+      <route name="Test_Route" id="1">
+        <skips />
+      </route>
       <types>
         <carType name="Baggage" />
         <carType name="Boxcar" />

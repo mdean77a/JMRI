@@ -18,6 +18,12 @@ profile.xml.4.bak
 **/blockvalues.xml
 **/.DS_Store
 **/backupPanels/*.xml
+# JMRI Operations generated output (manifests, switch lists, build reports — regenerated on each train build)
+**/operations/buildstatus/
+**/operations/manifests/
+**/operations/jsonManifests/
+**/operations/csvManifests/
+**/operations/csvSwitchLists/
 **/.venv/
 **/.pytest_cache/
 **/.ruff_cache/
