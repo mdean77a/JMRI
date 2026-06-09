@@ -3,6 +3,7 @@ stepsCompleted: ['step-01-init', 'step-02-context', 'step-03-starter', 'step-04-
 lastStep: 8
 status: 'complete'
 completedAt: '2026-05-06'
+lastEdited: '2026-06-09'
 inputDocuments:
   - '_bmad-output/planning-artifacts/prd.md'
   - '_bmad-output/planning-artifacts/prd-validation-report.md'
@@ -10,6 +11,9 @@ workflowType: 'architecture'
 project_name: 'JMRI'
 user_name: 'Mikey'
 date: '2026-05-06'
+editHistory:
+  - date: '2026-06-09'
+    changes: 'Added "Operations Subsystem (Read-Only)" decision section (Epic 8 / FR45-FR50): separate Operations container + discover_operations(), snapshot-not-live, reuse EntityCollection, read-only data objects, parsing reuse. Updated Internal Layering + directory structure (operations.py, fixtures, tests, example), added FR45-FR50 requirements mapping, moved read-only Operations off the Vision-deferred list (command ops remain deferred).'
 projectClassification:
   projectType: 'developer_tool'
   domain: 'general (iot / process-control flavor)'
@@ -361,8 +365,11 @@ loaded, discovery and the library's primitives must work.
   spike; unit tests cover CI in v1)
 - Higher-level patterns library (`automaton.py`) beyond v1 stubs
 - CLI utilities (`pyjmri-status`, etc.) — Growth-deferred per PRD
-- Operations / Warrants / LogixNG / Dispatcher integration — Vision-
-  deferred per PRD
+- Operations *command* integration (train build, car move/assign,
+  manifest generation), Warrants, LogixNG, Dispatcher integration —
+  Vision-deferred per PRD. *(Read-only Operations discovery is now in
+  active v1.1 scope — see "Operations Subsystem (Read-Only)" under Core
+  Architectural Decisions.)*
 
 ### Transport Layer
 
@@ -569,6 +576,71 @@ expose what we'd need).
   masts" returns `[]`; becomes `EntityCollection` with
   `len() == 0`. Only non-200 or schema-broken responses raise.
 
+### Operations Subsystem (Read-Only)
+
+JMRI's Operations module (locations, trains, cars, engines) is a
+distinct data subsystem from the layout model and from the roster. v1.1
+adds **read-only discovery** of it (FR45–FR50, PRD Journey 5); command
+features (train build, car move/assign, manifest generation) stay
+Vision-deferred.
+
+- **Separate container, separate entry point.** `Client.discover_operations()`
+  returns an `Operations` container — distinct from `Layout`. It is a
+  separate method, not folded into `discover()`, so Epic 1–6 behavior
+  is byte-for-byte unchanged (Epic 8 scope policy) and users/layouts
+  that don't use Operations pay nothing.
+- **Snapshot, not a live model.** `discover_operations()` returns a
+  point-in-time snapshot over HTTP. Operations entities are **not**
+  WebSocket-subscribed and expose no `wait_*` primitives in v1.1
+  (matches the PRD's "not subscribed to or commanded" contract). To
+  refresh, call `discover_operations()` again.
+- **Reuses `EntityCollection[T]`.** `ops.locations`, `ops.trains`,
+  `ops.cars`, `ops.engines` are the same dual-name `EntityCollection`
+  that `Layout` uses. One honest asymmetry from JMRI's JSON: locations
+  and trains carry both `userName` and a system `name`; cars and
+  engines are identified by road+number (the `name` field) with no
+  separate user name, so they populate only the system-name index.
+  Lookup falls through to system name, so `ops.cars["AA123"]` works;
+  `LayoutEntityNotFound` is reused for misses.
+- **Read-only data objects — no client handle.** Unlike `Turnout` et
+  al. (which hold a `Protocol`-typed handle for issuing commands),
+  `Location`, `Train`, `Car`, `Engine` are pure typed snapshots with
+  no command, set, or wait methods (FR49 enforced by the class
+  surface). Nested JMRI data — a car's `location → track`, a train's
+  route stops and its consist (`cars[]` / `engines[]`) — is modeled as
+  small frozen typed value objects.
+- **Operational state is the value-add over the roster.** A `Car`
+  exposes current `location`, assigned `train`, and `destination`
+  (each optional — `None` when unplaced/unassigned is a valid state,
+  parsed without error per FR48). An `Engine` exposes deployment and an
+  optional `train` (assigned and unassigned both occur in practice).
+  This is exactly what the roster — JMRI's full DecoderPro catalog —
+  cannot tell you; Operations entities are the operationally-active
+  subset on the layout. `Engine` is therefore a distinct type from
+  `RosterEntry`, not an alias.
+- **`train.status` is a raw string** in v1.1 (e.g. "Partial 3/27
+  cars"); JMRI's status text is freeform. A status enum is a candidate
+  for a later increment, not v1.1.
+- **Parsing reuses existing machinery.** `_parsing.py` gains pure
+  `parse_location` / `parse_train` / `parse_car` / `parse_engine`
+  functions over JMRI's `{"type", "data"}` envelope and the nested
+  objects. `_codes.py` is untouched — Operations entities carry no
+  integer state enums.
+- **Fully simulator-testable.** Operations is a pure data subsystem
+  with no hardware/physical-state dependency, so it is not subject to
+  the open-loop blind spot that limits throttle/sensor testing. Unit
+  tests parse captured JSON fixtures; an integration test exercises
+  `discover_operations()` against the configured simulator data and
+  the empty-collection path (FR50).
+- **Rejected:** folding Operations into `Layout`/`discover()` (couples
+  an optional subsystem to core discovery and risks Epic 1–6 behavior
+  change); per-entity modules `location.py`/`train.py`/… (read-only
+  entities are cohesive enough for one `operations.py`; the per-module
+  split earns its keep only when each type carries a command/wait
+  surface, which these do not); WebSocket-subscribing Operations for
+  live updates (outside the v1.1 read-only contract; revisit with the
+  command increment).
+
 ### Internal Layering
 
 ```text
@@ -576,6 +648,7 @@ src/pyjmri/
 ├── __init__.py          # public re-exports
 ├── client.py            # Client                                   ┐
 ├── layout.py            # Layout, EntityCollection                 │
+├── operations.py        # Operations + Location/Train/Car/Engine   │
 ├── turnout.py           # Turnout, TurnoutState                    │
 ├── sensor.py            # Sensor, SensorState                      │
 ├── block.py             # Block, BlockState                        │
@@ -981,8 +1054,9 @@ python_code/                              # repo-root for pyjmri (named per Step
 ├── src/
 │   └── pyjmri/
 │       ├── __init__.py                   # public re-exports + __all__
-│       ├── client.py                     # Client (FR1–FR7)
+│       ├── client.py                     # Client (FR1–FR7); discover_operations() (FR45–FR50)
 │       ├── layout.py                     # Layout, EntityCollection (FR8–FR12)
+│       ├── operations.py                 # Operations, Location, Train, Car, Engine (FR45–FR50)
 │       ├── turnout.py                    # Turnout, TurnoutState
 │       ├── sensor.py                     # Sensor, SensorState
 │       ├── block.py                      # Block, BlockState
@@ -1015,14 +1089,20 @@ python_code/                              # repo-root for pyjmri (named per Step
 │   │   │   ├── routes.json
 │   │   │   ├── signal_heads.json
 │   │   │   ├── signal_masts.json
-│   │   │   └── roster.json
+│   │   │   ├── roster.json
+│   │   │   └── operations/               # FR45–FR50 (captured from live JMRI)
+│   │   │       ├── locations.json
+│   │   │       ├── trains.json
+│   │   │       ├── cars.json
+│   │   │       └── engines.json
 │   │   ├── test_parsing.py               # _parsing.py per-entity parsers
 │   │   ├── test_codes.py                 # _codes.py integer-↔-enum tables
 │   │   ├── test_subscriptions.py         # SubscriptionRegistry
 │   │   ├── test_reconnect_backoff.py     # backoff math (jitter, cap, attempts)
 │   │   ├── test_state_machine.py         # waiter list, predicate fanout, early-return
 │   │   ├── test_layout_collection.py     # dual-name lookup + collision rule
-│   │   └── test_exceptions.py            # diagnostic context, chaining, __str__
+│   │   ├── test_exceptions.py            # diagnostic context, chaining, __str__
+│   │   └── test_operations_parsing.py    # _parsing.py operations parsers (FR45–FR48)
 │   └── integration/
 │       ├── conftest.py                   # JMRI-probe session fixture (skip-on-absence)
 │       ├── test_connection_lifecycle.py  # Client __aenter__ / __aexit__ lifecycle
@@ -1033,11 +1113,13 @@ python_code/                              # repo-root for pyjmri (named per Step
 │       ├── test_subscription_lifecycle.py # subscribe/unsubscribe/replay [Epic 4]
 │       ├── test_reconnect_resilience.py  # forced disconnect mid-run (NFR5)
 │       ├── test_throttle_lifecycle.py    # acquire / release / multi-throttle parallel [Epic 5]
-│       └── test_long_run.py              # unattended stability; default 5 min, 1 hr pre-release (NFR4)
+│       ├── test_long_run.py              # unattended stability; default 5 min, 1 hr pre-release (NFR4)
+│       └── test_operations_discovery.py  # discover_operations() real + empty paths (FR45–FR50)
 └── examples/
     ├── hello_jmri.py                     # FR43 #1 — connect, discover, list
     ├── back_and_forth.py                 # FR43 #2 — port of MikeBackAndForth.py
-    └── multi_train_session.py            # FR43 #3 — Journey 2 use case
+    ├── multi_train_session.py            # FR43 #3 — Journey 2 use case
+    └── operations_report.py              # Journey 5 — read-only Operations report (FR45–FR50)
 ```
 
 (`docs/` for the Sphinx or MkDocs site is **Growth-deferred per PRD**;
@@ -1156,6 +1238,21 @@ tree.
   not under `python_code/`, because GitHub Actions only reads
   `.github/` from the repo root. Path-scoped to `python_code/**` so
   panel-XML / roster / Jython commits do not trigger CI.
+
+**Operations Read-Only Discovery (FR45–FR50) →**
+
+- `client.py` — `Client.discover_operations()` orchestrates parallel
+  per-type HTTP calls for `location`, `train`, `car`, `engine`; returns
+  an `Operations` container distinct from `Layout`
+- `operations.py` — `Operations` container (reuses `EntityCollection`)
+  plus read-only `Location`, `Train`, `Car`, `Engine` value objects
+  (FR45–FR48); no command or wait surface (FR49)
+- `_parsing.py` — `parse_location` / `parse_train` / `parse_car` /
+  `parse_engine` over JMRI's `{type, data}` envelope
+- `layout.py` — `EntityCollection[T]` reused (cars/engines populate the
+  system-name index only)
+- `exceptions.py` — `LayoutEntityNotFound` reused for misses; absent
+  Operations data yields empty collections, not errors (FR50)
 
 ### Cross-Cutting Concerns Mapping
 
