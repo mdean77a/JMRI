@@ -2,12 +2,18 @@
 stepsCompleted: ['step-01-validate-prerequisites', 'step-02-design-epics', 'step-03-create-stories', 'step-04-final-validation']
 status: 'complete'
 completedAt: '2026-05-06'
+lastEdited: '2026-06-09'
 inputDocuments:
   - '_bmad-output/planning-artifacts/prd.md'
   - '_bmad-output/planning-artifacts/architecture.md'
 project_name: 'pyjmri'
 user_name: 'Mikey'
 date: '2026-05-06'
+editHistory:
+  - date: '2026-05-26'
+    changes: 'Added Epic 7 (v1.0.x Maintenance) detail section with Story 7.1.'
+  - date: '2026-06-09'
+    changes: 'Added Epic 8 (Discover the Operations Subsystem — Read-Only): FR45-FR50 in inventory + coverage map, Epic List entries for Epics 7 and 8, full Epic 8 section with Stories 8.1-8.3. Targets v1.1.'
 ---
 
 # pyjmri - Epic Breakdown
@@ -87,6 +93,15 @@ This document provides the complete epic and story breakdown for `pyjmri`, decom
 - FR42: A user can read a "Limitations" section that explains what the library can and cannot detect (NCE open-loop, no DCC feedback path, no power control on this hardware).
 - FR43: A user can run three shipped example programs (`hello_jmri.py`, `back_and_forth.py`, `multi_train_session.py`) against `Basement_Revised_2024.jmri` without modification.
 - FR44: A developer can use the library against their own user scripts under `mypy --strict` and have all public types resolve cleanly (the library ships a `py.typed` marker).
+
+**Operations (Read-Only Discovery)**
+
+- FR45: A user script can enumerate JMRI Operations locations and access each location by both system and user name, receiving a typed read-only object.
+- FR46: A user script can enumerate JMRI Operations trains and read each train's read-only operational state (e.g., assigned route and current location) as exposed by JMRI.
+- FR47: A user script can enumerate JMRI Operations cars (rolling stock) and read each car's read-only operational state (e.g., current location, assigned train, destination) as exposed by JMRI.
+- FR48: A user script can enumerate JMRI Operations engines and read their read-only operational state. Operations engines are a distinct subsystem from the roster (FR12): the roster catalogs every engine the user programmed in DecoderPro, whereas Operations engines are the operationally-active subset actually deployed on the layout.
+- FR49: Operations discovery is read-only in this increment — no build-train, move/assign-car, or generate-manifest operations (deferred to Vision).
+- FR50: A layout whose JMRI has no Operations data configured discovers empty Operations collections rather than raising an error (layout-agnostic, as with FR8–FR12).
 
 ### NonFunctional Requirements
 
@@ -193,6 +208,12 @@ These are technical/infrastructure requirements derived from the Architecture do
 | FR42 | 6 | Limitations section |
 | FR43 | 6 | Three shipped examples |
 | FR44 | 1 | `py.typed` marker; mypy strict resolves |
+| FR45 | 8 | Enumerate Operations locations (dual-name) |
+| FR46 | 8 | Enumerate Operations trains + read-only state |
+| FR47 | 8 | Enumerate Operations cars + read-only state |
+| FR48 | 8 | Enumerate Operations engines (distinct from roster) |
+| FR49 | 8 | Read-only boundary — no command surface |
+| FR50 | 8 | Empty Operations collections, not errors |
 
 ## Epic List
 
@@ -241,6 +262,21 @@ A new user reads the README, installs via `uv add pyjmri`, follows the 5-minute 
 
 **FRs covered:** FR40, FR41, FR42, FR43
 **Notes:** README quickstart; Limitations section; Jython migration table; `hello_jmri.py`; `back_and_forth.py`; `multi_train_session.py`; `CONTRIBUTING.md` integration-tests-local-only policy; PyPI publish workflow.
+
+### Epic 7: v1.0.x Maintenance
+
+A post-v1.0 maintenance track collecting bugfixes and small quality improvements that warrant a patch release, under a strict scope policy (no public-API change, no version bump within a story, all quality gates green, v1.0.0 requirements unchanged).
+
+**FRs covered:** none (test/quality discipline; no new requirements)
+**Notes:** Opened 2026-05-26 after v1.0.0 shipped. Patch releases follow the Story 6.6 Phase A/B pattern.
+
+### Epic 8: Discover the Operations Subsystem (Read-Only)
+
+A user writes `ops = await jmri.discover_operations()` and receives a typed `Operations` container enumerating locations, trains, cars, and engines — distinct from `Layout` and from the roster. Each entity exposes read-only operational state (a car's current location and train assignment; a train's route and position; an engine's deployment). Layouts with no Operations data configured discover empty collections, not errors. No command surface — build/move/manifest stay in Vision. Targets a v1.1 release.
+
+**FRs covered:** FR45, FR46, FR47, FR48, FR49, FR50
+**NFRs supported:** NFR2 (Operations discovery latency bound), NFR7, NFR8
+**Notes:** Reuses the existing `_transport.HTTPClient`, exception hierarchy, and `EntityCollection` dual-name lookup from Epic 2. Adds Operations JSON parsing (`location`, `train`, `car`, `engine`), four read-only entity classes, an `Operations` container, and `Client.discover_operations()`. Fully testable on the NCE simulator — Operations is a data subsystem with no hardware/physical-state dependency (not subject to the throttle/sensor open-loop blind spot). Requires Operations data configured in the test profile; the basement simulator profile currently has none.
 
 ## Epic 1: Buildable, Type-checked Library Foundation
 
@@ -1106,3 +1142,99 @@ Originates from Epic 6 retrospective action item C3. Two flake events observed o
 The story scope: pin each shared-first-entity test to an explicit JMRI system name, force a known starting state per test via the existing raw-httpx pattern, calibrate timeouts against suite-load reality (5 s for the NFR1 sensor `wait_change`, 10 s for the AC10 turnout round-trip), and verify two consecutive `pytest -m "integration and not slow"` runs pass plus one `pytest --with pytest-cov`. No production source change; tests only.
 
 See `_bmad-output/implementation-artifacts/7-1-fix-integration-test-inter-test-interference.md` for full acceptance criteria.
+
+## Epic 8: Discover the Operations Subsystem (Read-Only)
+
+**Status:** Post-v1.0 feature track (v1.1). Promotes read-only Operations discovery from the PRD Vision tier into active scope (PRD edit 2026-06-09). Delivers FR45–FR50 and PRD Journey 5.
+
+**Scope policy:** read-only only. This epic adds no operation that mutates Operations state (no train build, no car move/assign, no manifest generation) — those remain Vision. Public-API additions are confined to a new `Operations` container, `Client.discover_operations()`, and four read-only entity classes; nothing in Epics 1–6 changes behavior.
+
+**Test environment:** Operations is a pure data subsystem (cars/engines/locations/trains are records JMRI serves over JSON regardless of hardware), so unlike throttles it is *fully* testable on the NCE simulator. The epic requires a profile with Operations data configured; the basement simulator profile currently has none, so Story 8.1 captures real JSON fixtures from a JMRI instance with Operations data loaded, and Story 8.2's integration test runs against that data plus the empty-collection path.
+
+### Story 8.1: Operations wire-format parsing + read-only entity classes
+
+As a library user,
+I want JMRI's Operations JSON for locations, trains, cars, and engines parsed into typed read-only Python objects,
+So that I can read operational state (where a car is, what train it's on, where a train is) as proper typed attributes rather than raw JSON.
+
+**Acceptance Criteria:**
+
+**Given** captured JMRI Operations JSON fixtures for `location`, `train`, `car`, and `engine` (from a JMRI instance with Operations data loaded)
+**When** the `_parsing` Operations functions are implemented
+**Then** each entity type has a parsing function mapping JMRI's JSON shape to a typed object, covering both the list and single-entity response forms
+**And** parsing is unit-tested against the captured fixtures with no live JMRI required
+
+**Given** the four read-only entity classes `Location`, `Train`, `Car`, `Engine`
+**When** they are defined
+**Then** each carries its system name and user name and a typed read-only view of the operational state JMRI exposes (e.g., `Car.location`, `Car.train`, `Car.destination`; `Train.route`, `Train.current_location`; `Engine` road/number plus deployment)
+**And** none exposes a mutating method (no setter, no command) — read-only is enforced by the class surface (FR49)
+
+**Given** the roster-vs-Operations distinction (FR48)
+**When** `Engine` is defined
+**Then** it is a distinct type from `RosterEntry`, documented as the operationally-active subset on the layout rather than the full DecoderPro catalog
+**And** the two are not conflated in the type model
+
+**Given** JMRI reports an unknown or absent optional field (e.g., a car not currently assigned to a train)
+**When** parsing encounters it
+**Then** the field resolves to a typed empty/None value rather than crashing — absence is a valid operational state
+
+**Given** the project quality gates
+**When** Story 8.1 lands
+**Then** all new public types resolve under `mypy --strict` and `ruff check` / `ruff format --check` / unit pytest are green
+
+### Story 8.2: `Operations` container + `Client.discover_operations()` + integration
+
+As a library user,
+I want `await jmri.discover_operations()` to enumerate every Operations entity from a running JMRI and return a typed `Operations` container,
+So that I can inspect my whole operating session — locations, trains, cars, engines — in one call, looked up by name.
+
+**Acceptance Criteria:**
+
+**Given** Story 8.1's parsing and entity classes
+**When** `Client.discover_operations()` is implemented
+**Then** it issues per-type HTTP GETs for `location`, `train`, `car`, `engine` in parallel via `asyncio.TaskGroup` (matching `discover()`)
+**And** assembles each into an `EntityCollection` (reused from Epic 2) on an `Operations` instance, supporting dual-name lookup and iteration (FR45–FR47)
+**And** returns the populated `Operations` container, which is distinct from `Layout` (Operations is its own subsystem)
+
+**Given** a JMRI instance with no Operations data configured
+**When** `discover_operations()` runs
+**Then** it returns an `Operations` container whose collections are empty rather than raising (FR50)
+**And** this empty-collection path is covered by an integration test on the basement simulator profile as it stands today
+
+**Given** a JMRI instance (simulator) with Operations data loaded
+**When** an integration test calls `discover_operations()` and times it
+**Then** the call completes within the NFR2 Operations bound (layout discovery plus ≤1 s for an Operations roster of comparable size)
+**And** every collection is non-empty and entities resolve by both system and user name
+**And** the test is marked `@pytest.mark.integration` and skips cleanly if JMRI is unreachable
+
+**Given** layout-agnosticism (the FR43/FR50 invariant)
+**When** a reviewer audits Story 8.2's code
+**Then** no hardcoded Operations entity name or count appears in `src/pyjmri/` — discovery operates on whatever JMRI returns
+
+### Story 8.3: Read-only boundary + Operations example + docs
+
+As a JMRI layout owner,
+I want a worked example and documentation showing how to inspect my Operations session from Python,
+So that I can write my own "where is every car" reports (PRD Journey 5) and understand the read-only boundary.
+
+**Acceptance Criteria:**
+
+**Given** the read-only contract (FR49)
+**When** Story 8.3 lands
+**Then** a test asserts the `Operations` container and its entity classes expose no mutating/command method (build, move, assign, manifest)
+**And** the read-only boundary is stated in the docs with a forward pointer to the Vision command increment
+
+**Given** PRD Journey 5
+**When** the example `operations_report.py` is written
+**Then** it connects, calls `discover_operations()`, and prints locations, each train and its current location, and each car with its location and train assignment
+**And** it runs against `Basement_Revised_2024.jmri` (with Operations data loaded) without modification
+**And** it degrades gracefully (prints an explanatory message, not a traceback) when no Operations data is configured
+
+**Given** the documentation set
+**When** the Operations section is added
+**Then** it explains the roster-vs-Operations distinction (catalog vs operationally-active subset) and that Operations read-only discovery is fully simulator-testable
+**And** `CONTRIBUTING.md` / release notes record the Operations data setup needed to run the Operations integration tests
+
+**Given** the v1.1 release
+**When** Epic 8 completes
+**Then** the version bump, gates, TestPyPI dry-run, publish, and tag follow the Story 6.6 Phase A/B release pattern (no throttle hardware validation needed — Operations is read-only data)
