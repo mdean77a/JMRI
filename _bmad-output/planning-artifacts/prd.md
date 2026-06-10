@@ -104,7 +104,7 @@ requiring any change to JMRI itself.
   `python_code/` is empty, but the library must integrate with a
   long-running JMRI instance and a fully-built layout. Primary
   development target: the `Basement_Revised_2024.jmri` profile
-  (~93 blocks / 28 sections / ~45 locos), connecting to either real
+  (38 blocks / no sections / ~45 locos), connecting to either real
   NCE hardware or NCE simulation depending on which machine launched
   JMRI — a distinction the library is required to be transparent to.
 - **Distribution:** planned PyPI release for the JMRI community as a
@@ -305,7 +305,7 @@ requiring any change to JMRI itself.
 ### Journey 1 — Mike, the author: porting his first Jython script
 
 **Who:** Mike, the author and primary user. Runs an N-scale basement
-layout, ~45 locos, 93 blocks, 28 sections. Has a Jython codebase he
+layout, ~45 locos, 38 blocks, no sections. Has a Jython codebase he
 wrote between 2019 and 2024. Wants modern Python.
 
 **Opening:** Mike sits down on a Tuesday evening with `pyjmri` v0.1

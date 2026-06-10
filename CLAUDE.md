@@ -48,7 +48,7 @@ Each `.jmri` profile directory contains:
 - `profile/profile.xml` — Connection config, startup actions (loads panel XML, starts WiThrottle on port 12090, web server on port 12080)
 - `profile/profile.properties` — Preferences (roster path, LogixNG options, web server settings)
 - `profile/<UUID>/` — Per-machine overrides (`profile.xml`, `profile.properties`, `user-interface.xml`). JMRI selects the matching UUID at startup, so different hosts can have different connection/UI prefs while sharing the layout config.
-- `*Settings.xml` — Main panel/layout configuration file (sensors, turnouts, signals, blocks, sections, layout editor geometry)
+- `*Settings.xml` — Main panel/layout configuration file (sensors, turnouts, signals, blocks, layout editor geometry)
 - `backupPanels/` — Timestamped automatic backups
 - `signal/`, `throttle/`, `programmers/`, `resources/` — Per-profile preferences
 
@@ -62,15 +62,15 @@ The main `*Settings.xml` files are JMRI's serialized layout configuration, conta
 1. **Sensors** — NCE sensors (`NS*`) and internal sensors (`IS*`)
 2. **Turnouts** — NCE turnouts (`NT*`)
 3. **Signal Heads / Signal Masts** — 12 each, CTC-style signaling
-4. **Blocks** — 93 blocks for occupancy detection
-5. **Sections** — 28 sections for Dispatcher/warrant routing
+4. **Blocks** — 38 blocks for occupancy detection
+5. **Sections** — none currently defined (the layout uses blocks, not Dispatcher/warrant sections)
 6. **Layout Editor panel** — Track geometry, turnout positions, visual elements
 
 JMRI system name conventions: prefix `N` = NCE hardware, `I` = internal; type letter: `S` = sensor, `T` = turnout, `B` = block.
 
 ## Layout Geography
 
-The layout is divided into zones: **North** (zones 1-10, tracks 1-6, bypass), **South** (zones 1-7, tracks 1-4), **East** (zones 1-13), **West** (NW and SW sub-areas), and **Mountain**. Sensors, blocks, and sections follow this geographic naming scheme.
+The layout is divided into zones: **North** (zones 1-10, tracks 1-6, bypass), **South** (zones 1-7, tracks 1-4), **East** (zones 1-13), **West** (NW and SW sub-areas), and **Mountain**. Sensors and blocks follow this geographic naming scheme.
 
 ## Jython Scripts
 
