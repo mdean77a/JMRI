@@ -1,0 +1,182 @@
+[
+    {
+        "type": "car",
+        "data": {
+            "name": "AA123",
+            "number": "123",
+            "road": "AA",
+            "rfid": "",
+            "whereLastSeen": null,
+            "whenLastSeen": null,
+            "type": "Boxcar",
+            "carSubType": "",
+            "length": 40,
+            "weight": 24,
+            "weightTons": "72",
+            "color": "Black",
+            "owner": "",
+            "built": "",
+            "comment": "",
+            "outOfService": false,
+            "locationUnknown": false,
+            "location": {
+                "userName": "NW_Staging_Yard",
+                "name": "2",
+                "route": "1r2",
+                "track": {
+                    "userName": "NW_Track_1",
+                    "name": "2s1"
+                }
+            },
+            "trainId": "1",
+            "trainName": "TestTrainOne",
+            "trainIconName": "TestTrainOne",
+            "destination": {
+                "userName": "South Interchange",
+                "name": "3",
+                "route": "1r3",
+                "track": {
+                    "userName": "Arrival_Departure",
+                    "name": "3s1"
+                }
+            },
+            "load": "E",
+            "hazardous": false,
+            "caboose": false,
+            "passenger": false,
+            "fred": false,
+            "setout msg": "",
+            "pickup msg": "",
+            "kernel": "",
+            "utility": false,
+            "isLocal": false,
+            "last train": "",
+            "final dest": null,
+            "rwe": null,
+            "returnWhenLoaded": null,
+            "division": "",
+            "block order": "",
+            "status": ""
+        }
+    },
+    {
+        "type": "car",
+        "data": {
+            "name": "AA134",
+            "number": "134",
+            "road": "AA",
+            "rfid": "",
+            "whereLastSeen": null,
+            "whenLastSeen": null,
+            "type": "Boxcar",
+            "carSubType": "",
+            "length": 40,
+            "weight": 24,
+            "weightTons": "72",
+            "color": "Black",
+            "owner": "",
+            "built": "",
+            "comment": "",
+            "outOfService": false,
+            "locationUnknown": false,
+            "location": {
+                "userName": "NW_Staging_Yard",
+                "name": "2",
+                "route": "1r2",
+                "track": {
+                    "userName": "NW_Track_1",
+                    "name": "2s1"
+                }
+            },
+            "trainId": "1",
+            "trainName": "TestTrainOne",
+            "trainIconName": "TestTrainOne",
+            "destination": {
+                "userName": "South Interchange",
+                "name": "3",
+                "route": "1r3",
+                "track": {
+                    "userName": "Arrival_Departure",
+                    "name": "3s1"
+                }
+            },
+            "load": "E",
+            "hazardous": false,
+            "caboose": false,
+            "passenger": false,
+            "fred": false,
+            "setout msg": "",
+            "pickup msg": "",
+            "kernel": "",
+            "utility": false,
+            "isLocal": false,
+            "last train": "",
+            "final dest": null,
+            "rwe": null,
+            "returnWhenLoaded": null,
+            "division": "",
+            "block order": "",
+            "status": ""
+        }
+    },
+    {
+        "type": "car",
+        "data": {
+            "name": "AA145",
+            "number": "145",
+            "road": "AA",
+            "rfid": "",
+            "whereLastSeen": null,
+            "whenLastSeen": null,
+            "type": "Boxcar",
+            "carSubType": "",
+            "length": 40,
+            "weight": 24,
+            "weightTons": "72",
+            "color": "Black",
+            "owner": "",
+            "built": "",
+            "comment": "",
+            "outOfService": false,
+            "locationUnknown": false,
+            "location": {
+                "userName": "NW_Staging_Yard",
+                "name": "2",
+                "route": "1r2",
+                "track": {
+                    "userName": "NW_Track_1",
+                    "name": "2s1"
+                }
+            },
+            "trainId": "1",
+            "trainName": "TestTrainOne",
+            "trainIconName": "TestTrainOne",
+            "destination": {
+                "userName": "South Interchange",
+                "name": "3",
+                "route": "1r3",
+                "track": {
+                    "userName": "Arrival_Departure",
+                    "name": "3s1"
+                }
+            },
+            "load": "E",
+            "hazardous": false,
+            "caboose": false,
+            "passenger": false,
+            "fred": false,
+            "setout msg": "",
+            "pickup msg": "",
+            "kernel": "",
+            "utility": false,
+            "isLocal": false,
+            "last train": "",
+            "final dest": null,
+            "rwe": null,
+            "returnWhenLoaded": null,
+            "division": "",
+            "block order": "",
+            "status": ""
+        }
+    }
+]

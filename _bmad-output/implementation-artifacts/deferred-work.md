@@ -1,5 +1,10 @@
 # Deferred Work
 
+## Deferred from: code review of 8-1-operations-wire-format-parsing-and-read-only-entity-classes (2026-06-10)
+
+- **`Track` drops `length`/`type` fields from location tracks** — `Location.tracks` only exposes `name`/`user_name`; JMRI's track length, track type (Staging/Yard/Spur), and carType allow-list are silently dropped. Intentional v1.1 scope limit; adding them later is additive (fields to a frozen dataclass requires a new version). [`operations.py:Track`]
+- **Malformed nested objects silently yield `None`** — `_parse_track` / `_parse_placement` return `None` when the JSON value is not a dict (catches `null`/`{}`); a non-dict non-null value (e.g. `"track": "string"`) would also yield `None` rather than `JMRIProtocolError`. Pre-existing `_optional_str` pattern; low risk as JMRI does not send non-dict track objects in practice. [`_parsing.py:_parse_track`]
+
 ## Deferred from: code review of 7-1-fix-integration-test-inter-test-interference (2026-06-09)
 
 - **`JMRI_BASE_URL` hardcodes `localhost`** — pre-existing across all test files; all previously used `http://localhost:12080` directly. A future story could make this configurable via env var. [`_entity_state.py:30`]

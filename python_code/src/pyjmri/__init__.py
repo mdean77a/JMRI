@@ -23,6 +23,7 @@ from pyjmri.exceptions import (
 from pyjmri.layout import EntityCollection, Layout
 from pyjmri.light import Light, LightState
 from pyjmri.memory import Memory
+from pyjmri.operations import Car, Engine, Location, Placement, RouteStop, Track, Train
 from pyjmri.power import PowerState
 from pyjmri.route import Route, RouteState
 from pyjmri.sensor import Sensor, SensorState
@@ -35,8 +36,10 @@ logging.getLogger("pyjmri").addHandler(logging.NullHandler())
 __all__ = [
     "Block",
     "BlockState",
+    "Car",
     "Client",
     "ClientConfig",
+    "Engine",
     "EntityCollection",
     "JMRIConnectionError",
     "JMRIError",
@@ -49,11 +52,14 @@ __all__ = [
     "LayoutEntityNotFound",
     "Light",
     "LightState",
+    "Location",
     "Memory",
+    "Placement",
     "PowerState",
     "ReconnectConfig",
     "Route",
     "RouteState",
+    "RouteStop",
     "Sensor",
     "SensorState",
     "SignalHead",
@@ -64,6 +70,8 @@ __all__ = [
     "ThrottleAcquireFailed",
     "ThrottleError",
     "ThrottleReleased",
+    "Track",
+    "Train",
     "Turnout",
     "TurnoutState",
     "WaitTimeout",

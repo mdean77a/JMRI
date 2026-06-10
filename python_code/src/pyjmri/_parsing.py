@@ -1,7 +1,16 @@
 """JMRI JSON v5 -> typed Python value translation.
 
-Each parser receives the JMRI envelope shape (``{"type": "...",
-"data": {...}}``) and returns a frozen ``_Parsed<Kind>`` dataclass.
+Layout entity parsers (``parse_turnout``, ``parse_sensor``, etc.) receive
+the JMRI envelope shape (``{"type": "...", "data": {...}}``) and return
+a frozen ``_Parsed<Kind>`` intermediate dataclass; the public domain
+object is assembled later by ``Client.discover`` using the ``_ENTITY_SPECS``
+registry (which injects the ``ClientHandle``).
+
+Operations entity parsers (``parse_location``, ``parse_train``,
+``parse_car``, ``parse_engine``) are handle-free snapshots, so they return
+the public frozen entity classes from :mod:`pyjmri.operations` directly
+with no ``_Parsed*`` intermediate.
+
 Architecture sec. JSON <-> Python Translation: integer codes are
 translated through ``_codes.py`` only; unknown JSON keys are silently
 ignored; missing required keys raise ``JMRIProtocolError``.
@@ -18,6 +27,7 @@ from pyjmri import _codes
 from pyjmri.block import BlockState
 from pyjmri.exceptions import JMRIProtocolError
 from pyjmri.light import LightState
+from pyjmri.operations import Car, Engine, Location, Placement, RouteStop, Track, Train
 from pyjmri.power import PowerState
 from pyjmri.sensor import SensorState
 from pyjmri.signal import SignalHeadAppearance, SignalMastAspect
@@ -182,6 +192,19 @@ def _required_bool(data: dict[str, Any], key: str, *, entity_type: str) -> bool:
     return value
 
 
+def _required_int(data: dict[str, Any], key: str, *, entity_type: str) -> int:
+    value = data.get(key)
+    # bool is an int subclass; JMRI never sends a bool here, so reject it.
+    if not isinstance(value, int) or isinstance(value, bool):
+        raise JMRIProtocolError(
+            f"missing or non-integer field {key!r}",
+            entity_type=entity_type,
+            field=key,
+            name=data.get("name"),
+        )
+    return value
+
+
 # ---- Parsers ----
 
 
@@ -328,4 +351,143 @@ def parse_power(payload: dict[str, Any]) -> _ParsedPower:
         name=_required_str(data, "name", entity_type="power"),
         state=_required_state(data, _codes.POWER_STATE, entity_type="power"),
         default=_required_bool(data, "default", entity_type="power"),
+    )
+
+
+# ---- Operations parsers (read-only; return public frozen entities directly) ----
+#
+# Operations entities carry no mutable handle, so — unlike the Layout entities
+# above — the parser fully constructs the public ``operations`` object; there is
+# no ``_Parsed*`` intermediate. ``train.engines[]`` / ``train.cars[]`` consist
+# elements are bare data objects (the inner ``data`` dict, no ``{type, data}``
+# envelope), so the ``_*_from_data`` helpers are shared between the top-level
+# collection parsers and the train-consist path. Absence (JSON ``null`` or an
+# empty reference string) maps to ``None`` rather than raising (FR48).
+
+
+def _parse_track(value: Any) -> Track | None:
+    """Build a :class:`Track` from a nested ``track`` object, or ``None``."""
+    if not isinstance(value, dict) or not value:
+        return None
+    return Track(
+        name=_required_str(value, "name", entity_type="track"),
+        user_name=_optional_str(value, "userName"),
+    )
+
+
+def _parse_placement(value: Any) -> Placement | None:
+    """Build a :class:`Placement` from a ``location``/``destination`` object.
+
+    Returns ``None`` when JMRI reports the reference as ``null`` or an
+    empty object — an unplaced/unassigned car or engine (FR48).
+    """
+    if not isinstance(value, dict) or not value:
+        return None
+    return Placement(
+        name=_required_str(value, "name", entity_type="placement"),
+        user_name=_optional_str(value, "userName"),
+        track=_parse_track(value.get("track")),
+    )
+
+
+def _parse_route_stop(value: dict[str, Any]) -> RouteStop:
+    """Build a :class:`RouteStop` from one ``train.locations[]`` element."""
+    return RouteStop(
+        name=_required_str(value, "name", entity_type="routeStop"),
+        user_name=_optional_str(value, "userName"),
+        sequence_id=_required_int(value, "sequenceId", entity_type="routeStop"),
+        train_direction=_required_str(value, "trainDirection", entity_type="routeStop"),
+    )
+
+
+def _car_from_data(data: dict[str, Any]) -> Car:
+    """Build a :class:`Car` from a car ``data`` object (envelope or consist)."""
+    return Car(
+        name=_required_str(data, "name", entity_type="car"),
+        road=_required_str(data, "road", entity_type="car"),
+        number=_required_str(data, "number", entity_type="car"),
+        car_type=_required_str(data, "type", entity_type="car"),
+        length=_required_int(data, "length", entity_type="car"),
+        location=_parse_placement(data.get("location")),
+        train=_optional_str(data, "trainName") or None,
+        destination=_parse_placement(data.get("destination")),
+    )
+
+
+def _engine_from_data(data: dict[str, Any]) -> Engine:
+    """Build an :class:`Engine` from an engine ``data`` object (envelope or consist)."""
+    return Engine(
+        name=_required_str(data, "name", entity_type="engine"),
+        road=_required_str(data, "road", entity_type="engine"),
+        number=_required_str(data, "number", entity_type="engine"),
+        engine_type=_required_str(data, "type", entity_type="engine"),
+        model=_optional_str(data, "model") or None,
+        length=_required_int(data, "length", entity_type="engine"),
+        location=_parse_placement(data.get("location")),
+        train=_optional_str(data, "trainName") or None,
+        destination=_parse_placement(data.get("destination")),
+    )
+
+
+def parse_location(payload: dict[str, Any]) -> Location:
+    data = _data(payload, "location")
+    raw_tracks = data.get("track")
+    tracks = (
+        tuple(t for t in (_parse_track(rt) for rt in raw_tracks) if t is not None)
+        if isinstance(raw_tracks, list)
+        else ()
+    )
+    return Location(
+        name=_required_str(data, "name", entity_type="location"),
+        user_name=_optional_str(data, "userName"),
+        length=_required_int(data, "length", entity_type="location"),
+        comment=_optional_str(data, "comment") or None,
+        tracks=tracks,
+    )
+
+
+def parse_car(payload: dict[str, Any]) -> Car:
+    return _car_from_data(_data(payload, "car"))
+
+
+def parse_engine(payload: dict[str, Any]) -> Engine:
+    return _engine_from_data(_data(payload, "engine"))
+
+
+def parse_train(payload: dict[str, Any]) -> Train:
+    data = _data(payload, "train")
+    raw_stops = data.get("locations")
+    route_stops = (
+        tuple(
+            sorted(
+                (_parse_route_stop(s) for s in raw_stops if isinstance(s, dict)),
+                key=lambda s: s.sequence_id,
+            )
+        )
+        if isinstance(raw_stops, list)
+        else ()
+    )
+    raw_engines = data.get("engines")
+    engines = (
+        tuple(_engine_from_data(e) for e in raw_engines if isinstance(e, dict))
+        if isinstance(raw_engines, list)
+        else ()
+    )
+    raw_cars = data.get("cars")
+    cars = (
+        tuple(_car_from_data(c) for c in raw_cars if isinstance(c, dict))
+        if isinstance(raw_cars, list)
+        else ()
+    )
+    return Train(
+        name=_required_str(data, "name", entity_type="train"),
+        user_name=_optional_str(data, "userName"),
+        route=_optional_str(data, "route") or None,
+        current_location=_optional_str(data, "location") or None,
+        status=_required_str(data, "status", entity_type="train"),
+        status_code=_required_int(data, "statusCode", entity_type="train"),
+        lead_engine=_optional_str(data, "leadEngine") or None,
+        route_stops=route_stops,
+        engines=engines,
+        cars=cars,
     )

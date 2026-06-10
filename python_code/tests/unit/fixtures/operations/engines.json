@@ -1,0 +1,162 @@
+[
+    {
+        "type": "engine",
+        "data": {
+            "name": "UP2570",
+            "number": "2570",
+            "road": "UP",
+            "rfid": "",
+            "whereLastSeen": null,
+            "whenLastSeen": null,
+            "type": "Diesel",
+            "carSubType": "",
+            "length": 70,
+            "weight": 0,
+            "weightTons": "",
+            "color": "",
+            "owner": "",
+            "built": "",
+            "comment": "",
+            "outOfService": false,
+            "locationUnknown": false,
+            "location": {
+                "userName": "NW_Staging_Yard",
+                "name": "2",
+                "route": null,
+                "track": {
+                    "userName": "NW_Track_6",
+                    "name": "2s4"
+                }
+            },
+            "trainId": null,
+            "trainName": null,
+            "trainIconName": null,
+            "destination": null,
+            "model": "ES44AC",
+            "hp": "",
+            "consist": ""
+        }
+    },
+    {
+        "type": "engine",
+        "data": {
+            "name": "UP5488",
+            "number": "5488",
+            "road": "UP",
+            "rfid": "",
+            "whereLastSeen": null,
+            "whenLastSeen": null,
+            "type": "Diesel",
+            "carSubType": "",
+            "length": 70,
+            "weight": 0,
+            "weightTons": "",
+            "color": "",
+            "owner": "",
+            "built": "",
+            "comment": "",
+            "outOfService": false,
+            "locationUnknown": false,
+            "location": {
+                "userName": "NW_Staging_Yard",
+                "name": "2",
+                "route": null,
+                "track": {
+                    "userName": "NW_Track_6",
+                    "name": "2s4"
+                }
+            },
+            "trainId": null,
+            "trainName": null,
+            "trainIconName": null,
+            "destination": null,
+            "model": "ES44AC",
+            "hp": "",
+            "consist": ""
+        }
+    },
+    {
+        "type": "engine",
+        "data": {
+            "name": "UP8096",
+            "number": "8096",
+            "road": "UP",
+            "rfid": "",
+            "whereLastSeen": null,
+            "whenLastSeen": null,
+            "type": "Diesel",
+            "carSubType": "",
+            "length": 70,
+            "weight": 0,
+            "weightTons": "",
+            "color": "",
+            "owner": "",
+            "built": "",
+            "comment": "",
+            "outOfService": false,
+            "locationUnknown": false,
+            "location": {
+                "userName": "NW_Staging_Yard",
+                "name": "2",
+                "route": null,
+                "track": {
+                    "userName": "NW_Track_6",
+                    "name": "2s4"
+                }
+            },
+            "trainId": null,
+            "trainName": null,
+            "trainIconName": null,
+            "destination": null,
+            "model": "ES44AC",
+            "hp": "",
+            "consist": ""
+        }
+    },
+    {
+        "type": "engine",
+        "data": {
+            "name": "UP8997",
+            "number": "8997",
+            "road": "UP",
+            "rfid": "",
+            "whereLastSeen": null,
+            "whenLastSeen": null,
+            "type": "Diesel",
+            "carSubType": "",
+            "length": 70,
+            "weight": 0,
+            "weightTons": "",
+            "color": "",
+            "owner": "",
+            "built": "",
+            "comment": "",
+            "outOfService": false,
+            "locationUnknown": false,
+            "location": {
+                "userName": "NW_Staging_Yard",
+                "name": "2",
+                "route": "1r2",
+                "track": {
+                    "userName": "NW_Track_1",
+                    "name": "2s1"
+                }
+            },
+            "trainId": "1",
+            "trainName": "TestTrainOne",
+            "trainIconName": "TestTrainOne",
+            "destination": {
+                "userName": "South Interchange",
+                "name": "3",
+                "route": "1r3",
+                "track": {
+                    "userName": "Arrival_Departure",
+                    "name": "3s1"
+                }
+            },
+            "model": "SD40",
+            "hp": "",
+            "consist": ""
+        }
+    }
+]
