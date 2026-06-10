@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-05-07
-last_updated: 2026-06-10  # Story 8.2 ready for review
+last_updated: 2026-06-10  # Story 8.2 code review complete -> done
 project: JMRI
 project_key: NOKEY
 tracking_system: file-system
@@ -98,6 +98,6 @@ development_status:
   # Epic 8: Discover the Operations Subsystem (Read-Only) — v1.1 feature, added 2026-06-09
   epic-8: in-progress
   8-1-operations-wire-format-parsing-and-read-only-entity-classes: done
-  8-2-operations-container-and-discover-operations-integration: review
+  8-2-operations-container-and-discover-operations-integration: done
   8-3-operations-read-only-boundary-example-and-docs: backlog
   epic-8-retrospective: optional

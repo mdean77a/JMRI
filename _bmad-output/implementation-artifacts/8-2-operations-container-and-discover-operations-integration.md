@@ -1,6 +1,6 @@
 # Story 8.2: `Operations` container + `Client.discover_operations()` + integration
 
-Status: review
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -53,6 +53,16 @@ so that I can inspect my whole operating session — locations, trains, cars, en
   - [x] Dual-name resolution: a named location resolves by user AND system name to the same object; a car resolves by system name with `user_name is None`. Entities pinned by attribute (defensive `next(...)` filter), never positional index (Story 7.1 lesson).
   - [x] Timing: `await discover()` first (warm version check), then time `discover_operations()` alone, assert `elapsed < 1.0` (NFR2 Operations bound). Measured ~0.1 s on the basement roster.
 - [x] **Task 6 — Run all gates** (AC: #11) — all green via `uv run --no-sync`: `ruff check` (All checks passed), `ruff format --check` (64 files formatted), `mypy --strict src/pyjmri` (Success, 22 files), `pytest -m "not integration"` (441 passed / 25 deselected, up from 433/22).
+
+### Review Findings
+
+Code review 2026-06-10 (Blind Hunter / Edge Case Hunter / Acceptance Auditor). AC coverage: all 11 ACs ✅ Met (AC11 gates ❓ not machine-verified in review, but +8 unit / +3 integration confirmed by inspection). No scope-fence violations.
+
+- [x] [Review][Dismissed] Error-surface parity with `discover()` (was Decision D1) — DISMISSED on verification: the finding's premise was false. `discover()`'s own `TaskGroup` block (client.py:720) is bare and propagates a raw `ExceptionGroup` exactly like `discover_operations()`; the `_unwrap_exception_group` calls (client.py:237, 276) are in lifecycle teardown (`__aexit__` / `_teardown_on_aenter_failure`), NOT in `discover()`. Both discovery methods are already consistent and document the raw-`ExceptionGroup` behavior identically (client.py:694-700 vs 809-814). Patching `discover_operations()` would have *introduced* divergence. No change made.
+- [x] [Review][Patch] Docstring overclaimed version check "fires at most once regardless of call order" — FIXED (client.py:787-791): softened to "cached for the Client's lifetime and shared with `discover` — subsequent sequential calls to either method skip the probe," matching `discover()`'s careful wording. The false concurrency claim is gone; the underlying non-atomic race is deferred (see below).
+- [x] [Review][Defer] Version-check concurrency race [client.py:820-823] — deferred, pre-existing: the non-atomic check-then-set is the identical pattern already in `discover()` (client.py:715); fixing only `discover_operations()` would be inconsistent and fixing both touches Epic 1–6 / fenced code. Benign (probe is idempotent; documented single-task discovery usage).
+- [x] [Review][Defer] Duplicate car/engine road+number silently collapse (last-wins) [layout.py:88-91] — deferred, pre-existing: `EntityCollection` is reused as-is (scope fence); cars/engines are keyed solely by system name with no user-name fallback, so a collision drops an entity with no diagnostic. Low real-world probability (JMRI enforces unique car IDs). Fix belongs in `EntityCollection`.
+- [x] [Review][Defer] Duplicate location/train user-name shadowing (last-wins) [layout.py:90-91] — deferred, pre-existing: same `EntityCollection` model; system-name access still works, so impact is limited to ambiguous user-name lookup.
 
 ## Dev Notes
 

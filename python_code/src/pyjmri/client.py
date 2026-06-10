@@ -787,8 +787,9 @@ class Client:
         On the first discovery against a given Client (whether via
         :meth:`discover` or this method), the JMRI application version is
         fetched from ``/json/v5/networkService`` and rejected if older
-        than 5.14 (NFR8). The check is cached for the Client's lifetime,
-        so it fires at most once regardless of call order.
+        than 5.14 (NFR8). The check is cached for the Client's lifetime
+        and shared with :meth:`discover` — subsequent sequential calls to
+        either method skip the probe.
 
         Returns:
             A populated :class:`~pyjmri.Operations`. A JMRI instance with
