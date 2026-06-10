@@ -23,7 +23,16 @@ from pyjmri.exceptions import (
 from pyjmri.layout import EntityCollection, Layout
 from pyjmri.light import Light, LightState
 from pyjmri.memory import Memory
-from pyjmri.operations import Car, Engine, Location, Placement, RouteStop, Track, Train
+from pyjmri.operations import (
+    Car,
+    Engine,
+    Location,
+    Operations,
+    Placement,
+    RouteStop,
+    Track,
+    Train,
+)
 from pyjmri.power import PowerState
 from pyjmri.route import Route, RouteState
 from pyjmri.sensor import Sensor, SensorState
@@ -54,6 +63,7 @@ __all__ = [
     "LightState",
     "Location",
     "Memory",
+    "Operations",
     "Placement",
     "PowerState",
     "ReconnectConfig",

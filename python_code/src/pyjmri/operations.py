@@ -15,10 +15,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from pyjmri.layout import EntityCollection
+
 __all__ = [
     "Car",
     "Engine",
     "Location",
+    "Operations",
     "Placement",
     "RouteStop",
     "Track",
@@ -176,3 +179,59 @@ class Train:
     route_stops: tuple[RouteStop, ...] = ()
     engines: tuple[Engine, ...] = ()
     cars: tuple[Car, ...] = ()
+
+
+class Operations:
+    """Read-only snapshot of a JMRI Operations session.
+
+    Returned by :meth:`pyjmri.Client.discover_operations`. Holds one
+    :class:`~pyjmri.EntityCollection` per Operations type — ``locations``,
+    ``trains``, ``cars``, ``engines`` — reusing the same dual-name
+    container that :class:`~pyjmri.Layout` uses.
+
+    This is a distinct subsystem from :class:`~pyjmri.Layout`: Operations
+    entities are pure data records (where a car is, what train it is on),
+    not commandable layout hardware. The container is therefore
+    **read-only and handle-free** — it exposes no command, set, wait, or
+    throttle method, only the four collection attributes (FR49).
+
+    The snapshot is point-in-time and is **not** WebSocket-subscribed; to
+    refresh, call :meth:`pyjmri.Client.discover_operations` again.
+
+    Locations and trains carry both a user name and a system name, so
+    dual-name lookup works (``ops.locations["NW_Staging_Yard"]`` and
+    ``ops.locations["2"]``). Cars and engines have no user name and are
+    keyed by road+number (``ops.cars["AA123"]``). A missing key raises
+    :class:`~pyjmri.LayoutEntityNotFound`.
+
+    Any constructor parameter omitted defaults to an empty
+    :class:`~pyjmri.EntityCollection` with the matching ``entity_type``,
+    so ``Operations()`` is a valid empty snapshot (FR50).
+
+    Args:
+        locations: Pre-built location collection, or ``None`` for empty.
+        trains: Pre-built train collection, or ``None`` for empty.
+        cars: Pre-built car collection, or ``None`` for empty.
+        engines: Pre-built engine collection, or ``None`` for empty.
+    """
+
+    def __init__(
+        self,
+        *,
+        locations: EntityCollection[Location] | None = None,
+        trains: EntityCollection[Train] | None = None,
+        cars: EntityCollection[Car] | None = None,
+        engines: EntityCollection[Engine] | None = None,
+    ) -> None:
+        self.locations: EntityCollection[Location] = (
+            locations if locations is not None else EntityCollection([], entity_type="location")
+        )
+        self.trains: EntityCollection[Train] = (
+            trains if trains is not None else EntityCollection([], entity_type="train")
+        )
+        self.cars: EntityCollection[Car] = (
+            cars if cars is not None else EntityCollection([], entity_type="car")
+        )
+        self.engines: EntityCollection[Engine] = (
+            engines if engines is not None else EntityCollection([], entity_type="engine")
+        )

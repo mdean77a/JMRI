@@ -25,8 +25,15 @@ __all__ = ["EntityCollection", "Layout"]
 
 
 class _NamedEntity(Protocol):
-    name: str
-    user_name: str | None
+    # Read-only members: EntityCollection only ever reads name/user_name,
+    # never writes them. Declaring them as properties (rather than
+    # read-write attributes) lets both the mutable-attribute layout
+    # entities (Turnout, Sensor, ...) AND the frozen-dataclass Operations
+    # entities (Location, Train, Car, Engine) satisfy the protocol.
+    @property
+    def name(self) -> str: ...
+    @property
+    def user_name(self) -> str | None: ...
 
 
 T = TypeVar("T", bound=_NamedEntity)

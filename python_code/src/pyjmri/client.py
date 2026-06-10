@@ -21,13 +21,17 @@ if TYPE_CHECKING:
 
 from pyjmri._parsing import (
     parse_block,
+    parse_car,
+    parse_engine,
     parse_light,
+    parse_location,
     parse_memory,
     parse_power,
     parse_route,
     parse_sensor,
     parse_signal_head,
     parse_signal_mast,
+    parse_train,
     parse_turnout,
 )
 from pyjmri._protocols import ClientHandle, Waitable
@@ -44,6 +48,7 @@ from pyjmri.exceptions import (
 from pyjmri.layout import EntityCollection, Layout
 from pyjmri.light import Light
 from pyjmri.memory import Memory
+from pyjmri.operations import Car, Engine, Location, Operations, Train
 from pyjmri.power import PowerState
 from pyjmri.route import Route
 from pyjmri.sensor import Sensor
@@ -763,6 +768,90 @@ class Client:
             handle=self,
         )
 
+    async def discover_operations(self) -> Operations:
+        """Enumerate every Operations entity from JMRI and return an Operations snapshot.
+
+        Issues ``GET /json/v5/{entity_type}`` in parallel via
+        :class:`asyncio.TaskGroup` for the four Operations types
+        (``location``, ``train``, ``car``, ``engine``), parses each with
+        the Story 8.1 parsers, and assembles the results into a read-only
+        :class:`~pyjmri.Operations` container.
+
+        This is a **separate entry point** from :meth:`discover` — it
+        returns an :class:`~pyjmri.Operations` (its own subsystem),
+        **not** a :class:`~pyjmri.Layout`, and does not touch the
+        Client's WebSocket-dispatch index. Operations entities are
+        read-only point-in-time snapshots, not WebSocket-subscribed; to
+        refresh, call this method again.
+
+        On the first discovery against a given Client (whether via
+        :meth:`discover` or this method), the JMRI application version is
+        fetched from ``/json/v5/networkService`` and rejected if older
+        than 5.14 (NFR8). The check is cached for the Client's lifetime,
+        so it fires at most once regardless of call order.
+
+        Returns:
+            A populated :class:`~pyjmri.Operations`. A JMRI instance with
+            no Operations data configured yields a container whose four
+            collections are empty — that is a valid result, not an error
+            (FR50).
+
+        Raises:
+            JMRIVersionUnsupported: when the running JMRI is older than
+                5.14 (only if the version check has not already run).
+            JMRIProtocolError: when a per-type response is malformed
+                (e.g., not a list, missing required fields).
+            JMRIConnectionError, JMRIRequestTimeout: surfaced from the
+                HTTP transport.
+            RuntimeError: when the Client is not open (use
+                ``async with Client() as jmri:`` first).
+
+        Note:
+            If one of the four parallel per-type fetches fails,
+            :class:`asyncio.TaskGroup` cancels the others and propagates
+            the underlying error wrapped in an :class:`ExceptionGroup`.
+            Catch with ``except* JMRIProtocolError`` (Python 3.11+) or
+            ``except ExceptionGroup``.
+        """
+        if self._http is None:
+            raise RuntimeError("Client is not open; use 'async with Client() as jmri:'")
+        http = self._http
+
+        if not self._version_checked:
+            version_payload = await http.get("/json/v5/networkService")
+            _check_jmri_version(version_payload)
+            self._version_checked = True
+
+        async with asyncio.TaskGroup() as tg:
+            fetch_tasks = {
+                entity_type: tg.create_task(_fetch_collection(http, entity_type))
+                for entity_type in _OPERATIONS_PARSERS
+            }
+
+        # Each Operations parser returns the public frozen entity directly
+        # (no _Parsed<Kind>/build step — these entities carry no handle).
+        # The dict is list[Any] because the parser table is heterogeneous;
+        # the per-variable annotations below pin the element type back down.
+        results: dict[str, list[Any]] = {
+            entity_type: [parser(env) for env in fetch_tasks[entity_type].result()]
+            for entity_type, parser in _OPERATIONS_PARSERS.items()
+        }
+        locations: list[Location] = results["location"]
+        trains: list[Train] = results["train"]
+        cars: list[Car] = results["car"]
+        engines: list[Engine] = results["engine"]
+
+        # Deliberately does NOT rebuild self._entities (the WS-dispatch
+        # index): Operations entities are read-only snapshots with no
+        # _on_event, and clobbering the index would break in-flight Layout
+        # wait_* calls (Epic 8 scope: Epics 1-6 behavior unchanged).
+        return Operations(
+            locations=EntityCollection(locations, entity_type="location"),
+            trains=EntityCollection(trains, entity_type="train"),
+            cars=EntityCollection(cars, entity_type="car"),
+            engines=EntityCollection(engines, entity_type="engine"),
+        )
+
     async def power_state(self) -> PowerState:
         """Return the current JMRI track-power state.
 
@@ -891,6 +980,21 @@ Adding a new entity type is one entry here plus the domain class.
 Entries with ``primary_attr=None`` are built and surfaced in the
 :class:`~pyjmri.Layout` but excluded from the WS dispatch index — their
 state changes are not modelled as waitable events in v1.
+"""
+
+
+_OPERATIONS_PARSERS: dict[str, Callable[[dict[str, Any]], Any]] = {
+    "location": parse_location,
+    "train": parse_train,
+    "car": parse_car,
+    "engine": parse_engine,
+}
+"""Single source of truth for the read-only Operations subsystem (FR45-FR48).
+
+Driven by :meth:`Client.discover_operations`. Simpler than
+:data:`_ENTITY_SPECS`: each Operations parser returns its public frozen
+entity directly, so there is no ``build`` step (no client handle) and no
+``primary_attr`` (Operations entities are not WebSocket-waitable).
 """
 
 
