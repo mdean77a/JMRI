@@ -24,6 +24,7 @@ profile.xml.4.bak
 **/operations/jsonManifests/
 **/operations/csvManifests/
 **/operations/csvSwitchLists/
+**/operations/autoBackups/
 **/.venv/
 **/.pytest_cache/
 **/.ruff_cache/

@@ -14,7 +14,8 @@
         <perform xmlns="" class="jmri.util.startup.configurexml.PerformActionModelXml" enabled="yes" name="apps.SystemConsoleAction" type="Action">
             <property name="systemPrefix" value=""/>
         </perform>
-        <perform xmlns="" class="jmri.util.startup.configurexml.PerformFileModelXml" enabled="yes" name="preference:March2026Settings.xml" type="XmlFile"/>
+        <perform xmlns="" class="jmri.util.startup.configurexml.PerformFileModelXml" enabled="yes" name="preference:June2026Settings.xml" type="XmlFile"/>
+        <perform xmlns="" class="jmri.util.startup.configurexml.PerformFileModelXml" enabled="no" name="preference:March2026Settings.xml" type="XmlFile"/>
         <perform xmlns="" class="jmri.util.startup.configurexml.PerformFileModelXml" enabled="no" name="preference:May2025Settings.xml" type="XmlFile"/>
         <perform xmlns="" class="jmri.util.startup.configurexml.PerformActionModelXml" enabled="yes" name="jmri.jmrit.withrottle.WiThrottleCreationAction" type="Action">
             <property name="systemPrefix" value=""/>
