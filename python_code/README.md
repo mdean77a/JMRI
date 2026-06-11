@@ -125,6 +125,8 @@ The biggest structural shift is from `AbstractAutomaton`'s synchronous `init()` 
 | `self.waitSensorInactive(s)` | `await s.wait_inactive()` |
 | `self.waitMsec(ms)` | `await asyncio.sleep(ms / 1000)` (see note (c)) |
 | `AbstractAutomaton init() / handle()` | top-level `async def` + `asyncio.run(...)` (see note (d)) |
+| `TrainManager.getTrainsByIdList()` | `(await jmri.discover_operations()).trains` (see note (e)) |
+| `CarManager.getByIdList()` | `(await jmri.discover_operations()).cars` (see note (e)) |
 
 ### Notes
 
@@ -132,3 +134,33 @@ The biggest structural shift is from `AbstractAutomaton`'s synchronous `init()` 
 - **(b) Throttle lifecycle is the async context manager.** `async with layout.throttle(addr, long=True) as t:` acquires on entry and releases on exit, including exception paths. No explicit `t.release()` call is needed; the Jython end-of-script release pattern goes away. (A `.release()` method exists for advanced cases — ordinary scripts don't need it.)
 - **(c) `asyncio.sleep` takes seconds, not milliseconds.** Add `import asyncio` at the top of the script (Jython's `waitMsec` was a method on `AbstractAutomaton`), and convert with `/ 1000` — `waitMsec(500)` becomes `await asyncio.sleep(0.5)`.
 - **(d) No `init` / `handle` analog.** `pyjmri` is event-driven, not polling: instead of returning `True` from `handle()` to keep looping, you `await` sensor events. The top-level structure is one `async def main()` wrapped in `asyncio.run(main())` — no base class to subclass.
+- **(e) Operations discovery is read-only and returns a snapshot.** `await jmri.discover_operations()` returns an `Operations` container with `.locations` / `.trains` / `.cars` / `.engines`, each looked up by name like a `Layout` collection. It is a point-in-time read — re-call to refresh. See the [Operations](#operations-read-only) section below.
+
+## Operations (read-only)
+
+JMRI's Operations module models an operating session: locations (yards, towns, staging), the cars and engines on the layout, and trains with assigned routes. `pyjmri` exposes it through a separate entry point:
+
+```python
+async with Client() as jmri:
+    ops = await jmri.discover_operations()
+    print(f"{len(ops.locations)} locations, {len(ops.trains)} trains, "
+          f"{len(ops.cars)} cars, {len(ops.engines)} engines")
+    for train in ops.trains.values():
+        print(train.user_name, "→", train.current_location)
+    for car in ops.cars.values():
+        print(car.name, "at", car.location, "on train", car.train)
+```
+
+`discover_operations()` returns an `Operations` container — distinct from the `Layout` returned by `discover()`. Locations and trains are looked up by both system and user name; cars and engines by road+number. A worked "where is every car" report is in [`examples/operations_report.py`](examples/operations_report.py).
+
+### Operations is not the roster
+
+The roster (DecoderPro's catalog) lists *every* engine you have ever programmed. Operations engines are the **operationally-active subset actually deployed** on the layout — you may have ~45 roster engines but only a handful running tonight. The two are intentionally separate: an Operations `Engine` is never a roster entry, and Operations tells you a car's current location and train assignment, which the roster cannot.
+
+### Fully simulator-testable
+
+Operations is a pure data subsystem — cars, engines, locations, and trains are records JMRI serves over JSON regardless of hardware. Unlike throttles and sensors (see [Limitations](#limitations)), Operations discovery is **not** subject to the open-loop blind spot, so it is fully exercisable on the NCE simulator with Operations data loaded.
+
+### Read-only in this release
+
+Operations discovery is **read-only**. There is no build-train, move/assign-car, or generate-manifest surface in `pyjmri` yet — those mutating operations are deferred to a future command increment. Today you can inspect the whole operating session as typed Python; you cannot change it.

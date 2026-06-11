@@ -1,5 +1,42 @@
 # pyjmri release notes
 
+## v1.1.0
+
+Adds read-only discovery of JMRI's Operations subsystem (Epic 8). No
+changes to existing Epic 1–6 behavior — purely additive.
+
+- New `Client.discover_operations()` returns a typed, read-only
+  `Operations` container enumerating locations, trains, cars, and
+  engines, looked up by name like a `Layout` collection.
+- Four read-only entity classes (`Location`, `Train`, `Car`, `Engine`)
+  plus nested value objects (`Track`, `Placement`, `RouteStop`),
+  exposing each entity's operational state (a car's location and train
+  assignment; a train's route and position; an engine's deployment).
+- Operations is the operationally-active subset actually deployed on the
+  layout — distinct from the roster (the DecoderPro catalog). Read-only
+  in this release: no build-train / move-assign-car / generate-manifest
+  surface (deferred to a future command increment).
+- A layout with no Operations data configured discovers empty
+  collections rather than raising (FR50).
+- New example `examples/operations_report.py` (a "where is every car"
+  report) and a README Operations section.
+
+JMRI version tested against: JMRI 5.14.0
+
+Long-run test: skipped for this release; v1.0.0 evidence reused
+(`duration=3600s disconnects=5 reconnects=5 rss_delta=-5.1MB fd_delta=0
+task_delta=0 status=PASS`). Epic 8 adds only read paths (HTTP discovery
++ parsing); it does not touch the WebSocket transport, reconnect
+machinery, or supervised-task plumbing, so the v1.0.0 long-run result
+still characterizes the same code.
+
+Hardware-mode validation: not required. Operations is a pure read-only
+data subsystem with no throttle/DCC or physical-state dependency; the
+Operations integration tests run fully against the NCE simulator with
+Operations data loaded. No throttle code changed in this release.
+
+(Published YYYY-MM-DD — Phase B: fill in at publish time)
+
 ## v1.0.1
 
 Security-pass cleanup; no API changes.

@@ -40,7 +40,7 @@ uv run --no-sync mypy --strict src/pyjmri
 uv run --no-sync pytest -m "not integration"
 ```
 
-The post-Story-6.4 unit-test baseline is **411 passed, 22 deselected**. The 22 deselected tests are `@pytest.mark.integration` tests excluded from the default run; see the next section for what they cover and why they live locally.
+The post-Story-8.3 unit-test baseline is **610 passed, 25 deselected**. The 25 deselected tests are `@pytest.mark.integration` tests excluded from the default run; see the next section for what they cover and why they live locally.
 
 `uv run` without `--no-sync` re-resolves the lockfile on every invocation, which is wasteful once `uv sync` has been run. The convention in this doc is uniform — every tool invocation takes `--no-sync` so a reader does not have to memorize which commands need the flag. The exception is `uv build`, `uv sync`, `uv publish`, and `uv add` — those are `uv` commands themselves, not "run a tool inside the venv" invocations, and they do not take `--no-sync`.
 
@@ -48,8 +48,8 @@ The post-Story-6.4 unit-test baseline is **411 passed, 22 deselected**. The 22 d
 
 `pyjmri` ships two test suites:
 
-- **Unit tests** (the 411 above) — no external dependencies, run in CI on every push and PR.
-- **Integration tests** (the 22 deselected) — require a real JMRI 5.14+ instance at `localhost:12080` with a panel file loaded, and are **excluded from CI**.
+- **Unit tests** (the 610 above) — no external dependencies, run in CI on every push and PR.
+- **Integration tests** (the 25 deselected) — require a real JMRI 5.14+ instance at `localhost:12080` with a panel file loaded, and are **excluded from CI**.
 
 The CI workflow at `.github/workflows/ci.yml` runs `pytest -m "not integration"` across `[ubuntu-latest, macos-latest] × ['3.11', '3.12', '3.13']`. No CI job spins up a JMRI instance. Headless-JMRI CI is Growth-deferred — not under consideration for v1.
 
@@ -65,6 +65,7 @@ Pre-conditions:
 
 - JMRI 5.14 or later is running on the same machine (or reachable on the LAN) with its web server enabled.
 - A panel file is loaded. Most integration tests are layout-agnostic; `Basement_Revised_2024.jmri` or the NCE simulator profile both work.
+- **For the Operations integration tests** (`tests/integration/test_operations_discovery.py`): the loaded profile must have JMRI Operations data configured. These tests are **not** layout-agnostic — they assert non-empty locations/trains/cars/engines. `Basement_Revised_2024.jmri` carries this data (3 locations / 4 engines / 3 cars / 1 train / 1 route); a bare NCE simulator profile without Operations data exercises only the empty-collection path and the rest skip. Operations is pure JSON data, so no hardware or physical layout is needed — the simulator with Operations data loaded is sufficient.
 - `pyjmri` is installed in the active venv (i.e., you have run `uv sync`).
 
 If JMRI is not reachable, the `conftest`'s skip-on-absence fixture skips the integration tests with a clear message rather than failing them — so it is safe to run the full suite from a state where JMRI may or may not be up.
@@ -121,9 +122,9 @@ Every command uses `uv run --no-sync` for tool invocations. The exceptions are `
    uv run --no-sync pytest -m "not integration"
    ```
 
-   Expected: `411 passed, 22 deselected` (post-Story-6.4 baseline). The passed count may grow as the library grows; the deselected count may grow as new `@pytest.mark.integration` tests are added. Any failure halts the release until the failing test is either fixed (regression) or explicitly de-scoped via story.
+   Expected: `610 passed, 25 deselected` (post-Story-8.3 baseline). The passed count may grow as the library grows; the deselected count may grow as new `@pytest.mark.integration` tests are added. Any failure halts the release until the failing test is either fixed (regression) or explicitly de-scoped via story.
 
-4. **Full integration suite passes against a real JMRI instance.** Start JMRI with `Basement_Revised_2024.jmri` (or an equivalent layout / the simulator), confirm the web server is up at `localhost:12080`, then run the integration suite minus the long-run test:
+4. **Full integration suite passes against a real JMRI instance.** Start JMRI with `Basement_Revised_2024.jmri` (or an equivalent layout / the simulator), confirm the web server is up at `localhost:12080`, then run the integration suite minus the long-run test. Note: the Operations integration tests need Operations data loaded — `Basement_Revised_2024.jmri` has it; a bare simulator profile without Operations data is insufficient for that subset (see "Running integration tests locally" above):
 
    ```bash
    uv run --no-sync pytest -m "integration and not slow"
