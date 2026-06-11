@@ -146,9 +146,10 @@ async with Client() as jmri:
     print(f"{len(ops.locations)} locations, {len(ops.trains)} trains, "
           f"{len(ops.cars)} cars, {len(ops.engines)} engines")
     for train in ops.trains.values():
-        print(train.user_name, "→", train.current_location)
+        print(train.user_name or train.name, "→", train.current_location or "—")
     for car in ops.cars.values():
-        print(car.name, "at", car.location, "on train", car.train)
+        loc = car.location.name if car.location else "—"
+        print(car.name, "at", loc, "on train", car.train or "—")
 ```
 
 `discover_operations()` returns an `Operations` container — distinct from the `Layout` returned by `discover()`. Locations and trains are looked up by both system and user name; cars and engines by road+number. A worked "where is every car" report is in [`examples/operations_report.py`](examples/operations_report.py).

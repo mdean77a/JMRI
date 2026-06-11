@@ -1,6 +1,6 @@
 # Story 8.3: Read-only boundary test + Operations example + docs + v1.1 release
 
-Status: review
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -66,6 +66,24 @@ so that I can write my own "where is every car" reports (PRD Journey 5), underst
 - [x] **Task 6 — Final verification**
   - [x] Run `examples/operations_report.py` against the live basement JMRI (`localhost:12080`, Operations data loaded) and confirm it prints the Journey-5 report without modification (AC #3).
   - [x] Confirm all Phase-A gates green and the boundary test passes. Record the final unit-test count.
+
+### Review Findings
+
+Code review 2026-06-11 (commit `5cc2bd8`, layers: Blind Hunter / Edge Case Hunter / Acceptance Auditor):
+
+- [x] [Review][Patch] Bad `--url` value crashes with a raw `ValueError` traceback — `Client(url)` is constructed outside the `try` and `_parse_url` raises plain `ValueError` (missing port, bad port, bad scheme), bypassing `except* JMRIError`; the most likely user typo produces exactly the traceback AC4's spirit forbids [python_code/examples/operations_report.py:110]
+- [x] [Review][Patch] CONTRIBUTING misdescribes the Operations suite on a bare simulator — "the rest skip" is wrong: `test_discover_operations_returns_populated_container` hard-fails its `len(...) > 0` asserts, only the dual-name test skips, and the NFR2 test passes on empty data; a contributor will misread a red run as expected (AC6 partial) [python_code/CONTRIBUTING.md:68]
+- [x] [Review][Patch] RELEASES.md v1.1.0 hard-wrap puts `+ ` at line start — CommonMark renders `+ parsing); it does not touch…` as a stray one-item bullet list mid-sentence; rewrap so no line begins with `+ ` [python_code/RELEASES.md:29]
+- [x] [Review][Patch] Partially-empty Operations data prints bare section headers — the empty guard fires only when all four collections are empty; e.g. locations but zero cars prints "Cars — where is every car:" followed by nothing (the per-section "empty sections" case AC4 aimed at); add per-section `(none)` fallbacks [python_code/examples/operations_report.py:87-99]
+- [x] [Review][Patch] Nested `ExceptionGroup` renders the generic TaskGroup repr in the friendly message — `"; ".join(str(exc) for exc in eg.exceptions)` walks one level; a group-in-group (e.g. concurrent supervisor failure) prints "unhandled errors in a TaskGroup (N sub-exceptions)" instead of the leaf reason; flatten leaves recursively [python_code/examples/operations_report.py:121]
+- [x] [Review][Patch] Connection-failure path exits with status 0 — the `except*` handler prints and falls through to a normal return, so cron/script wrappers cannot distinguish failure from success; `raise SystemExit(1)` at the end of the handler (empty-data return stays 0 — that is success per FR50) [python_code/examples/operations_report.py:120-123]
+- [x] [Review][Patch] README Operations snippet prints raw `None` / `Placement` reprs — `print(train.user_name, "→", train.current_location)` and the car line emit `None → None` and a verbose dataclass repr for the very fields the diff documents as optional; make the snippet None-safe or trim it [python_code/README.md, Operations section snippet]
+- [x] [Review][Patch] Task-1 fixture deviation not recorded — the subtask "use `load_fixture` to parse real entities" is checked `[x]` but the test constructs instances directly (sound rationale, in-file comment only); add one line to Completion Notes disclosing the deviation [this story file, Completion Notes]
+- [x] [Review][Patch] Boundary-test comment overstates itself — "documents the full read-only attribute surface" but `Location` is built without `tracks` and other defaulted fields are omitted; soften the comment [python_code/tests/unit/test_operations_boundary.py:559]
+- [x] [Review][Defer] `httpx.DecodingError` / `TooManyRedirects` are not translated to `JMRIError` in the transport, so they escape the example's handler and traceback [python_code/src/pyjmri/_transport.py:101-117] — deferred, pre-existing (scope-fenced src; affects all callers, fix belongs in `_transport.py`)
+- [x] [Review][Defer] Sibling examples (`hello_jmri.py`, `show_discovery.py`, etc.) share the `Client(url)`-outside-`try` raw-`ValueError` pattern [python_code/examples/*.py] — deferred, pre-existing (same fix as the operations_report patch, separate sweep)
+
+Dismissed as noise (5): dead `discover()` call (spec-mandated by Task 2 / Journey 5); `dir()` allowlist contradicts Dev-Notes pattern (it implements Task 1's "only locations/trains/cars/engines attributes" wording; the fragility is the point of a boundary test); `uv.lock` missing from diff vs File List (reviewer diff filtered `uv.lock`; commit verified to contain it); Ctrl-C traceback (precedent-conforming across all examples); AC4(a) verified function-level only (Dev Record is honest about the method; nothing to fix).
 
 ## Dev Notes
 
@@ -155,6 +173,7 @@ Claude Opus 4.8 (1M context) — `claude-opus-4-8[1m]`
 - **AC7 (release prep — Phase A only):** bumped `pyproject.toml` 1.0.1 → 1.1.0, regenerated `uv.lock`, added the `## v1.1.0` RELEASES.md entry (long-run reused, hardware validation waived — read-only data), clean build + twine check + all gates green. **STOPPED at the publish boundary** per the scope fence.
 - **Remaining Phase-B steps for Mikey (manual, not done here):** re-run gates + Operations integration tests against live JMRI; TestPyPI dry-run; `uv publish` to production PyPI; fresh-venv smoke install; `git tag v1.1.0` + push; GitHub release; fill the `(Published YYYY-MM-DD)` date in RELEASES.md. No throttle-hardware validation required.
 - **Scope fence honored:** no Epic 1–6 behavior, Story 8.1 entity classes/parsers, `_codes.py`, `EntityCollection`, or `discover`/`discover_operations` logic was modified. No mutating surface added.
+- **Task 1 deviation (recorded post-review):** the subtask called for `load_fixture`-parsed entities; the boundary test instead constructs all instances directly — method absence is a class-level property, so fixtures add nothing. The rationale lives in the test's module comment; flagged by code review and disclosed here.
 
 ### File List
 

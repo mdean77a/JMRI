@@ -25,8 +25,8 @@ JMRI version tested against: JMRI 5.14.0
 
 Long-run test: skipped for this release; v1.0.0 evidence reused
 (`duration=3600s disconnects=5 reconnects=5 rss_delta=-5.1MB fd_delta=0
-task_delta=0 status=PASS`). Epic 8 adds only read paths (HTTP discovery
-+ parsing); it does not touch the WebSocket transport, reconnect
+task_delta=0 status=PASS`). Epic 8 adds only read paths (HTTP discovery +
+parsing); it does not touch the WebSocket transport, reconnect
 machinery, or supervised-task plumbing, so the v1.0.0 long-run result
 still characterizes the same code.
 

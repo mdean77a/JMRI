@@ -29,7 +29,8 @@ Graceful degradation
 - If JMRI has no Operations data configured, the four collections come back
   empty (a valid result, not an error); the script says so and exits cleanly.
 - If JMRI is unreachable or returns a malformed response, the script prints a
-  short explanation instead of a traceback.
+  short explanation instead of a traceback and exits with a non-zero status.
+- An invalid ``--url`` value is reported with a one-line message (exit code 2).
 
 Simulator note
 --------------
@@ -50,6 +51,13 @@ from pyjmri import Client, JMRIError, Operations, Placement
 def _fmt(value: str | None, fallback: str = "—") -> str:
     """Render an optional string, using a dash for None/empty."""
     return value if value else fallback
+
+
+def _leaf_messages(exc: BaseException) -> list[str]:
+    """Flatten an exception (or nested ExceptionGroup) into its leaf messages."""
+    if isinstance(exc, BaseExceptionGroup):
+        return [msg for sub in exc.exceptions for msg in _leaf_messages(sub)]
+    return [str(exc)]
 
 
 def _fmt_placement(placement: Placement | None) -> str:
@@ -85,11 +93,15 @@ def print_report(ops: Operations) -> None:
     )
 
     print("\nLocations:")
+    if not ops.locations:
+        print("  (none)")
     for loc in ops.locations.values():
         tracks = ", ".join(_fmt(t.user_name, t.name) for t in loc.tracks) or "—"
         print(f"  {_fmt(loc.user_name, loc.name)}  (tracks: {tracks})")
 
     print("\nTrains — where is each one:")
+    if not ops.trains:
+        print("  (none)")
     for train in ops.trains.values():
         print(
             f"  {_fmt(train.user_name, train.name)} → at {_fmt(train.current_location)}"
@@ -97,6 +109,8 @@ def print_report(ops: Operations) -> None:
         )
 
     print("\nCars — where is every car:")
+    if not ops.cars:
+        print("  (none)")
     for car in ops.cars.values():
         print(
             f"  {car.name:<10} at {_fmt_placement(car.location)}"
@@ -107,7 +121,14 @@ def print_report(ops: Operations) -> None:
 
 async def main(args: argparse.Namespace) -> None:
     url: str | None = args.url
-    client = Client(url) if url is not None else Client()
+    try:
+        client = Client(url) if url is not None else Client()
+    # An invalid --url (missing/bad port, unsupported scheme) raises ValueError
+    # from Client() before any connection is attempted.
+    except ValueError as exc:
+        print(f"Invalid --url {url!r}: {exc}")
+        raise SystemExit(2) from None
+    exit_code = 0
     try:
         async with client as jmri:
             # Journey 5 calls discover() first, then discover_operations().
@@ -115,12 +136,18 @@ async def main(args: argparse.Namespace) -> None:
             ops = await jmri.discover_operations()
             print_report(ops)
     # discover_operations() fetches the four types in an asyncio.TaskGroup, so a
-    # failure arrives wrapped in an ExceptionGroup; a connection failure on open
-    # arrives bare. `except*` handles both (it matches a naked exception too).
+    # failure arrives wrapped in an ExceptionGroup (possibly nested); a connection
+    # failure on open arrives bare. `except*` handles both (it matches a naked
+    # exception too); _leaf_messages flattens any nesting to the real reasons.
     except* JMRIError as eg:
-        reasons = "; ".join(str(exc) for exc in eg.exceptions)
-        print(f"Could not read Operations from JMRI: {reasons}")
+        print(f"Could not read Operations from JMRI: {'; '.join(_leaf_messages(eg))}")
         print(f"Is JMRI running with the web server enabled at {url or 'localhost:12080'}?")
+        exit_code = 1
+    # `return` is a syntax error inside an except* block, and a raise there can be
+    # re-grouped with unhandled siblings, so the exit code is carried out and
+    # raised here instead.
+    if exit_code:
+        raise SystemExit(exit_code)
 
 
 def _parse_args() -> argparse.Namespace:

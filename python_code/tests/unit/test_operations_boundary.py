@@ -57,7 +57,7 @@ _FORBIDDEN_METHODS = (
 
 # One representative instance of every public Operations type, built directly —
 # method absence is a class-level property, so this needs no live JMRI or
-# fixtures. Construction also documents the full read-only attribute surface.
+# fixtures. Instances are minimal — defaulted fields are omitted.
 _INSTANCES = [
     pytest.param(Track(name="1s1", user_name=None), id="Track"),
     pytest.param(Placement(name="1", user_name=None, track=None), id="Placement"),
