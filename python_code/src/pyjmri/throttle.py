@@ -143,7 +143,7 @@ class Throttle:
             return
         await self._release_impl(suppress_errors=False)
 
-    async def set_speed(self, value: float, *, forward: bool) -> None:
+    async def set_speed(self, value: float, *, forward: bool = True) -> None:
         """Set speed and direction in a single fire-and-forget WS update (FR25).
 
         Sends ``{"type":"throttle","data":{"throttle":<id>,"speed":<value>,
@@ -162,7 +162,8 @@ class Throttle:
                 <= 1.0`` evaluates ``False`` for NaN and for ``-inf``;
                 ``inf > 1.0`` catches positive infinity. ``0.0`` is a
                 valid emergency stop.
-            forward: ``True`` for forward, ``False`` for reverse.
+            forward: ``True`` for forward, ``False`` for reverse. Optional;
+                defaults to ``True`` (forward) when omitted.
 
         Raises:
             ThrottleReleased: when called after :meth:`release` (carries
