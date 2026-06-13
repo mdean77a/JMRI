@@ -12,6 +12,7 @@ come-home; the script then drives the train back and parks it.
 import asyncio
 import logging
 import sys
+from datetime import datetime
 
 from pyjmri import Client
 
@@ -53,6 +54,16 @@ async def slow_through(layout, t, schedule):
         await t.set_speed(speed, forward=True)
 
 
+async def count_laps(throat) -> None:
+    """Print one line per lap while the train is on the mainline."""
+    lap = 0
+    while True:
+        await throat.wait_active()
+        lap += 1
+        print(f"Lap {lap} at {datetime.now():%H:%M:%S}")
+        await throat.wait_inactive()
+
+
 async def run_train(layout, dcc, staging_track, return_track, come_home):
     print(f"[{dcc}] preparing to depart {staging_track}")
     throat = layout.sensors["West / SW"]
@@ -66,18 +77,25 @@ async def run_train(layout, dcc, staging_track, return_track, come_home):
             await t.set_speed(0.2)
             await wait_edge(throat)
             await layout.routes["NW Staging Close"].activate()
-            await t.set_speed(0.4)
+            await t.set_speed(0.8)
             print("Now we fire the come home event, and we will fall into the return routine")
+            lap_task = asyncio.create_task(count_laps(throat))
             try:
                 await come_home.wait()
                 print("come_home.wait() returned cleanly")
             except BaseException as e:
                 print(f"come_home.wait() raised: {type(e).__name__}: {e}")
                 raise
+            finally:
+                lap_task.cancel()
+                try:
+                    await lap_task
+                except asyncio.CancelledError:
+                    pass
             print(f"{dcc} has been commanded to return to staging")
             await slow_through(layout, t, [
-                ("North Zone 9", 0.20),
-                ("West / SW", 0.15),
+                ("North Zone 9", 0.30),
+                ("West / SW", 0.25),
             ])
             await throat.wait_inactive()
             await t.set_speed(0)
