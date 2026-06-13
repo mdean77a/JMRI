@@ -72,13 +72,13 @@ async def run_train(layout, dcc, staging_track, return_track, come_home):
     try:
         async with layout.throttle(dcc, long=True) as t:
             await t.set_function(0, True)
-            await t.set_speed(0.05, forward=True)
+            await t.set_speed(0.2, forward=True)
             print(f"[{dcc}] departing {staging_track}")
-            await t.set_speed(0.2)
+            #await t.set_speed(0.2)
             await wait_edge(throat)
             await layout.routes["NW Staging Close"].activate()
             await t.set_speed(0.8)
-            print("Now we fire the come home event, and we will fall into the return routine")
+            print("When you want the train to return home, press the Enter key.")
             lap_task = asyncio.create_task(count_laps(throat))
             try:
                 await come_home.wait()
