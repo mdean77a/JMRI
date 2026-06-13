@@ -17,7 +17,7 @@ from datetime import datetime
 from pyjmri import Client
 
 
-HOST = "192.168.1.159:12080"
+HOST = "localhost:12080"
 DCC = 8997
 STAGING_TRACK = "NW Track 6"
 RETURN_TRACK = "NW Track 6"

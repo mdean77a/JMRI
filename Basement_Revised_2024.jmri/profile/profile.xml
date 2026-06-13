@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <auxiliary-configuration xmlns="http://www.netbeans.org/ns/auxiliary-configuration/1">
     <connections xmlns="http://jmri.org/xml/schema/auxiliary-configuration/connections-2-9-6.xsd">
-        <connection xmlns="" class="jmri.jmrix.nce.simulator.configurexml.ConnectionConfigXml" disabled="no" manufacturer="NCE" port="" reconnectMaxAttempts="100" reconnectMaxInterval="120" speed="" systemPrefix="N" turnoutInterval="250" userName="NCE">
+        <connection xmlns="" class="jmri.jmrix.nce.usbdriver.configurexml.ConnectionConfigXml" disabled="no" manufacturer="NCE" port="cu.usbserial-0001" reconnectMaxAttempts="100" reconnectMaxInterval="120" speed="19200" systemPrefix="N" turnoutInterval="250" userName="NCE">
             <options>
                 <option>
-                    <name>Eprom</name>
-                    <value>Mar 3 2007 to Jan 24 2008</value>
+                    <name>System</name>
+                    <value>SB5</value>
+                </option>
+                <option>
+                    <name>USB Version</name>
+                    <value>V7.x.x</value>
                 </option>
             </options>
         </connection>
