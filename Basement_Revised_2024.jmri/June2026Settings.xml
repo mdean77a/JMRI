@@ -509,7 +509,7 @@
     <memory>
       <systemName>IM:AUTO:0007</systemName>
     </memory>
-    <memory value="3:15 PM">
+    <memory>
       <systemName>IMCURRENTTIME</systemName>
     </memory>
     <memory value="1.0">
@@ -2058,6 +2058,8 @@
     <route userName="Straight Through">
       <systemName>IO:AUTO:0015</systemName>
       <userName>Straight Through</userName>
+      <routeOutputTurnout systemName="South Turnout 100" state="CLOSED" />
+      <routeOutputTurnout systemName="South Turnout 118" state="CLOSED" />
       <routeOutputTurnout systemName="East Turnout 201" state="CLOSED" />
       <routeOutputTurnout systemName="East Turnout 202" state="THROWN" />
       <routeOutputTurnout systemName="East Turnout 203" state="CLOSED" />
@@ -7428,107 +7430,4 @@
     <positionablepoint ident="A42" type="ANCHOR" x="504.0" y="1071.0" connect1name="T126" class="jmri.jmrit.display.layoutEditor.configurexml.PositionablePointXml" />
     <levelxing ident="X1" blocknameac="EZ8" blocknamebd="EZ11" connectaname="T239" connectbname="T240" connectcname="T67" connectdname="T241" xcen="933.6488037109375" ycen="1140.3004150390625" xa="962.6641235351562" ya="1148.1885986328125" xb="963.660400390625" yb="1140.286376953125" class="jmri.jmrit.display.layoutEditor.configurexml.LevelXingXml" />
   </LayoutEditor>
-  <filehistory>
-    <operation>
-      <type>app</type>
-      <date>Sat Jun 13 15:13:52 MDT 2026</date>
-      <filename>PanelPro (v5.14.0)</filename>
-    </operation>
-    <operation>
-      <type>Load OK</type>
-      <date>Sat Jun 13 15:13:53 MDT 2026</date>
-      <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/June2026Settings.xml</filename>
-      <filehistory>
-        <operation>
-          <type>app</type>
-          <date>Thu Jun 11 16:41:33 MDT 2026</date>
-          <filename>PanelPro (v5.14.0)</filename>
-        </operation>
-        <operation>
-          <type>Load OK</type>
-          <date>Thu Jun 11 16:41:41 MDT 2026</date>
-          <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/June2026Settings.xml</filename>
-          <filehistory>
-            <operation>
-              <type>app</type>
-              <date>Thu Jun 11 16:39:19 MDT 2026</date>
-              <filename>PanelPro (v5.14.0)</filename>
-            </operation>
-            <operation>
-              <type>Load OK</type>
-              <date>Thu Jun 11 16:39:27 MDT 2026</date>
-              <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
-              <filehistory>
-                <operation>
-                  <type>app</type>
-                  <date>Wed Apr 01 17:12:53 MDT 2026</date>
-                  <filename>PanelPro (v5.14.0)</filename>
-                </operation>
-                <operation>
-                  <type>Load OK</type>
-                  <date>Wed Apr 01 17:13:01 MDT 2026</date>
-                  <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
-                  <filehistory>
-                    <operation>
-                      <type>app</type>
-                      <date>Wed Apr 01 16:50:56 MDT 2026</date>
-                      <filename>PanelPro (v5.14.0)</filename>
-                    </operation>
-                    <operation>
-                      <type>Load OK</type>
-                      <date>Wed Apr 01 16:51:00 MDT 2026</date>
-                      <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
-                      <filehistory>
-                        <operation>
-                          <type>app</type>
-                          <date>Wed Apr 01 16:06:18 MDT 2026</date>
-                          <filename>PanelPro (v5.14.0)</filename>
-                        </operation>
-                        <operation>
-                          <type>Load OK</type>
-                          <date>Wed Apr 01 16:06:27 MDT 2026</date>
-                          <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
-                        </operation>
-                        <operation>
-                          <type>Store</type>
-                          <date>Wed Apr 01 16:16:02 MDT 2026</date>
-                          <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
-                        </operation>
-                      </filehistory>
-                    </operation>
-                    <operation>
-                      <type>Store</type>
-                      <date>Wed Apr 01 17:02:09 MDT 2026</date>
-                      <filename>/Users/mdean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
-                    </operation>
-                  </filehistory>
-                </operation>
-                <operation>
-                  <type>Store</type>
-                  <date>Sun Apr 05 22:26:13 MDT 2026</date>
-                  <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/March2026Settings.xml</filename>
-                </operation>
-              </filehistory>
-            </operation>
-            <operation>
-              <type>Store</type>
-              <date>Thu Jun 11 16:41:16 MDT 2026</date>
-              <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/June2026Settings.xml</filename>
-            </operation>
-          </filehistory>
-        </operation>
-        <operation>
-          <type>Store</type>
-          <date>Thu Jun 11 16:46:12 MDT 2026</date>
-          <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/June2026Settings.xml</filename>
-        </operation>
-      </filehistory>
-    </operation>
-    <operation>
-      <type>Store</type>
-      <date>Sat Jun 13 15:15:42 MDT 2026</date>
-      <filename>/Users/jmichaeldean/JMRI/Basement_Revised_2024.jmri/June2026Settings.xml</filename>
-    </operation>
-  </filehistory>
-  <!--Written by JMRI version 5.14+Rdea51dcccf on Sat Jun 13 15:15:42 MDT 2026-->
 </layout-config>
