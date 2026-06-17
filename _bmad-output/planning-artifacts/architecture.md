@@ -3,7 +3,7 @@ stepsCompleted: ['step-01-init', 'step-02-context', 'step-03-starter', 'step-04-
 lastStep: 8
 status: 'complete'
 completedAt: '2026-05-06'
-lastEdited: '2026-06-09'
+lastEdited: '2026-06-17'
 inputDocuments:
   - '_bmad-output/planning-artifacts/prd.md'
   - '_bmad-output/planning-artifacts/prd-validation-report.md'
@@ -14,6 +14,8 @@ date: '2026-05-06'
 editHistory:
   - date: '2026-06-09'
     changes: 'Added "Operations Subsystem (Read-Only)" decision section (Epic 8 / FR45-FR50): separate Operations container + discover_operations(), snapshot-not-live, reuse EntityCollection, read-only data objects, parsing reuse. Updated Internal Layering + directory structure (operations.py, fixtures, tests, example), added FR45-FR50 requirements mapping, moved read-only Operations off the Vision-deferred list (command ops remain deferred).'
+  - date: '2026-06-17'
+    changes: 'Added "Roster Subsystem (Read-Only)" decision section (Epic 9 / FR51-FR59, correct-course): standalone Client.discover_roster() -> Roster mirroring discover_operations() (NOT folded into Layout/discover()), graceful-degrade on fetch failure, Roster as EntityCollection[RosterEntry] + client-built by_address index, read-only RosterEntry/FunctionLabel, capability-from-function-labels, Client.throttle_for_entry. Recorded the rejected folded-into-Layout design (forced a never-raise TaskGroup wrapper + layout<->roster import cycle). Added FR51-FR59 requirements mapping; updated directory tree (discover_roster, FunctionLabel/by_address, roster test + examples) and discover() minimum-coverage list (roster moved to discover_roster).'
 projectClassification:
   projectType: 'developer_tool'
   domain: 'general (iot / process-control flavor)'
@@ -42,7 +44,8 @@ _This document builds collaboratively through step-by-step discovery. Sections a
   `Layout`; entities indexed by both system name and user name; full
   iteration without re-discovery; typed `LayoutEntityNotFound` on miss;
   minimum entity coverage = turnouts, sensors, blocks, lights, memories,
-  routes, signal heads, signal masts, roster entries.
+  routes, signal heads, signal masts. (Roster entries are discovered
+  separately via `discover_roster()` — see the Roster Subsystem section.)
 - *Entity Read* (FR13–FR16): typed state read for every entity;
   `unknown` distinguishable from every other state; memory value read;
   power state read (read-only on supported hardware).
@@ -641,6 +644,65 @@ Vision-deferred.
   live updates (outside the v1.1 read-only contract; revisit with the
   command increment).
 
+### Roster Subsystem (Read-Only)
+
+JMRI's roster — the full DecoderPro locomotive catalog — is a distinct
+read-only data subsystem. v1.2 adds capability-aware **read-only
+discovery** of it (FR51–FR59, PRD Journey 6). It is modelled identically
+to Operations.
+
+- **Separate container, separate entry point.** `Client.discover_roster()`
+  returns a `Roster` — NOT folded into `Layout`/`discover()`. A separate
+  method keeps the two read-only snapshot subsystems (Operations, roster)
+  symmetric, leaves Epic 1–6 behavior byte-for-byte unchanged, and lets
+  layouts/users that don't need the roster pay nothing. (Decision
+  corrected 2026-06-17: an earlier Epic 9 design folded the roster into
+  `discover()`; that coupling forced a never-raise TaskGroup wrapper and a
+  layout↔roster import cycle, so it was reversed to this standalone form.)
+- **Snapshot, not a live model.** A point-in-time HTTP snapshot; roster
+  entries are not WebSocket-subscribed and expose no `wait_*` primitives.
+  To refresh, call `discover_roster()` again. It does not touch the
+  WS-dispatch index (`self._entities`).
+- **Reuses `EntityCollection[T]`, extended with an address index.**
+  `Roster` subclasses `EntityCollection[RosterEntry]` and adds a
+  client-built address→entry index backing `by_address(n) -> RosterEntry |
+  None` (a `get()`-style find; `None` + WARNING on a miss, FR51/FR55).
+  Entries have no `userName` (the roster ID is the name), so name lookup
+  uses the system-name index; `LayoutEntityNotFound` is reused for name
+  misses. Duplicate DCC addresses resolve first-wins + WARNING.
+- **Read-only data objects — no client handle.** `RosterEntry` and
+  `FunctionLabel` are frozen typed snapshots (FR56) with no command/set/
+  wait methods. `RosterEntry` is a distinct type from Operations' `Engine`
+  (full catalog vs operationally-active subset), not an alias.
+- **Capability from function labels, not decoder strings.** Capability
+  classification (Story 9.3) keys off per-function labels, explicitly not
+  `decoder_family`/`decoder_model` (which are date-stamped definition-file
+  names). Falls back to motor-only when labels are blank/unrecognized.
+- **Throttle acquisition on the Client.** `Client.throttle_for_entry(entry
+  | name | address)` derives long/short addressing from the matched entry
+  and returns the same `Throttle` as the raw path. An unknown address
+  warns and acquires motor-only best-effort (FR55); an unresolvable name
+  raises.
+- **Graceful-degrade (FR57).** A roster fetch failure returns an empty
+  `Roster` + WARNING rather than raising. Being a separate call, it cannot
+  affect layout discovery — no shared TaskGroup, so no sibling-cancellation
+  risk to engineer around.
+- **Parsing reuses existing machinery.** `_parsing.parse_roster_entry` is
+  extended to emit a frozen `RosterEntry` directly (Epic 8 direct-parser
+  pattern; the Epic-2 `_ParsedRosterEntry` intermediate is dropped).
+  `_codes.py` is untouched — roster entries carry no integer state enums.
+- **Fully simulator-testable.** Pure metadata over JSON — not subject to
+  the open-loop blind spot. Unit tests parse a captured `roster.json`
+  fixture; an integration test exercises `discover_roster()` (populated +
+  empty paths).
+- **Rejected:** folding the roster into `Layout`/`discover()` (the original
+  Epic 9 design — couples an optional subsystem to core discovery, forces a
+  never-raise TaskGroup wrapper for FR57, and creates a layout↔roster
+  import cycle); per-entity modules (`RosterEntry`/`FunctionLabel` are
+  cohesive in one `roster.py`); WebSocket-subscribing the roster (outside
+  the read-only contract); roster groups and any mutation (stay in
+  DecoderPro).
+
 ### Internal Layering
 
 ```text
@@ -1054,7 +1116,7 @@ python_code/                              # repo-root for pyjmri (named per Step
 ├── src/
 │   └── pyjmri/
 │       ├── __init__.py                   # public re-exports + __all__
-│       ├── client.py                     # Client (FR1–FR7); discover_operations() (FR45–FR50)
+│       ├── client.py                     # Client (FR1–FR7); discover_operations() (FR45–FR50); discover_roster() + throttle_for_entry (FR51–FR59)
 │       ├── layout.py                     # Layout, EntityCollection (FR8–FR12)
 │       ├── operations.py                 # Operations, Location, Train, Car, Engine (FR45–FR50)
 │       ├── turnout.py                    # Turnout, TurnoutState
@@ -1065,7 +1127,7 @@ python_code/                              # repo-root for pyjmri (named per Step
 │       ├── route.py                      # Route
 │       ├── signal.py                     # SignalHead, SignalMast, aspect enums
 │       ├── throttle.py                   # Throttle (FR23–FR28)
-│       ├── roster.py                     # Roster, RosterEntry
+│       ├── roster.py                     # Roster, RosterEntry, FunctionLabel (read-only; discover_roster, by_address) (FR51–FR59)
 │       ├── power.py                      # PowerState read (FR16)
 │       ├── exceptions.py                 # JMRIError hierarchy (FR34–FR35)
 │       ├── automaton.py                  # higher-level patterns (v1 stub; Growth)
@@ -1102,7 +1164,8 @@ python_code/                              # repo-root for pyjmri (named per Step
 │   │   ├── test_state_machine.py         # waiter list, predicate fanout, early-return
 │   │   ├── test_layout_collection.py     # dual-name lookup + collision rule
 │   │   ├── test_exceptions.py            # diagnostic context, chaining, __str__
-│   │   └── test_operations_parsing.py    # _parsing.py operations parsers (FR45–FR48)
+│   │   ├── test_operations_parsing.py    # _parsing.py operations parsers (FR45–FR48)
+│   │   └── test_roster_parsing.py        # _parsing.py roster parser (FR51–FR53)
 │   └── integration/
 │       ├── conftest.py                   # JMRI-probe session fixture (skip-on-absence)
 │       ├── test_connection_lifecycle.py  # Client __aenter__ / __aexit__ lifecycle
@@ -1114,12 +1177,15 @@ python_code/                              # repo-root for pyjmri (named per Step
 │       ├── test_reconnect_resilience.py  # forced disconnect mid-run (NFR5)
 │       ├── test_throttle_lifecycle.py    # acquire / release / multi-throttle parallel [Epic 5]
 │       ├── test_long_run.py              # unattended stability; default 5 min, 1 hr pre-release (NFR4)
-│       └── test_operations_discovery.py  # discover_operations() real + empty paths (FR45–FR50)
+│       ├── test_operations_discovery.py  # discover_operations() real + empty paths (FR45–FR50)
+│       └── test_roster_discovery.py      # discover_roster() real + empty paths (FR51–FR59)
 └── examples/
     ├── hello_jmri.py                     # FR43 #1 — connect, discover, list
     ├── back_and_forth.py                 # FR43 #2 — port of MikeBackAndForth.py
     ├── multi_train_session.py            # FR43 #3 — Journey 2 use case
-    └── operations_report.py              # Journey 5 — read-only Operations report (FR45–FR50)
+    ├── operations_report.py              # Journey 5 — read-only Operations report (FR45–FR50)
+    ├── roster_catalog.py                 # Journey 6 — fleet catalog report (FR59)
+    └── capability_aware_startup.py       # Journey 6 — capability-aware startup (FR59)
 ```
 
 (`docs/` for the Sphinx or MkDocs site is **Growth-deferred per PRD**;
@@ -1202,7 +1268,7 @@ tree.
 - `throttle.py` — `Throttle` class, async context manager,
   `set_speed`, `set_function`, `release`; spawns keep-alive
   coroutine in Client's TaskGroup
-- `roster.py` — `Roster`, `RosterEntry` (read-only metadata)
+- `roster.py` — `Roster`, `RosterEntry`, `FunctionLabel` (read-only metadata; `by_address`)
 
 **Event Subscription & Wait Primitives (FR29–FR33) →**
 
@@ -1253,6 +1319,24 @@ tree.
   system-name index only)
 - `exceptions.py` — `LayoutEntityNotFound` reused for misses; absent
   Operations data yields empty collections, not errors (FR50)
+
+**Roster Read-Only Discovery (FR51–FR59) →**
+
+- `client.py` — `Client.discover_roster()` fetches `GET /json/v5/roster`
+  and returns a `Roster` container distinct from `Layout` (separate entry
+  point, mirroring `discover_operations()`); `Client.throttle_for_entry`
+  derives long/short addressing from a matched entry (FR54–FR55)
+- `roster.py` — `Roster` (subclasses `EntityCollection[RosterEntry]`, adds
+  the `by_address` address index — FR51) plus read-only `RosterEntry` and
+  `FunctionLabel` value objects (identity/metadata + decoder ids +
+  per-function labels — FR52, FR53); no command/set/wait surface (FR56)
+- `_parsing.py` — `parse_roster_entry` extended to emit a frozen
+  `RosterEntry` directly (Epic-2 `_ParsedRosterEntry` intermediate dropped)
+- `client.py` — `discover_roster()` graceful-degrade: a roster fetch
+  failure returns an empty `Roster` + WARNING and, being a separate call,
+  cannot affect layout discovery (FR57); empty roster + per-entry
+  malformed-skip yield valid results, not errors (FR58)
+- `examples/` — `roster_catalog.py` + `capability_aware_startup.py` (FR59)
 
 ### Cross-Cutting Concerns Mapping
 

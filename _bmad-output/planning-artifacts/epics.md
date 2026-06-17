@@ -2,10 +2,12 @@
 stepsCompleted: ['step-01-validate-prerequisites', 'step-02-design-epics', 'step-03-create-stories', 'step-04-final-validation']
 status: 'complete'
 completedAt: '2026-05-06'
-lastEdited: '2026-06-09'
+lastEdited: '2026-06-16'
 inputDocuments:
   - '_bmad-output/planning-artifacts/prd.md'
   - '_bmad-output/planning-artifacts/architecture.md'
+  - '_bmad-output/planning-artifacts/product-brief-roster.md'
+  - '_bmad-output/planning-artifacts/product-brief-roster-distillate.md'
 project_name: 'pyjmri'
 user_name: 'Mikey'
 date: '2026-05-06'
@@ -14,6 +16,10 @@ editHistory:
     changes: 'Added Epic 7 (v1.0.x Maintenance) detail section with Story 7.1.'
   - date: '2026-06-09'
     changes: 'Added Epic 8 (Discover the Operations Subsystem — Read-Only): FR45-FR50 in inventory + coverage map, Epic List entries for Epics 7 and 8, full Epic 8 section with Stories 8.1-8.3. Targets v1.1.'
+  - date: '2026-06-16'
+    changes: 'Added Epic 9 (Capability-Aware Roster — Read-Only): FR51-FR59 (with amended FR55 warn-and-drive) in inventory + coverage map, roster additional-technical-requirements block, Epic List entry, and full Epic 9 section with Stories 9.1-9.4. Sourced from prd.md (FR51-FR59, Journey 6) + product-brief-roster.md (+ distillate). Targets v1.2.'
+  - date: '2026-06-17'
+    changes: 'Correct-course (see sprint-change-proposal-2026-06-17.md): decoupled roster discovery from Layout. Roster is now a standalone read-only subsystem discovered via Client.discover_roster() (mirroring discover_operations), NOT folded into discover()/Layout; throttle_for_entry moves to Client. Inverted the former "Key divergence from Epic 8" into "Alignment with Epic 8". Rewrote Story 9.2 (heading + story + ACs) around discover_roster() with graceful-degrade (empty roster + WARNING, not raise) replacing the shared-TaskGroup failure-isolation. Updated Epic List summary + NFR line, tech-requirements block, Epic 9 intro/scope, Stories 9.3/9.4 references, and the FR57 coverage-map brief. Story 9.1 unchanged (paradigm-agnostic).'
 ---
 
 # pyjmri - Epic Breakdown
@@ -103,6 +109,20 @@ This document provides the complete epic and story breakdown for `pyjmri`, decom
 - FR49: Operations discovery is read-only in this increment — no build-train, move/assign-car, or generate-manifest operations (deferred to Vision).
 - FR50: A layout whose JMRI has no Operations data configured discovers empty Operations collections rather than raising an error (layout-agnostic, as with FR8–FR12).
 
+**Roster (Read-Only, Capability-Aware) — v1.2**
+
+The MVP enumerated roster entries shallowly. This increment deepens the roster into a standalone capability-aware, read-only subsystem discovered via `discover_roster()` — mirroring read-only Operations (FR45–FR50) and distinct from it.
+
+- FR51: A user script can access any roster entry by system name, by user name, and by DCC address, receiving a typed read-only roster entry. Name-keyed access is Mapping-style (a missing name raises, as elsewhere in `Layout`); address-keyed access is a `get()`-style optional find whose absence handling is governed by FR55.
+- FR52: A `RosterEntry` exposes locomotive identity and metadata: DCC address, long/short addressing, road name, road number, model, manufacturer, owner, comment, image path, and maximum-speed percent.
+- FR53: A `RosterEntry` exposes its per-function labels (function number, label text, lockable/momentary flag) and decoder family/model identifiers — sufficient to determine function capabilities (e.g., labeled sound, lighting, or momentary functions).
+- FR54: A user script can acquire a throttle from a roster entry, a roster name, or a DCC address, with the library deriving long/short addressing from the matched entry. A roster entry is a discovery-time snapshot; re-addressing in JMRI after discovery is not reflected until the script re-runs discovery (documented).
+- FR55 (amended 2026-06-16, PO directive): A throttle for a DCC **address** absent from the roster is **not** an error — the library logs an informative motor-only warning and acquires best-effort (consistent with FR23's raw-address path), keeping an un-catalogued loco drivable. A throttle by a roster **name** with no match still raises (a name cannot resolve to an address). For lookups: name/user-name access raises on a miss; `by_address` returns `None` with the same warning rather than raising.
+- FR56: Roster discovery is read-only. The library exposes no operation to create or modify roster entries, function labels, or decoder configuration; those remain in DecoderPro.
+- FR57: A failure or timeout fetching the roster during discovery degrades to an empty roster with a logged warning and does not prevent discovery of the rest of the layout. Roster discovery cannot regress the layout discovery of FR8–FR12.
+- FR58: An empty JMRI roster discovers an empty collection (not an error); an individual malformed roster entry is skipped with a logged warning without failing the overall roster discovery — layout-agnostic as with FR50.
+- FR59: A user can run two shipped examples against `Basement_Revised_2024.jmri` without modification: a fleet-catalog report (`roster_catalog.py`) and a capability-aware startup script (`capability_aware_startup.py`) that adapts a locomotive's startup sequence based on its roster function labels and decoder metadata (FR53).
+
 ### NonFunctional Requirements
 
 **Performance**
@@ -155,6 +175,19 @@ These are technical/infrastructure requirements derived from the Architecture do
 - **Implementation patterns enforcement:** Type annotation conventions (`from __future__ import annotations`, PEP 604 unions, `Self`, no `Any` in public surface), async patterns (`asyncio.timeout(...)` over `wait_for`), error handling discipline (third-party exceptions wrapped at `_transport` boundary with `from e`), JSON↔Python translation at parse boundary (camelCase → snake_case; unknown JSON fields ignored, missing expected fields raise `JMRIProtocolError`), public API discipline (`__all__` everywhere, top-level re-exports for users), Google-style docstrings on every public class/method/function.
 - **Three shipped examples in `examples/`:** `hello_jmri.py` (connect + enumerate + print first 5 turnouts), `back_and_forth.py` (port of `MikeBackAndForth.py`), `multi_train_session.py` (Journey 2 — `asyncio.gather` of multi-loco coroutines).
 - **`CONTRIBUTING.md`:** Documents integration-tests-local-only policy and developer setup.
+
+**Roster increment (v1.2) — additional technical requirements** (from `product-brief-roster.md` + distillate; the `architecture.md` directory tree pre-reserves `roster.py` and a roster fixture path):
+
+- **Standalone `discover_roster()` call, mirroring Operations.** Roster is discovered through its own `Client.discover_roster()` entry point (exactly like Epic 8's standalone `discover_operations()`), returning a `Roster` container — NOT folded into `Layout`/`discover()`. The two read-only snapshot subsystems are modelled identically.
+- **Graceful-degrade on fetch failure (FR57).** A roster fetch failure or timeout is caught at the `discover_roster()` method boundary and returns an empty `Roster` + logged warning rather than raising. Because `discover_roster()` is a separate call (no shared `asyncio.TaskGroup` with the layout fetches), a roster failure is structurally isolated from layout discovery — there is no sibling-cancellation risk to wrap against. Roster must NOT mutate the WS-dispatch entity index (`self._entities`); it is a non-subscribed snapshot like Operations.
+- **Address index built client-side.** JMRI's roster primary key is the entry name/ID string, not the address; `by_address` requires a client-built address→entry index over the entries. DCC-address-collision handling (two entries sharing an address) is a story-level open question (addresses are unique in today's fleet).
+- **Capability = function labels, NOT `decoderFamily`.** `decoderFamily`/`decoderModel` are decoder-definition-file names (e.g., "Jan 2012", "ESU LokSound 5"), not capability tags. Classification keys off function *labels* ("Startup"/"Horn"/"Bell" ⇒ sound) via a documented, testable decision function that falls back to motor-only when labels are blank/unrecognized (many entries have empty `<functionlabels/>`). Flagged as the riskiest/largest part — sized as its own story.
+- **Reuse existing assets.** `_parsing.parse_roster_entry` (Epic 2 scaffolding) exists and must be EXTENDED for `owner`/`comment`/`image_path`/`max_speed_pct`/`decoder_family`/`decoder_model`/`function_labels`; `roster.py` is an empty stub reserved for `RosterEntry`/`Roster`. Apply Epic 8's frozen `@dataclass(frozen=True, kw_only=True, slots=True)` + direct-parser pattern (drop the Epic-2 `_ParsedRosterEntry` intermediate). `EntityCollection` (in `layout.py`) reused, extended with the address index.
+- **Wire format (JSON v5, confirmed from JMRI master):** `GET /json/v5/roster` → array of `{"type":"rosterEntry","data":{...}}`; `data` keys include `name`, `address` (string), `isLongAddress` (bool), `road`, `number`, `mfg`, `model`, `decoderModel`, `decoderFamily`, `owner`, `comment`, `maxSpeedPct` (int), `image`/`icon` (relative URLs), `functionKeys` (array of `{name "F0".."F28", label, lockable, icon}`). Media are relative URLs (resolve against web-server base + URL-encoded entry ID), not filesystem paths. Roster groups (`rosterGroups`/`rosterGroup/{name}`) are OUT of scope.
+- **`throttle_for_entry` addressing.** Derives long/short from the matched entry. For an address with no entry (FR55), default by JMRI convention (`address > 127` ⇒ long, else short) with an explicit `long=` override, logging the assumption.
+- **Throttle constraints (existing v1).** `set_function(n, on)` supports `0 <= n <= 28` (F29+ deferred — affects some sound locos). The roster path is additive convenience over the existing raw `throttle(dcc_address, long)`.
+- **Testing.** Capture a live `/json/v5/roster` fixture from the layout machine (`localhost:12080` / basement `192.168.1.159:12080`) — do not author the `function_labels` model from source alone. Required cases: empty, partial, malformed-entry skip, failure-isolation (injected roster-fetch failure leaves the rest of `discover()` intact), no-mutation boundary, address-not-found warn-and-continue. Integration tests pin entities by attribute filter (`next(...)`), never positional `[0]`; roster discovery is fully simulator-testable (pure metadata, no NCE open-loop blind spot). Capability-startup success splits: (a) simulator asserts which function commands the decision function issues given fixture data; (b) physical "visibly correct startup" is manual, hardware-only — not a CI gate. All commands via `uv run --no-sync`; both `ruff check` and `ruff format --check` are CI gates; new public types exported alphabetically in `__init__.py` `__all__` and pass `mypy --strict`.
+- **Release.** Mirror the Epic 8 Phase-A pattern: bump `pyproject.toml` version (no `__version__` in src), `uv lock`, add a RELEASES.md section, `uv build` + `twine check dist/*`, all Phase-A gates green — then STOP before `uv publish` / git tag / GitHub release (Mikey's manual Phase-B). Targets **v1.2.0**.
 
 ### UX Design Requirements
 
@@ -214,6 +247,15 @@ These are technical/infrastructure requirements derived from the Architecture do
 | FR48 | 8 | Enumerate Operations engines (distinct from roster) |
 | FR49 | 8 | Read-only boundary — no command surface |
 | FR50 | 8 | Empty Operations collections, not errors |
+| FR51 | 9 | Roster lookup by system/user name + DCC address (`by_address`) |
+| FR52 | 9 | `RosterEntry` identity + metadata |
+| FR53 | 9 | Per-function labels + decoder family/model identifiers |
+| FR54 | 9 | `throttle_for_entry` (entry/name/address); derives long/short |
+| FR55 | 9 | Unknown address → warn + motor-only best-effort acquire; unknown name raises |
+| FR56 | 9 | Read-only — no roster mutation |
+| FR57 | 9 | Roster fetch failure → empty roster (graceful-degrade, not raise); separate `discover_roster()` call, structurally isolated from layout discovery |
+| FR58 | 9 | Empty roster + malformed-entry skip, not errors |
+| FR59 | 9 | Two shipped examples (catalog + capability-aware startup) |
 
 ## Epic List
 
@@ -277,6 +319,14 @@ A user writes `ops = await jmri.discover_operations()` and receives a typed `Ope
 **FRs covered:** FR45, FR46, FR47, FR48, FR49, FR50
 **NFRs supported:** NFR2 (Operations discovery latency bound), NFR7, NFR8
 **Notes:** Reuses the existing `_transport.HTTPClient`, exception hierarchy, and `EntityCollection` dual-name lookup from Epic 2. Adds Operations JSON parsing (`location`, `train`, `car`, `engine`), four read-only entity classes, an `Operations` container, and `Client.discover_operations()`. Fully testable on the NCE simulator — Operations is a data subsystem with no hardware/physical-state dependency (not subject to the throttle/sensor open-loop blind spot). Requires Operations data configured in the test profile; the basement simulator profile currently has none.
+
+### Epic 9: Drive Any Loco by Name or Address (Capability-Aware Roster — Read-Only)
+
+A user writes `roster = await jmri.discover_roster()` then `roster.by_address(5327)` (or by name) and gets a typed `RosterEntry` carrying decoder identifiers and per-function labels; `async with jmri.throttle_for_entry(loco) as t:` acquires a throttle with long/short addressing derived from the matched entry. A capability-aware startup adapts to each loco's function labels (sound vs. motor-only). An address absent from the roster warns and drives best-effort (motor-only assumption) rather than blocking an un-catalogued loco; an unresolvable roster *name* errors. The roster is its own standalone read-only subsystem discovered via `Client.discover_roster()` (mirroring `discover_operations()`); a roster fetch failure degrades to an empty roster and, being a separate call, can never affect layout discovery. Ships `roster_catalog.py` and `capability_aware_startup.py`. Targets a v1.2 release.
+
+**FRs covered:** FR51, FR52, FR53, FR54, FR55, FR56, FR57, FR58, FR59
+**NFRs supported:** NFR2 (roster discovered via a separate `discover_roster()` call; ~1s for the ~45-entry roster), NFR7, NFR8
+**Notes:** Standalone `Client.discover_roster()` entry point, exactly like Epic 8's `discover_operations()` (NOT folded into `Layout`/`discover()`). Reuses `_transport.HTTPClient`, the exception hierarchy, and `EntityCollection` dual-name lookup; extends the existing `_parsing.parse_roster_entry` and the empty `roster.py` stub, applying Epic 8's frozen-dataclass + direct-parser pattern. Capability classification keys off function *labels* (not `decoderFamily` strings) via a documented, testable decision function with motor-only fallback — sized as its own story (9.3). Fully simulator-testable (pure metadata, no NCE open-loop blind spot). Roster groups, mutation, WebSocket subscription, and `max_speed_pct` auto-clamping are out of scope.
 
 ## Epic 1: Buildable, Type-checked Library Foundation
 
@@ -1238,3 +1288,161 @@ So that I can write my own "where is every car" reports (PRD Journey 5) and unde
 **Given** the v1.1 release
 **When** Epic 8 completes
 **Then** the version bump, gates, TestPyPI dry-run, publish, and tag follow the Story 6.6 Phase A/B release pattern (no throttle hardware validation needed — Operations is read-only data)
+
+## Epic 9: Drive Any Loco by Name or Address (Capability-Aware Roster — Read-Only)
+
+**Status:** Post-v1.0 feature track (v1.2). Promotes the shallow MVP roster into a standalone capability-aware, read-only subsystem discovered via `discover_roster()` (PRD edits 2026-06-16 / 2026-06-17). Delivers FR51–FR59 and PRD Journey 6.
+
+**Scope policy:** read-only only. No roster mutation — entries, function labels, and decoder config stay in DecoderPro. Out of scope: roster groups, WebSocket roster subscription (one-shot HTTP snapshot only), `max_speed_pct` auto-clamping, F29+ functions, and the roster↔Operations join. Public-API additions are confined to `RosterEntry`/`Roster`/`FunctionLabel` in `roster.py`, a `Client.discover_roster()` method, a `Client.throttle_for_entry` convenience, `by_address` on the `Roster` collection, and an extended `parse_roster_entry`; nothing in Epics 1–8 changes behavior.
+
+**Alignment with Epic 8:** like read-only Operations, the roster is its own standalone read-only subsystem with a dedicated `Client.discover_roster()` entry point — NOT folded into `discover()`/`Layout`. This keeps the two read-only snapshot subsystems modelled identically and removes the shared-`asyncio.TaskGroup` failure-isolation machinery an earlier design required. FR57 is satisfied structurally: a separate call cannot cancel the layout fetches, so a roster fetch failure simply degrades to an empty roster + warning at the method boundary.
+
+**Test environment:** the roster is pure metadata served over JSON regardless of hardware, so the whole epic — discovery, lookup, and classification — is fully testable on the NCE simulator (not subject to the throttle/sensor open-loop blind spot). Capability-aware *startup* splits its success criterion: (a) the simulator asserts which function commands the decision function issues for given fixture data; (b) physical "visibly correct startup" is manual, hardware-only, and not a CI gate. Fixtures are pinned to a captured live `/json/v5/roster` payload from the layout machine.
+
+### Story 9.1: Roster wire-format parsing + capability-aware read-only entity classes
+
+As a library user,
+I want JMRI's roster JSON parsed into typed read-only `RosterEntry` objects carrying each loco's identity, metadata, decoder identifiers, and per-function labels,
+So that I can read a locomotive's capabilities (labeled sound, lighting, momentary functions) and reference data as proper typed attributes rather than raw JSON.
+
+**Acceptance Criteria:**
+
+**Given** a captured live `/json/v5/roster` payload from the layout machine saved as a test fixture (envelope `{"type":"rosterEntry","data":{...}}`)
+**When** the existing `_parsing.parse_roster_entry` is extended
+**Then** it maps a single `rosterEntry.data` object directly to a public frozen `RosterEntry` (Epic 8 pattern — no `_ParsedRosterEntry` intermediate; the prior Epic-2 intermediate is removed)
+**And** it populates `dcc_address: int` (parsed from the JSON `address` string), `long_address: bool` (from `isLongAddress`), `road_name`, `road_number`, `model`, `mfg`, `owner`, `comment`, `image_path`, `max_speed_pct: int`, `decoder_family`, `decoder_model` (FR52)
+**And** unknown JSON fields are ignored (forward-compat) and a missing *required* field (e.g., `address`) raises `JMRIProtocolError` for that entry
+
+**Given** the `functionKeys` array on a roster entry
+**When** it is parsed
+**Then** each element becomes a `FunctionLabel(num: int, label: str | None, lockable: bool)` (num parsed from "F0".."F28"), collected into the entry's `function_labels` (FR53)
+**And** an entry whose `functionKeys` is empty or absent yields an empty `function_labels` (valid — many real entries have no labels)
+**And** a `label` that is null or empty is preserved as `None`/empty (never fabricated)
+
+**Given** `roster.py` (currently an empty stub)
+**When** the entity classes are defined
+**Then** `RosterEntry` and `FunctionLabel` are frozen `@dataclass(frozen=True, kw_only=True, slots=True)` with no mutating/setter method — read-only enforced by the class surface (FR56) — while the `Roster` *container* (an `EntityCollection` subclass with `by_address`) is built in Story 9.2
+**And** `RosterEntry` carries `name` (the roster ID / primary key) and `user_name` (likely `None`, mirroring Operations engines — system name only)
+**And** each public class has a Google-style docstring and `from __future__ import annotations`; `__all__` lists the user-facing exports
+
+**Given** the roster-vs-Operations distinction (FR48)
+**When** `RosterEntry` is defined
+**Then** it is a distinct type from Epic 8's `Engine`, documented as the full DecoderPro catalog rather than the operationally-active subset, and the two are not conflated in the type model
+
+**Given** the roster parsing unit tests against the captured fixture
+**When** the suite runs (no live JMRI required)
+**Then** every entry's metadata, decoder identifiers, and function labels parse to the expected typed values
+**And** a deliberately malformed entry fixture (bad `address`, missing `isLongAddress`) raises `JMRIProtocolError` *for that entry only* (the collection-level skip-and-continue is exercised in Story 9.2)
+**And** `Any` does not appear in any roster parser return type
+**And** `mypy --strict src/pyjmri`, `ruff check`, and `ruff format --check` are green
+
+### Story 9.2: Discover the roster via a standalone `discover_roster()` with `by_address` + graceful-degrade
+
+As a library user,
+I want `await jmri.discover_roster()` to return a `Roster` — looked up by system name, user name, or DCC address — discovered independently of `discover()`,
+So that I can `roster.by_address(5327)`, and a roster hiccup never touches my layout discovery.
+
+**Acceptance Criteria:**
+
+**Given** Story 9.1's parser and entity classes and the existing `Client.discover_operations()` standalone-discovery precedent
+**When** `Client.discover_roster()` is added
+**Then** it issues `GET /json/v5/roster`, parses each envelope via Story 9.1's `parse_roster_entry`, and returns a `Roster` collection — a **separate entry point** from `discover()`, mirroring `discover_operations()` (it returns a `Roster`, not a `Layout`)
+**And** the shared cached version gate (`>= 5.14`) is honored: whichever discovery runs first (`discover()` or `discover_roster()`) probes `/json/v5/networkService`, the result is cached for the Client's lifetime, and no second probe is issued
+**And** the roster snapshot does NOT mutate the WebSocket-dispatch entity index (`self._entities`) — it is a non-subscribed snapshot like Operations
+
+**Given** a roster fetch that fails or times out (FR57)
+**When** `discover_roster()` runs
+**Then** the failure is caught at the method boundary and `discover_roster()` returns an empty `Roster` with a logged WARNING (it does not raise)
+**And** a test injects a roster-fetch failure and asserts an empty `Roster` + WARNING — and, because `discover_roster()` is a separate call with no shared `asyncio.TaskGroup`, it is structurally impossible for a roster failure to affect `discover()` (FR8–FR12)
+
+**Given** the `Roster` collection
+**When** it is built
+**Then** name and user-name access is Mapping-style (`roster["1029 NW2 Switcher"]`) and raises `LayoutEntityNotFound` on a miss, consistent with the layout collections
+**And** a client-side address→entry index backs `by_address(n: int) -> RosterEntry | None`, returning the matched entry or `None` (a `get()`-style find; FR51)
+**And** when `by_address` finds no entry it returns `None` and logs an informative warning naming the address (FR55 lookup path — no raise)
+**And** the address-collision case (two entries sharing a DCC address) is handled by a documented rule (e.g., first-wins) with a logged warning, even though today's fleet has unique addresses
+
+**Given** an empty JMRI roster (FR58)
+**When** `discover_roster()` runs
+**Then** it returns an empty `Roster` collection (not an error), and an individual malformed entry is skipped with a logged warning while the good entries still load (per-entry skip-and-continue)
+
+**Given** an integration test against `Basement_Revised_2024.jmri` (NCE simulator)
+**When** `discover_roster()` is called and timed (warm version check first, then time the roster fetch)
+**Then** the ~44-entry roster is populated within ~1 second (the NFR2 roster bound)
+**And** test entries are pinned by attribute filter (`next(e for e in ... if ...)`), never positional `[0]`
+**And** the test is marked `@pytest.mark.integration` and skips cleanly if JMRI is unreachable
+
+**Given** layout-agnosticism
+**When** a reviewer audits Story 9.2's code
+**Then** no hardcoded roster name, DCC address, or count appears in `src/pyjmri/` — discovery operates on whatever JMRI returns
+
+### Story 9.3: `throttle_for_entry` + capability-classification decision function + capability-aware startup example
+
+As an operator,
+I want to acquire a throttle straight from a roster entry, name, or DCC address — with a reusable startup that adapts to that loco's function labels — while a brand-new loco that isn't in the roster yet still drives,
+So that I can point one capability-aware script at whatever loco I put on the track, without rewriting it per engine or being blocked by an un-catalogued address.
+
+**Acceptance Criteria:**
+
+**Given** Story 9.2's `Roster` (from `discover_roster()`) and the existing `Throttle` (`throttle(dcc_address, long)`)
+**When** `Client.throttle_for_entry(target: RosterEntry | str | int)` is added
+**Then** a `RosterEntry`, a resolvable roster name, or a known DCC address yields a `Throttle` async context manager with long/short addressing derived from the matched entry (FR54)
+**And** it returns the same `Throttle` type as the raw `throttle(...)` path (additive convenience, not a parallel implementation)
+**And** name/address resolution is defined: a `RosterEntry` argument needs no roster (the Client reads `dcc_address`/`long_address` straight off the entry), whereas a roster **name** or bare **address** is resolved against a `Roster` — supplied by the caller (e.g. `throttle_for_entry(name, roster=...)`) or one the Client fetches/caches via `discover_roster()`; the exact mechanism is a Story 9.3 design decision
+**And** the discovery-time snapshot caveat is documented: a loco re-addressed in JMRI after discovery resolves to its prior address until the script re-runs `discover_roster()`
+
+**Given** a `throttle_for_entry` call for a DCC **address** not present in the roster (FR55)
+**When** it resolves
+**Then** it does NOT raise — it logs an informative WARNING ("DCC address N is not in the roster; assuming motor-only capabilities") and acquires the throttle best-effort (consistent with FR23's raw path), keeping an un-catalogued loco drivable
+**And** because there is no entry to derive addressing from, long/short defaults by JMRI convention (`address > 127` ⇒ long, else short) with the assumption logged, and an explicit `long=` override is accepted
+
+**Given** a `throttle_for_entry` call for a roster **name** that matches no entry
+**When** it resolves
+**Then** it raises a typed error naming the unresolved name (a name cannot be turned into a DCC address without a matching entry)
+
+**Given** the capability-classification decision function (the risk-bearing core of this epic)
+**When** it is implemented as a documented, unit-tested pure function over a `RosterEntry`
+**Then** it classifies capability from function **labels** (e.g., a label containing "startup"/"shutdown"/"sound"/"horn"/"bell" ⇒ sound-capable), explicitly NOT from `decoder_family`/`decoder_model` strings (which are date-stamped definition-file names, not capability tags)
+**And** it falls back to a minimal **motor-only** classification when labels are blank or unrecognized (the common real case)
+**And** its inputs (which fields), its matching rule, and its fallback are stated in the function's docstring so the decision is auditable, not a black box
+**And** unit tests cover a sound-labeled entry, a motor-only (empty-labels) entry, and a mixed/partial-labels entry
+
+**Given** `examples/capability_aware_startup.py` (FR59)
+**When** a user runs it against `Basement_Revised_2024.jmri` with a chosen DCC address
+**Then** it calls `discover_roster()`, looks the loco up by address, prints its identity/decoder, classifies capability via the decision function, fires only the functions the classification calls for, and drives — and runs the *same* code unmodified for a sound loco, a motor-only loco, and an address absent from the roster (which logs the motor-only warning and still drives)
+**And** it imports only from the top-level `pyjmri` namespace and runs clean under `mypy --strict`
+**And** the docstring states the split success criterion: the simulator verifies *which* function commands are issued; physical "visibly correct startup" is hardware-only and manual
+
+**Given** the simulator test for capability startup
+**When** it runs
+**Then** it asserts the exact set of `set_function` commands the decision function issues for given fixture roster data (plumbing-verifiable) and does not assert physical movement (the NCE simulator has no virtual loco)
+
+### Story 9.4: Fleet-catalog example + read-only boundary + docs + v1.2 release
+
+As a JMRI layout owner,
+I want a fleet-catalog report, documentation for the roster feature, and the v1.2 release,
+So that I get a printable reference/maintenance sheet of my whole fleet (PRD Journey 6) and the increment ships under the established release discipline.
+
+**Acceptance Criteria:**
+
+**Given** the read-only contract (FR56)
+**When** Story 9.4 lands
+**Then** a test asserts `RosterEntry`, `Roster`, and `FunctionLabel` expose no mutating/command method (no create/edit of entry, function label, or decoder config)
+**And** the read-only boundary is stated in the docs, noting that editing stays in DecoderPro
+
+**Given** `examples/roster_catalog.py` (FR59)
+**When** a user runs it against `Basement_Revised_2024.jmri` unmodified
+**Then** it connects, runs `discover_roster()`, and prints a fleet reference sheet — per loco: road number, model, decoder family/model, owner, DCC address, and comment — plus a decoder-family/model rollup (counts per family)
+**And** it degrades gracefully (prints an explanatory message, not a traceback) when the roster is empty
+**And** it imports only from the top-level `pyjmri` namespace, runs clean under `mypy --strict`, and hardcodes no entity name/address (layout-agnostic; basement defaults overridable)
+
+**Given** the documentation set
+**When** the Roster section is added
+**Then** it explains: the roster-vs-Operations distinction (full catalog vs operationally-active subset), that the roster is a standalone read-only subsystem discovered via `discover_roster()` (mirroring Operations), `by_address`/name lookup semantics, the warn-and-drive behavior for an unknown address vs the raise for an unknown name, the snapshot-staleness caveat (FR54), and that capability is inferred from function labels not the decoder family
+**And** `CONTRIBUTING.md` / release notes record any roster fixture/setup needed to run the roster integration tests
+
+**Given** the v1.2 release (Epic 8 Phase-A pattern)
+**When** Epic 9 completes
+**Then** Phase A is performed: bump `pyproject.toml` version, `uv lock`, add a RELEASES.md section, run all gates (`ruff check`, `ruff format --check`, `mypy --strict` on `src/pyjmri` + `examples/`, `pytest -m "not integration"`) green, then `uv build` + `twine check dist/*`
+**And** the process STOPS before `uv publish` / git tag / GitHub release (Mikey's manual Phase B)
+**And** no throttle *hardware* validation gate is required (roster is read-only metadata), though the capability-startup example's physical check remains an optional manual hardware step

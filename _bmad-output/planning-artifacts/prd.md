@@ -1,14 +1,22 @@
 ---
-stepsCompleted: ['step-01-init', 'step-02-discovery', 'step-02b-vision', 'step-02c-executive-summary', 'step-03-success', 'step-04-journeys', 'step-05-domain-skipped', 'step-06-innovation-skipped', 'step-07-project-type', 'step-08-scoping', 'step-09-functional', 'step-10-nonfunctional', 'step-11-polish', 'step-12-complete']
+stepsCompleted: ['step-01-init', 'step-02-discovery', 'step-02b-vision', 'step-02c-executive-summary', 'step-03-success', 'step-04-journeys', 'step-05-domain-skipped', 'step-06-innovation-skipped', 'step-07-project-type', 'step-08-scoping', 'step-09-functional', 'step-10-nonfunctional', 'step-11-polish', 'step-12-complete', 'step-e-01-discovery', 'step-e-02-review', 'step-e-03-edit']
 date: '2026-05-05'
-lastEdited: '2026-06-09'
+lastEdited: '2026-06-17'
 editHistory:
   - date: '2026-05-06'
     changes: 'Validation polish: lifted date into frontmatter; reframed httpx/websockets implementation hints; sharpened NFR9 CI-scope contract; added Assumed JMRI JSON Contract subsection.'
   - date: '2026-06-09'
     changes: 'Promoted read-only Operations discovery (locations, trains, cars, engines) from Vision to active v1.1 Growth scope. Added FR45–FR50, Journey 5, Operations JSON-contract endpoints, NFR2 Operations bound; narrowed Exec Summary/Vision deferral to Operations command features only. Roster-vs-Operations distinction made explicit.'
+  - date: '2026-06-16'
+    changes: 'Promoted the shallow MVP roster to an active v1.2 capability-aware Roster increment folded into Layout. Added FR51–FR59, Journey 6, Growth scope bullet, Vision roster extensions, RosterEntry/throttle_for_entry in the API surface, roster_catalog.py + capability_aware_startup.py examples, expanded roster JSON contract (functionKeys/decoderFamily/decoderModel, address-keyed access), and an NFR2 roster bound + failure-isolation note. Sourced from product-brief-roster.md (+ distillate).'
+  - date: '2026-06-16'
+    changes: 'Validation polish (see prd-validation-report-2026-06-16.md): removed API identifiers from FR51/FR54 prose for capability altitude + FR45–FR50 consistency; added the throttle_for_entry staleness contract to FR54; dropped soft adjective in FR55; replaced NFR2 "negligible" with the measurable 2-second discovery bound.'
+  - date: '2026-06-16'
+    changes: 'FR55 reversal (PO directive during epic creation): an unknown DCC address is no longer an error on the throttle path. A throttle for an address absent from the roster now logs an informative motor-only warning and acquires best-effort (like FR23) so a newly-acquired, not-yet-catalogued loco stays drivable; by_address becomes a get()-style optional find (returns None + warning, no raise). An unresolvable roster *name*, and name/user-name metadata lookups, still raise. Synced Journey 6 narrative + capabilities, Technical Success API coverage, Growth bullet, Journey Requirements Summary, and an FR51 absence-handling pointer.'
+  - date: '2026-06-17'
+    changes: 'Roster discovery decoupled from Layout (correct-course, see sprint-change-proposal-2026-06-17.md). The roster is no longer folded into Client.discover()/Layout; it is discovered through a separate Client.discover_roster() -> Roster call, mirroring read-only Operations (discover_operations). throttle_for_entry moves from Layout to Client. FR57 reframed: a roster fetch failure degrades to an empty roster (graceful-degrade, not raise) and is structurally isolated from layout discovery because it is a separate call. FR12 no longer lists roster among discover() Layout types (roster discovery is FR51). Synced NFR2 (roster off the discover() bound), Journey 6 code + capabilities, Growth/Vision bullets, API coverage + Public types, and FR51 collection reference.'
 releaseMode: phased
-inputDocuments: []
+inputDocuments: ['product-brief-roster.md', 'product-brief-roster-distillate.md']
 documentCounts:
   briefs: 0
   research: 0
@@ -46,9 +54,14 @@ existing `jython/Mike*.py` examples (route traversal, multi-loco
 sequencing, sensor-driven back-and-forth running). A post-v1.0
 increment adds **read-only discovery of JMRI's Operations subsystem**
 (locations, trains, cars, engines) as its own typed surface, distinct
-from the layout model and from the roster. Operations *command*
-features (train build, car movement, manifest generation), Warrants,
-LogixNG, and full Dispatcher integration remain deferred.
+from the layout model and from the roster. A further increment (v1.2)
+realizes a **capability-aware Roster**: roster entries deepened with
+decoder identifiers and per-function labels, addressable by DCC address,
+with a throttle-from-entry convenience — so a script can look up the
+loco it is about to drive and adapt its startup to that decoder.
+Operations *command* features (train build, car movement, manifest
+generation), Warrants, LogixNG, and full Dispatcher integration remain
+deferred.
 
 The library is the author's tool first and a JMRI-community release second.
 It is layout-agnostic by construction: it carries zero assumptions about the
@@ -174,6 +187,17 @@ requiring any change to JMRI itself.
   `car`, `engine` — enumerated as a typed subsystem distinct from the
   roster, exposing operational state (e.g., a car's current location
   and train assignment). Read paths only; no build, move, or manifest.
+- API coverage (v1.2, read-only): capability-aware `roster` — a standalone
+  read-only subsystem discovered through `Client.discover_roster()`
+  (mirroring read-only Operations). Each `RosterEntry` exposes decoder
+  family/model and per-function labels (number, label, lockable) plus
+  identity/metadata; the returned `Roster` is addressable by DCC address
+  (`by_address`); a `Client.throttle_for_entry` convenience resolves a
+  throttle from an entry, name, or address. For an address the roster does
+  not contain, it warns and acquires best-effort (capabilities assumed
+  motor-only) rather than erroring — so an un-catalogued loco stays
+  drivable — while an unresolvable roster *name* errors clearly. Read paths
+  only; no roster mutation.
 - `unknown` state is round-tripped correctly through the typed model
   for every entity that JMRI can report as unknown.
 - Test suite: unit tests for all primitives; integration tests run
@@ -272,6 +296,18 @@ requiring any change to JMRI itself.
   owns; Operations entities are the operationally-active subset actually
   on the layout. Command, build, move, and manifest operations stay in
   Vision.
+- **Capability-aware Roster (active v1.2 increment):** deepen the
+  shallow roster enumeration of MVP into a read-only, capability-aware
+  subsystem discovered through its own `Client.discover_roster()` call
+  (mirroring read-only Operations). `RosterEntry` carries decoder
+  identifiers and per-function labels; the returned `Roster` is
+  addressable by DCC address; a `Client.throttle_for_entry` convenience
+  resolves a throttle from an entry, name, or address — for an unknown
+  address it logs a motor-only warning
+  and acquires best-effort rather than erroring, while an unresolvable
+  roster name errors. Ships a fleet-catalog example and a
+  capability-aware startup example. Read-only;
+  roster groups and any roster mutation stay out of scope.
 - Higher-level patterns library: asyncio analogs of common Jython
   automation patterns (back-and-forth, route-traversal, multi-loco
   sequencer)
@@ -289,6 +325,12 @@ requiring any change to JMRI itself.
 - Operations *command* integration — train build, car movement,
   manifest generation, schedules — as a first-class subsystem, building
   on the read-only Operations discovery delivered in Growth
+- Roster extensions building on the v1.2 capability-aware roster: roster
+  groups (drive "all my switchers"); `max_speed_pct`-aware throttles
+  (per-loco speed clamping); a roster↔Operations join by road+number
+  (connect the owned fleet to tonight's trains); a shareable Markdown/HTML
+  fleet sheet with photos; an optional live roster subscription; and a
+  community-shared decoder-keyed "startup profile" convention
 - Warrants integration via `oblock` + `signalMast` types
 - LogixNG bridge or modern-Python replacement
 - Dispatcher integration (sections, automatic block control) — sections
@@ -402,9 +444,10 @@ import asyncio
 async def main():
     async with Client() as jmri:
         layout = await jmri.discover()
+        roster = await jmri.discover_roster()
         print(f"{len(layout.turnouts)} turnouts, "
               f"{len(layout.sensors)} sensors, "
-              f"{len(layout.roster)} locos")
+              f"{len(roster)} locos")
         for t in list(layout.turnouts.values())[:5]:
             print(t.name, t.user_name, t.state)
 
@@ -517,6 +560,62 @@ provide; empty collections (not errors) when no Operations data is
 configured; clear read-only boundary — no build/move surface in this
 increment.
 
+### Journey 6 — Mike drives a chosen loco with a capability-aware startup
+
+**Who:** Same Mike. He has built a reusable startup routine and wants
+to point it at whatever locomotive he feels like running tonight —
+without rewriting it per engine, and without remembering roster names.
+
+**Opening:** Mike knows the DCC address printed on the loco he just put
+on the track — 5327 — but not its roster name. He wants the script to
+look the loco up, figure out what kind of decoder it has, and start it
+correctly.
+
+**Action:** He writes:
+
+```python
+async with Client() as jmri:
+    roster = await jmri.discover_roster()
+    loco = roster.by_address(5327)
+    print(f"Starting {loco.road_name} {loco.road_number} "
+          f"({loco.decoder_model})")
+    async with jmri.throttle_for_entry(loco) as t:
+        # Capability-aware: only sound decoders get a startup/horn sequence
+        sound = [f for f in loco.function_labels
+                 if f.label and any(k in f.label.lower()
+                                    for k in ("startup", "horn", "bell"))]
+        if sound:
+            for f in sound:
+                t.set_function(f.num, True)
+        t.set_speed(0.3, forward=True)
+```
+
+**Climax:** Against a sound-equipped loco, the script reads its function
+labels ("Startup", "Horn", "Bell"), fires the right functions, and rolls
+it out. He swaps in a motor-only switcher at address 9155 and runs the
+*same script* — it finds no sound labels, skips the sound sequence, and
+just drives. Later he drops a brand-new loco on the rails at address
+`5237` that he hasn't entered into DecoderPro yet; the same script logs
+"DCC address 5237 is not in the roster — assuming motor-only
+capabilities" and drives it anyway, rather than refusing to move an
+un-catalogued engine. (The tradeoff is deliberate: an address typo can no
+longer be distinguished from a genuinely new loco, so the roster path
+warns-and-drives instead of blocking. A mistyped roster *name*, which
+cannot resolve to any address, still errors.)
+
+**Resolution:** Separately, he runs `roster_catalog.py` and gets a
+printed reference sheet of all ~45 locos — road number, model, decoder,
+owner, and the maintenance notes he stashed in each entry's comment.
+
+**Capabilities revealed:** roster as a standalone read-only subsystem via
+`discover_roster()` (the returned `Roster` offers `by_address` lookup);
+`RosterEntry` exposing decoder identifiers and per-function labels;
+`Client.throttle_for_entry` resolving addressing from the
+entry; warn-and-drive fallback (motor-only assumption) for a DCC address
+absent from the roster, with an unresolvable roster name still erroring;
+capability-aware behavior driven by function labels (not brittle
+decoder-family strings); a fleet-catalog report over the whole roster.
+
 ### Journey Requirements Summary
 
 | Capability | From journeys |
@@ -538,6 +637,10 @@ increment.
 | Read-only Operations discovery (locations, trains, cars, engines) as a typed subsystem distinct from the roster | 5 |
 | Operational state per entity (location, train assignment, route position) the roster cannot provide | 5 |
 | Empty Operations collections (not errors) when no Operations data is configured | 5 |
+| Capability-aware `RosterEntry` (decoder identifiers + per-function labels) as a standalone read-only subsystem (`discover_roster()`) | 6 |
+| Roster lookup by DCC address (`by_address`) and throttle acquisition from a roster entry (`Client.throttle_for_entry`) | 6 |
+| Warn-and-drive fallback (motor-only) on a throttle for a DCC address absent from the roster; unresolvable roster name still errors | 6 |
+| Fleet-catalog report and capability-aware startup driven by function labels | 6 |
 
 ## Developer Tool Specific Requirements
 
@@ -593,7 +696,7 @@ pyjmri/
 ├── route.py        # Route
 ├── signal.py       # SignalHead, SignalMast (read-only in v1)
 ├── throttle.py     # Throttle (async context manager)
-├── roster.py       # Roster, RosterEntry
+├── roster.py       # Roster, RosterEntry, FunctionLabel (read-only; by_address lookup)
 ├── exceptions.py   # JMRIError hierarchy
 └── automaton.py    # higher-level patterns (Growth; may be a stub in v1)
 ```
@@ -601,9 +704,17 @@ pyjmri/
 Public types each user will routinely touch:
 
 - `Client` — connection lifecycle (async context manager); methods
-  `discover()`, `subscribe(...)`, plus per-entity convenience.
+  `discover()`, `discover_roster()`, `subscribe(...)`, a
+  `throttle_for_entry(entry | name | address)` convenience (v1.2), plus
+  per-entity convenience.
 - `Layout` — typed container of all enumerated entities, indexed by
   both system name and user name.
+- `RosterEntry` — read-only locomotive metadata: `dcc_address`,
+  `long_address`, road name/number, model, mfg, owner, comment,
+  image path, max-speed percent, `decoder_family`/`decoder_model`, and a
+  `function_labels` collection of `FunctionLabel(num, label, lockable)`
+  (v1.2). Accessible via the `Roster` returned by `discover_roster()` —
+  `roster[...]` and `roster.by_address(...)`.
 - `Turnout`, `Sensor`, `Block`, `Light`, `Memory`, `Route`,
   `SignalHead`, `SignalMast` — each carrying state, identity, and
   async methods (`get_state()`, `set_state()`, `wait_state()`,
@@ -626,6 +737,15 @@ Three worked examples, plus a README quickstart:
 3. **`multi_train_session.py`** — `asyncio.gather` of multiple
    per-loco coroutines, each with its own sensor subscriptions.
    Demonstrates the Journey 2 use case.
+
+Two further examples ship with the v1.2 capability-aware roster increment:
+
+4. **`roster_catalog.py`** — enumerate the full roster and print a fleet
+   reference sheet (road number, model, decoder, owner, comment), plus a
+   decoder-family rollup. Demonstrates Journey 6's catalog use.
+5. **`capability_aware_startup.py`** — look up a loco by DCC address and
+   run a startup sequence adapted to its function labels and decoder
+   metadata. Demonstrates Journey 6's capability-aware use.
 
 All examples are runnable against `Basement_Revised_2024.jmri` (which
 auto-selects NCE simulator on the development machine) without
@@ -690,7 +810,14 @@ exposed by JMRI's web server:
 - `turnout`, `sensor`, `block`, `light`, `memory`, `route`,
   `signalHead`, `signalMast` — read state, set state (where
   applicable), and subscribe to state-change events
-- `roster`, `rosterEntry` — read locomotive metadata and identifiers
+- `roster`, `rosterEntry` — read locomotive metadata and identifiers.
+  The v1.2 capability-aware roster additionally depends on the
+  `rosterEntry` payload exposing `decoderFamily`, `decoderModel`, and the
+  `functionKeys` array (per-function `label` and `lockable`), plus
+  `address`/`isLongAddress` for DCC-address-keyed access. The
+  `rosterGroup`/`rosterGroups` endpoints exist but are out of scope for
+  v1.2. Capability is inferred from function labels, not from the
+  decoder-family string (which is a decoder-definition-file name).
 - `power` — read layout-power state
 - `throttle` — acquire by DCC address, set speed / direction /
   function bits, release
@@ -837,7 +964,7 @@ The dominant risk. Solo developer, hobby time. Mitigations:
 - FR9: A user script can access enumerated entities by both system name (e.g., `NT400`) and user name (e.g., "Staging NW Turnout 400").
 - FR10: A user script can iterate the full collection of any entity type without invoking additional discovery calls.
 - FR11: A user script can detect when a requested entity does not exist and receive a typed lookup error rather than `None` or a silent failure.
-- FR12: The discovered layout includes, at minimum: turnouts, sensors, blocks, lights, memories, routes, signal heads, signal masts, and roster entries.
+- FR12: The discovered layout includes, at minimum: turnouts, sensors, blocks, lights, memories, routes, signal heads, and signal masts. (Roster entries are discovered through the separate `discover_roster()` call — FR51.)
 
 ### Entity Read
 
@@ -903,6 +1030,20 @@ The dominant risk. Solo developer, hobby time. Mitigations:
 - FR49: Operations discovery is read-only in this increment. The library exposes no operation to build a train, move or assign a car, or generate a manifest; those are deferred to Vision (see Product Scope).
 - FR50: A layout whose JMRI has no Operations data configured discovers empty Operations collections rather than raising an error; Operations support is layout-agnostic in the same way as the layout-entity discovery in FR8–FR12.
 
+### Roster (Read-Only, Capability-Aware)
+
+The MVP enumerated roster entries shallowly. This increment (v1.2) deepens the roster into a capability-aware, read-only subsystem discovered through its own `discover_roster()` call — mirroring read-only Operations (FR45–FR50) and distinct from it: Operations catalogs the operationally-active subset, whereas the roster is the full DecoderPro catalog.
+
+- FR51: A user script can access any roster entry by system name, by user name, and by DCC address, receiving a typed read-only roster entry. DCC address is a first-class lookup key because the operator may not know an entry's roster name. Name-keyed access is Mapping-style (a missing name raises, as in pyjmri's other entity collections); address-keyed access is a `get()`-style optional find whose absence handling is governed by FR55.
+- FR52: A `RosterEntry` exposes locomotive identity and metadata as exposed by JMRI: DCC address, long/short addressing, road name, road number, model, manufacturer, owner, comment, image path, and maximum-speed percent.
+- FR53: A `RosterEntry` exposes its per-function labels (function number, label text, and lockable/momentary flag) and its decoder family and model identifiers — sufficient for a script to determine a locomotive's function capabilities (e.g., whether it has labeled sound, lighting, or momentary functions).
+- FR54: A user script can acquire a throttle directly from a roster entry, a roster name, or a DCC address, with the library deriving long/short addressing from the matched entry rather than requiring the script to supply it. A roster entry is a discovery-time snapshot: if a locomotive is re-addressed in JMRI after discovery, the snapshot reflects the prior address until the script re-runs discovery. This limitation is documented.
+- FR55: A throttle request (FR54) for a DCC **address** not present in the roster is not an error. The library logs an informative warning that the address is unknown to the roster and that the locomotive's capabilities are therefore assumed motor-only, then acquires the throttle on a best-effort basis (consistent with the raw-address path of FR23). This keeps a newly-acquired locomotive that has not yet been entered in DecoderPro drivable; the deliberate tradeoff is that an address typo can no longer be distinguished from a genuinely new loco. A throttle request by a roster **name** that matches no entry still raises a typed error, because a name cannot be resolved to a DCC address without a matching entry. For read-only metadata lookups (FR51): name and user-name access is Mapping-style and raises on a miss, whereas the address-keyed `by_address` find returns no entry (a `get()`-style `None`) and logs the same motor-only warning rather than raising — the operator may legitimately be holding a loco the roster has never seen.
+- FR56: Roster discovery is read-only. The library exposes no operation to create or modify roster entries, function labels, or decoder configuration; those remain in DecoderPro.
+- FR57: A failure or timeout fetching the roster degrades to an empty roster with a logged warning rather than raising. Because the roster is discovered through a separate call (`discover_roster()`) from layout discovery (FR8–FR12), a roster failure is self-contained and structurally cannot affect, slow, or regress layout discovery.
+- FR58: An empty JMRI roster discovers an empty roster collection (not an error), and an individual malformed roster entry is skipped with a logged warning without failing the overall roster discovery — layout-agnostic in the same way as FR50.
+- FR59: A user can run two shipped example programs against `Basement_Revised_2024.jmri` without modification: a fleet-catalog report (`roster_catalog.py`) and a capability-aware startup script that adapts a locomotive's startup sequence based on its roster function labels and decoder metadata (FR53).
+
 ## Non-Functional Requirements
 
 ### Performance
@@ -914,7 +1055,13 @@ The dominant risk. Solo developer, hobby time. Mitigations:
 - NFR2: Layout discovery against a layout the size of the author's
   basement (~370 entities across the supported types) completes
   within 2 seconds on a current macOS or Linux laptop, against a
-  JMRI instance running on the same machine. Read-only Operations
+  JMRI instance running on the same machine. The capability-aware roster
+  (v1.2) is discovered through a separate `discover_roster()` call
+  (mirroring read-only Operations), not inside the `discover()` bound; the
+  author's ~45-entry roster completes within an additional 1 second. A
+  roster fetch failure degrades to an empty roster (FR57) and cannot affect
+  layout discovery.
+  Read-only Operations
   discovery, where Operations data is configured, completes within an
   additional 1 second for an Operations roster of comparable size
   (up to ~200 cars, ~50 engines, ~25 trains, ~25 locations).

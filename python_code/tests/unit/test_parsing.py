@@ -6,7 +6,7 @@ Covers:
 - Translation rules: camelCase -> snake_case, null -> None, unknown keys ignored,
   missing required keys raise ``JMRIProtocolError``.
 - Per-entity peculiarities: state=0 mappings, signal-mast aspect translation,
-  roster DCC-address parsing, power singleton.
+  power singleton. (Roster parsing has its own suite: test_roster_parsing.py.)
 """
 
 from __future__ import annotations
@@ -39,7 +39,6 @@ from pyjmri._parsing import (
     parse_light,
     parse_memory,
     parse_power,
-    parse_roster_entry,
     parse_route,
     parse_sensor,
     parse_signal_head,
@@ -123,16 +122,6 @@ def test_parse_signal_mast_round_trips_every_live_envelope(load_fixture: LoadFix
         assert isinstance(parsed.aspect, SignalMastAspect)
         assert isinstance(parsed.held, bool)
         assert isinstance(parsed.lit, bool)
-
-
-def test_parse_roster_round_trips_every_live_envelope(load_fixture: LoadFixture) -> None:
-    envelopes = load_fixture("roster")
-    assert envelopes, "roster fixture should not be empty"
-    for env in envelopes:
-        parsed = parse_roster_entry(env)
-        assert parsed.name
-        assert isinstance(parsed.dcc_address, int)
-        assert isinstance(parsed.long_address, bool)
 
 
 def test_parse_power_round_trips_singleton_envelope(load_fixture: LoadFixture) -> None:
@@ -533,102 +522,6 @@ def test_parse_signal_mast_chained_from_value_error() -> None:
     with pytest.raises(JMRIProtocolError) as exc_info:
         parse_signal_mast(env)
     assert isinstance(exc_info.value.__cause__, ValueError)
-
-
-# ---- Roster: DCC address parsing ----
-
-
-def test_parse_roster_entry_extracts_dcc_address() -> None:
-    env = {
-        "type": "rosterEntry",
-        "data": {
-            "name": "1029 NW2 Switcher",
-            "address": "1029",
-            "isLongAddress": True,
-            "road": "Union Pacific",
-            "number": "1029",
-            "model": "176-4374",
-            "comment": "$92 plus decoder",
-        },
-    }
-    parsed = parse_roster_entry(env)
-    assert parsed.dcc_address == 1029
-    assert parsed.long_address is True
-    assert parsed.road_name == "Union Pacific"
-    assert parsed.road_number == "1029"
-    assert parsed.model == "176-4374"
-    assert parsed.comment == "$92 plus decoder"
-
-
-def test_parse_roster_entry_short_address_is_long_address_false() -> None:
-    env = {
-        "type": "rosterEntry",
-        "data": {
-            "name": "Switcher 7",
-            "address": "7",
-            "isLongAddress": False,
-            "road": None,
-            "number": None,
-            "model": None,
-            "comment": None,
-        },
-    }
-    parsed = parse_roster_entry(env)
-    assert parsed.dcc_address == 7
-    assert parsed.long_address is False
-    assert parsed.road_name is None
-    assert parsed.road_number is None
-    assert parsed.model is None
-    assert parsed.comment is None
-
-
-def test_parse_roster_entry_raises_on_non_digit_address() -> None:
-    env = {
-        "type": "rosterEntry",
-        "data": {
-            "name": "Bad Loco",
-            "address": "1A2B",
-            "isLongAddress": False,
-        },
-    }
-    with pytest.raises(JMRIProtocolError) as exc_info:
-        parse_roster_entry(env)
-    assert exc_info.value.context["field"] == "address"
-    assert exc_info.value.context["address"] == "1A2B"
-
-
-def test_parse_roster_entry_raises_on_missing_is_long_address() -> None:
-    env = {
-        "type": "rosterEntry",
-        "data": {"name": "X", "address": "100"},
-    }
-    with pytest.raises(JMRIProtocolError) as exc_info:
-        parse_roster_entry(env)
-    assert exc_info.value.context["field"] == "isLongAddress"
-
-
-def test_parse_roster_entry_ignores_extra_jmri_fields() -> None:
-    """Roster envelopes carry many fields pyjmri doesn't surface; they are ignored."""
-    env = {
-        "type": "rosterEntry",
-        "data": {
-            "name": "X",
-            "address": "100",
-            "isLongAddress": False,
-            "mfg": "Kato",
-            "decoderModel": "DN123",
-            "decoderFamily": "Series 3",
-            "owner": "Mike",
-            "dateModified": "2015-08-15T14:58:45.000+00:00",
-            "functionKeys": [{"name": "F0"}],
-            "image": None,
-            "icon": None,
-            "maxSpeedPct": 100,
-            "shuntingFunction": "",
-        },
-    }
-    parsed = parse_roster_entry(env)
-    assert parsed.dcc_address == 100
 
 
 # ---- Memory peculiarities ----

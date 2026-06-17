@@ -27,6 +27,7 @@ from pyjmri._parsing import (
     parse_location,
     parse_memory,
     parse_power,
+    parse_roster_entry,
     parse_route,
     parse_sensor,
     parse_signal_head,
@@ -43,6 +44,7 @@ from pyjmri.exceptions import (
     JMRIProtocolError,
     JMRIRequestTimeout,
     JMRIVersionUnsupported,
+    LayoutEntityNotFound,
     ThrottleAcquireFailed,
 )
 from pyjmri.layout import EntityCollection, Layout
@@ -50,6 +52,7 @@ from pyjmri.light import Light
 from pyjmri.memory import Memory
 from pyjmri.operations import Car, Engine, Location, Operations, Train
 from pyjmri.power import PowerState
+from pyjmri.roster import Roster, RosterEntry
 from pyjmri.route import Route
 from pyjmri.sensor import Sensor
 from pyjmri.signal import SignalHead, SignalMast
@@ -149,6 +152,11 @@ class Client:
         self._ws_connected: asyncio.Event | None = None
         self._supervisor_task: asyncio.Task[None] | None = None
         self._entities: dict[tuple[str, str], Waitable] = {}
+        # Story 9.3: the most recently discovered roster, cached so
+        # throttle_for_entry() can resolve a name or address with no roster=
+        # argument. None until the first discover_roster() call; refreshed
+        # (possibly to an empty Roster) on every discover_roster().
+        self._roster: Roster | None = None
         # Story 5.1: name-keyed pending throttle acquires (Throttle's WS
         # correlation). Lives across the Client lifetime; cleared in __aexit__.
         self._pending_throttle: dict[str, asyncio.Future[dict[str, Any]]] = {}
@@ -623,6 +631,114 @@ class Client:
 
         return Throttle(self, dcc_address=dcc_address, long=long)
 
+    def throttle_for_entry(
+        self,
+        target: RosterEntry | str | int,
+        *,
+        roster: Roster | None = None,
+        long: bool | None = None,
+    ) -> Throttle:
+        """Create a :class:`Throttle` from a roster entry, name, or DCC address.
+
+        Additive convenience over :meth:`throttle` (FR54): it derives
+        long/short addressing from the matched roster entry and returns the
+        **same** unacquired :class:`Throttle` — acquire still happens on
+        ``async with`` entry, so ``async with jmri.throttle_for_entry(loco)
+        as t:`` works directly. This is a synchronous factory; resolution
+        does not perform any I/O.
+
+        Resolution of ``target``:
+
+        - A :class:`~pyjmri.RosterEntry` is used directly — its
+          ``dcc_address`` / ``long_address`` need no roster.
+        - A **name** (``str``) or **address** (``int``) is resolved against a
+          :class:`~pyjmri.Roster`: the one passed as ``roster=``, else the
+          Client's cached roster from the most recent :meth:`discover_roster`
+          call. (Call :meth:`discover_roster` once first, or pass ``roster=``.)
+
+        FR55 split:
+
+        - An **address not in the roster** (or when no roster is available)
+          does NOT raise: it logs a motor-only WARNING and acquires
+          best-effort, keeping an un-catalogued loco drivable. With no entry
+          to derive addressing from, long/short defaults by JMRI convention
+          (``address > 127`` ⇒ long); pass ``long=`` to override.
+        - A **name with no matching entry** raises
+          :class:`~pyjmri.LayoutEntityNotFound` (a name cannot be turned into
+          an address). A name given when **no roster is available at all**
+          likewise raises ``LayoutEntityNotFound`` — call
+          :meth:`discover_roster` first or pass ``roster=``.
+
+        Snapshot caveat (FR54): the roster is a discovery-time snapshot. A
+        loco re-addressed in JMRI after :meth:`discover_roster` resolves to
+        its prior address until the script re-runs :meth:`discover_roster`.
+
+        FR28 open-loop honesty is unchanged: a successful acquire means only
+        that JMRI accepted the throttle, not that a locomotive is physically
+        present at the address.
+
+        Args:
+            target: A :class:`~pyjmri.RosterEntry`, a roster name, or a DCC
+                address.
+            roster: Optional roster to resolve a name/address against;
+                defaults to the Client's last-discovered roster.
+            long: Optional explicit long/short override. When given, it
+                overrides the value derived from the entry or the
+                address-convention default.
+
+        Returns:
+            An unacquired :class:`~pyjmri.Throttle`.
+
+        Raises:
+            LayoutEntityNotFound: when ``target`` is a name with no matching
+                entry, or a name with no roster available.
+            TypeError: when ``target`` is a ``bool`` (ambiguous — pass a
+                RosterEntry, name, or address).
+        """
+        from pyjmri.throttle import Throttle
+
+        if isinstance(target, RosterEntry):
+            dcc_address = target.dcc_address
+            is_long = target.long_address if long is None else long
+        elif isinstance(target, bool):
+            # bool is an int subclass — reject it explicitly so True/False
+            # cannot be mistaken for DCC address 1/0.
+            raise TypeError(
+                "throttle_for_entry target must be a RosterEntry, roster name, "
+                f"or DCC address; got bool {target!r}"
+            )
+        elif isinstance(target, str):
+            resolved = roster if roster is not None else self._roster
+            if resolved is None:
+                raise LayoutEntityNotFound(
+                    entity_type="rosterEntry",
+                    key=target,
+                    reason="no roster available — call discover_roster() or pass roster=",
+                )
+            entry = resolved[target]  # raises LayoutEntityNotFound on a miss
+            dcc_address = entry.dcc_address
+            is_long = entry.long_address if long is None else long
+        else:
+            resolved = roster if roster is not None else self._roster
+            # Use the silent finder, not by_address: this path emits its own
+            # motor-only WARNING below, so by_address's miss-warning would be a
+            # redundant second line for one event.
+            entry_or_none = resolved._find_by_address(target) if resolved is not None else None
+            if entry_or_none is not None:
+                dcc_address = entry_or_none.dcc_address
+                is_long = entry_or_none.long_address if long is None else long
+            else:
+                logger.warning(
+                    "DCC address %d is not in the roster; assuming motor-only capabilities",
+                    target,
+                )
+                dcc_address = target
+                # No entry to derive addressing from: JMRI convention is that
+                # addresses above 127 require long (4-digit) addressing.
+                is_long = (target > 127) if long is None else long
+
+        return Throttle(self, dcc_address=dcc_address, long=is_long)
+
     async def get_entity(self, entity_type: str, name: str) -> dict[str, Any]:
         """Implementation of :class:`pyjmri._protocols.ClientHandle`.
 
@@ -666,6 +782,10 @@ class Client:
         (``turnout``, ``sensor``, ``block``, ``light``, ``memory``,
         ``route``, ``signalHead``, ``signalMast``) and assembles the
         results into a :class:`~pyjmri.Layout`.
+
+        The roster is a separate read-only subsystem — fetch it with
+        :meth:`discover_roster`, not here (it is not part of the
+        ``Layout``).
 
         On the first call against a given Client, ``discover()`` first
         fetches ``/json/v5/networkService`` and refuses to proceed if
@@ -852,6 +972,86 @@ class Client:
             cars=EntityCollection(cars, entity_type="car"),
             engines=EntityCollection(engines, entity_type="engine"),
         )
+
+    async def discover_roster(self) -> Roster:
+        """Fetch the JMRI roster and return a read-only Roster snapshot.
+
+        A **separate entry point** from :meth:`discover` (mirroring
+        :meth:`discover_operations`): issues ``GET /json/v5/roster``, parses
+        each envelope into a frozen :class:`~pyjmri.RosterEntry`, and returns
+        a :class:`~pyjmri.Roster` collection — **not** a
+        :class:`~pyjmri.Layout`. The roster is a non-subscribed,
+        point-in-time snapshot; it does not touch the WebSocket-dispatch
+        index and exposes no ``wait_*`` primitives. To refresh, call this
+        method again.
+
+        The returned roster is cached on the Client and used by
+        :meth:`throttle_for_entry` to resolve a name or address when no
+        ``roster=`` argument is supplied (Story 9.3). Re-running this method
+        refreshes that cache (possibly to an empty roster on a fetch
+        failure).
+
+        On the first discovery against a given Client (whether via
+        :meth:`discover`, :meth:`discover_operations`, or this method), the
+        JMRI application version is fetched from ``/json/v5/networkService``
+        and rejected if older than 5.14 (NFR8). The check is cached for the
+        Client's lifetime and shared across all three methods — subsequent
+        calls skip the probe.
+
+        Returns:
+            A :class:`~pyjmri.Roster`. A roster fetch failure or timeout
+            degrades to an **empty** ``Roster`` with a logged WARNING rather
+            than raising (FR57); because roster discovery is a separate call,
+            a failure here cannot affect :meth:`discover`. An empty JMRI
+            roster and an individual malformed entry are non-errors: the
+            malformed entry is skipped with a WARNING while the good entries
+            load (FR58).
+
+        Raises:
+            JMRIVersionUnsupported: when the running JMRI is older than 5.14
+                (only if the version check has not already run).
+            JMRIConnectionError, JMRIRequestTimeout: surfaced from the HTTP
+                transport during the version probe.
+            RuntimeError: when the Client is not open (use
+                ``async with Client() as jmri:`` first).
+        """
+        if self._http is None:
+            raise RuntimeError("Client is not open; use 'async with Client() as jmri:'")
+        http = self._http
+
+        if not self._version_checked:
+            version_payload = await http.get("/json/v5/networkService")
+            _check_jmri_version(version_payload)
+            self._version_checked = True
+
+        # Graceful-degrade boundary (FR57): any roster fetch/parse failure
+        # yields an empty Roster + WARNING rather than raising. A single fetch
+        # needs no TaskGroup, so there is no sibling-cancellation concern.
+        try:
+            payload = await _fetch_collection(http, "roster")
+            entries: list[RosterEntry] = []
+            for env in payload:
+                try:
+                    entries.append(parse_roster_entry(env))
+                except JMRIProtocolError as exc:
+                    logger.warning("skipping malformed roster entry: %s", exc)
+        except (JMRIConnectionError, JMRIRequestTimeout, JMRIProtocolError, ConnectionError) as exc:
+            # Narrow on purpose (FR57): transport failures and malformed wire
+            # data degrade to an empty roster. A programming error
+            # (KeyError/TypeError/AttributeError from a future refactor of the
+            # parse/Roster path) must NOT be swallowed here — an empty roster
+            # caused by a bug would be indistinguishable from an empty layout,
+            # so those propagate.
+            logger.warning("roster discovery failed; returning empty roster: %s", exc)
+            self._roster = Roster([])
+            return self._roster
+
+        # Deliberately does NOT rebuild self._entities — the roster is a
+        # non-subscribed snapshot with no _on_event (like Operations).
+        # Cache the result so throttle_for_entry() can resolve a name or
+        # address without a roster= argument (Story 9.3).
+        self._roster = Roster(entries)
+        return self._roster
 
     async def power_state(self) -> PowerState:
         """Return the current JMRI track-power state.

@@ -7,9 +7,10 @@ object is assembled later by ``Client.discover`` using the ``_ENTITY_SPECS``
 registry (which injects the ``ClientHandle``).
 
 Operations entity parsers (``parse_location``, ``parse_train``,
-``parse_car``, ``parse_engine``) are handle-free snapshots, so they return
-the public frozen entity classes from :mod:`pyjmri.operations` directly
-with no ``_Parsed*`` intermediate.
+``parse_car``, ``parse_engine``) and the roster parser
+(``parse_roster_entry``) are handle-free snapshots, so they return the
+public frozen entity classes from :mod:`pyjmri.operations` /
+:mod:`pyjmri.roster` directly with no ``_Parsed*`` intermediate.
 
 Architecture sec. JSON <-> Python Translation: integer codes are
 translated through ``_codes.py`` only; unknown JSON keys are silently
@@ -18,6 +19,7 @@ ignored; missing required keys raise ``JMRIProtocolError``.
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Mapping
 from dataclasses import dataclass
 from enum import Enum
@@ -29,9 +31,12 @@ from pyjmri.exceptions import JMRIProtocolError
 from pyjmri.light import LightState
 from pyjmri.operations import Car, Engine, Location, Placement, RouteStop, Track, Train
 from pyjmri.power import PowerState
+from pyjmri.roster import FunctionLabel, RosterEntry
 from pyjmri.sensor import SensorState
 from pyjmri.signal import SignalHeadAppearance, SignalMastAspect
 from pyjmri.turnout import TurnoutState
+
+logger = logging.getLogger("pyjmri.parsing")
 
 EnumT = TypeVar("EnumT", bound=Enum)
 
@@ -100,17 +105,6 @@ class _ParsedSignalMast:
 
 
 @dataclass(frozen=True, kw_only=True, slots=True)
-class _ParsedRosterEntry:
-    name: str
-    dcc_address: int
-    long_address: bool
-    road_name: str | None
-    road_number: str | None
-    model: str | None
-    comment: str | None
-
-
-@dataclass(frozen=True, kw_only=True, slots=True)
 class _ParsedPower:
     name: str
     state: PowerState
@@ -122,6 +116,11 @@ class _ParsedPower:
 
 def _data(payload: dict[str, Any], entity_type: str) -> dict[str, Any]:
     """Return ``payload['data']`` or raise :class:`JMRIProtocolError`."""
+    if not isinstance(payload, dict):
+        raise JMRIProtocolError(
+            "envelope is not a JSON object",
+            entity_type=entity_type,
+        )
     data = payload.get("data")
     if not isinstance(data, dict):
         raise JMRIProtocolError(
@@ -150,6 +149,24 @@ def _optional_str(data: dict[str, Any], key: str) -> str | None:
         return None
     if not isinstance(value, str):
         return None
+    return value
+
+
+def _as_int(value: Any) -> int | None:
+    # bool is an int subclass; JMRI never sends a bool here, so reject it.
+    if not isinstance(value, int) or isinstance(value, bool):
+        return None
+    return value
+
+
+def _optional_int(data: dict[str, Any], key: str) -> int | None:
+    return _as_int(data.get(key))
+
+
+def _optional_bool(data: dict[str, Any], key: str, *, default: bool = False) -> bool:
+    value = data.get(key)
+    if not isinstance(value, bool):
+        return default
     return value
 
 
@@ -193,9 +210,8 @@ def _required_bool(data: dict[str, Any], key: str, *, entity_type: str) -> bool:
 
 
 def _required_int(data: dict[str, Any], key: str, *, entity_type: str) -> int:
-    value = data.get(key)
-    # bool is an int subclass; JMRI never sends a bool here, so reject it.
-    if not isinstance(value, int) or isinstance(value, bool):
+    value = _as_int(data.get(key))
+    if value is None:
         raise JMRIProtocolError(
             f"missing or non-integer field {key!r}",
             entity_type=entity_type,
@@ -309,8 +325,49 @@ def parse_signal_mast(payload: dict[str, Any]) -> _ParsedSignalMast:
     )
 
 
-def parse_roster_entry(payload: dict[str, Any]) -> _ParsedRosterEntry:
-    """Parse a ``rosterEntry`` envelope.
+def _parse_function_labels(data: dict[str, Any]) -> tuple[FunctionLabel, ...]:
+    """Build the per-function label tuple from a roster entry's ``functionKeys``.
+
+    Each element is one F-key object (``{"name": "F0", "label": ..., "lockable":
+    ...}``). The function number is parsed from the ``"Fnn"`` name; ``label`` is
+    ``None`` when JMRI reports ``null`` or an empty string; ``lockable`` defaults
+    to ``False`` when absent. All keys JMRI sends are parsed, including F29+ — the
+    F0..F28 limit is a throttle-command constraint, not a roster-data one. An
+    absent or non-list ``functionKeys`` yields an empty tuple.
+    """
+    raw = data.get("functionKeys")
+    if not isinstance(raw, list):
+        return ()
+    labels: list[FunctionLabel] = []
+    for element in raw:
+        if not isinstance(element, dict):
+            logger.debug("skipping non-dict functionKeys element: %r", element)
+            continue
+        fname = element.get("name")
+        # Require an ASCII-decimal suffix, mirroring the address guard above: a
+        # name whose digits are non-ASCII (e.g. a fullwidth-digit "Fn") still
+        # satisfies str.isdecimal(), and int() would silently coerce it, so
+        # reject it rather than fabricate a bogus function number.
+        if (
+            not isinstance(fname, str)
+            or not fname.startswith("F")
+            or not fname[1:].isascii()
+            or not fname[1:].isdecimal()
+        ):
+            logger.debug("skipping functionKeys element with unparsable name: %r", fname)
+            continue
+        labels.append(
+            FunctionLabel(
+                num=int(fname[1:]),
+                label=_optional_str(element, "label") or None,
+                lockable=_optional_bool(element, "lockable"),
+            )
+        )
+    return tuple(labels)
+
+
+def parse_roster_entry(payload: dict[str, Any]) -> RosterEntry:
+    """Parse a ``rosterEntry`` envelope into a read-only :class:`RosterEntry`.
 
     The collection URL is ``/json/v5/roster`` but each envelope's
     ``type`` field is ``"rosterEntry"`` (not ``"roster"``).
@@ -318,7 +375,7 @@ def parse_roster_entry(payload: dict[str, Any]) -> _ParsedRosterEntry:
     data = _data(payload, "rosterEntry")
     name = _required_str(data, "name", entity_type="rosterEntry")
     address_str = _required_str(data, "address", entity_type="rosterEntry")
-    if not address_str.isdecimal():
+    if not address_str.isascii() or not address_str.isdecimal():
         raise JMRIProtocolError(
             "DCC address is not an integer string",
             entity_type="rosterEntry",
@@ -326,22 +383,23 @@ def parse_roster_entry(payload: dict[str, Any]) -> _ParsedRosterEntry:
             address=address_str,
             name=name,
         )
-    long_address = data.get("isLongAddress")
-    if not isinstance(long_address, bool):
-        raise JMRIProtocolError(
-            "missing or non-boolean field 'isLongAddress'",
-            entity_type="rosterEntry",
-            field="isLongAddress",
-            name=name,
-        )
-    return _ParsedRosterEntry(
+    long_address = _required_bool(data, "isLongAddress", entity_type="rosterEntry")
+    return RosterEntry(
         name=name,
+        user_name=None,
         dcc_address=int(address_str),
         long_address=long_address,
         road_name=_optional_str(data, "road"),
         road_number=_optional_str(data, "number"),
         model=_optional_str(data, "model"),
+        mfg=_optional_str(data, "mfg"),
+        owner=_optional_str(data, "owner"),
         comment=_optional_str(data, "comment"),
+        image_path=_optional_str(data, "image"),
+        max_speed_pct=_optional_int(data, "maxSpeedPct"),
+        decoder_family=_optional_str(data, "decoderFamily"),
+        decoder_model=_optional_str(data, "decoderModel"),
+        function_labels=_parse_function_labels(data),
     )
 
 

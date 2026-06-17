@@ -16,7 +16,6 @@ from datetime import datetime
 
 from pyjmri import Client
 
-
 HOST = "localhost:12080"
 DCC = 8997
 STAGING_TRACK = "NW Track 6"
@@ -74,7 +73,7 @@ async def run_train(layout, dcc, staging_track, return_track, come_home):
             await t.set_function(0, True)
             await t.set_speed(0.2, forward=True)
             print(f"[{dcc}] departing {staging_track}")
-            #await t.set_speed(0.2)
+            # await t.set_speed(0.2)
             await wait_edge(throat)
             await layout.routes["NW Staging Close"].activate()
             await t.set_speed(0.8)
@@ -93,10 +92,14 @@ async def run_train(layout, dcc, staging_track, return_track, come_home):
                 except asyncio.CancelledError:
                     pass
             print(f"{dcc} has been commanded to return to staging")
-            await slow_through(layout, t, [
-                ("North Zone 9", 0.30),
-                ("West / SW", 0.25),
-            ])
+            await slow_through(
+                layout,
+                t,
+                [
+                    ("North Zone 9", 0.30),
+                    ("West / SW", 0.25),
+                ],
+            )
             await throat.wait_inactive()
             await t.set_speed(0)
             print("Train stopping, ready to reverse")

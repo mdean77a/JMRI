@@ -34,6 +34,14 @@ from pyjmri.operations import (
     Train,
 )
 from pyjmri.power import PowerState
+from pyjmri.roster import (
+    Capability,
+    FunctionLabel,
+    Roster,
+    RosterEntry,
+    classify_capability,
+    firable_startup_functions,
+)
 from pyjmri.route import Route, RouteState
 from pyjmri.sensor import Sensor, SensorState
 from pyjmri.signal import SignalHead, SignalHeadAppearance, SignalMast, SignalMastAspect
@@ -45,11 +53,13 @@ logging.getLogger("pyjmri").addHandler(logging.NullHandler())
 __all__ = [
     "Block",
     "BlockState",
+    "Capability",
     "Car",
     "Client",
     "ClientConfig",
     "Engine",
     "EntityCollection",
+    "FunctionLabel",
     "JMRIConnectionError",
     "JMRIError",
     "JMRIProtocolError",
@@ -67,6 +77,8 @@ __all__ = [
     "Placement",
     "PowerState",
     "ReconnectConfig",
+    "Roster",
+    "RosterEntry",
     "Route",
     "RouteState",
     "RouteStop",
@@ -85,4 +97,6 @@ __all__ = [
     "Turnout",
     "TurnoutState",
     "WaitTimeout",
+    "classify_capability",
+    "firable_startup_functions",
 ]

@@ -6,6 +6,12 @@ I have multiple profiles for different purposes: a main layout, a programming tr
 
 All profiles share a single roster and a single jython scripts directory, avoiding the confused spaghetti of duplicated files I accumulated over several years of using JMRI.
 
+## pyjmri — Async Python client
+
+This repository also hosts [`pyjmri`](python_code/README.md), a modern async Python client for the JMRI web server. It lets you drive a JMRI-controlled layout — turnouts, sensors, lights, throttles — from Python scripts using `async`/`await`, over JMRI's JSON API, as a typed alternative to the bundled Jython scripts. It lives under [`python_code/`](python_code/) and is published to PyPI.
+
+See [python_code/README.md](python_code/README.md) for the quickstart, installation, and migration guide.
+
 ## File Structure
 
 ```
