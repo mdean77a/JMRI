@@ -193,7 +193,14 @@ Every command uses `uv run --no-sync` for tool invocations. The exceptions are `
 
 ### After publish
 
-Confirm `https://pypi.org/project/pyjmri/` shows the new version. In a scratch directory outside the repo, run `uv add pyjmri` in a fresh venv and re-run the Quickstart from `README.md` to confirm the installed wheel works as expected. Add a "Published 20YY-MM-DD" line at the bottom of the release notes for the version you just shipped. If the smoke install or smoke Quickstart fails, yank the broken version on PyPI before anyone downloads it and diagnose before re-publishing.
+Confirm `https://pypi.org/project/pyjmri/` shows the new version. In a scratch directory outside the repo, run `uv add pyjmri` in a fresh venv and re-run the Quickstart from `README.md` to confirm the installed wheel works as expected. The `scripts/smoke_test_published.sh` helper automates this — it builds a throwaway uv project in a temp dir outside the repo, installs the published wheel from PyPI, and asserts the version, imports, and roster API (pass a JMRI URL as the second argument to also run a live `discover_roster()` check):
+
+```bash
+scripts/smoke_test_published.sh 1.2.0                      # offline: version + imports
+scripts/smoke_test_published.sh 1.2.0 192.168.1.159:12080  # + live functional check
+```
+
+Add a "Published 20YY-MM-DD" line at the bottom of the release notes for the version you just shipped. If the smoke install or smoke Quickstart fails, yank the broken version on PyPI before anyone downloads it and diagnose before re-publishing.
 
 ## Hardware-mode throttle validation
 
