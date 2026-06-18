@@ -17,13 +17,19 @@
 #             check against that JMRI instance, exercising EVERY discover
 #             routine: discover() (layout entities + power), discover_operations()
 #             (locations/trains/cars/engines), and discover_roster() (roster
-#             entries), printing the counts/results for each. Omit to run only
-#             the offline checks (no JMRI needed).
+#             entries), printing the counts/results for each.
+#
+#             If NO URL is provided, the discover routines are NOT run and NO
+#             discovery results are displayed — only the offline checks (version,
+#             imports, API presence). To see discovery results, supply a URL:
+#             use localhost:12080 when JMRI runs on this same machine, or the
+#             layout machine's address (e.g. 192.168.1.159:12080) otherwise.
 #
 # Examples:
-#   scripts/smoke_test_published.sh                      # latest, offline only
-#   scripts/smoke_test_published.sh 1.2.0                # pin 1.2.0, offline only
-#   scripts/smoke_test_published.sh 1.2.0 192.168.1.159:12080   # + live check
+#   scripts/smoke_test_published.sh                      # latest, offline only (no discovery)
+#   scripts/smoke_test_published.sh 1.2.0                # pin 1.2.0, offline only (no discovery)
+#   scripts/smoke_test_published.sh latest localhost:12080      # + live discovery, JMRI on this machine
+#   scripts/smoke_test_published.sh 1.2.0 192.168.1.159:12080   # + live discovery, JMRI on layout machine
 #
 # Exit code is 0 only if every check passes.
 
@@ -182,7 +188,8 @@ async def main() -> int:
 raise SystemExit(asyncio.run(main()))
 PY
 else
-  echo "==> Skipping live discover sweep (no JMRI_URL given)."
+  echo "==> No JMRI_URL given — discover routines not run, no discovery results shown."
+  echo "    To see discovery results, re-run with a URL (e.g. localhost:12080 or 192.168.1.159:12080)."
 fi
 
 echo "==> ✅ Smoke test PASSED for '${SPEC}'."
