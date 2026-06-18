@@ -26,6 +26,42 @@ uv add pyjmri
 pip install pyjmri
 ```
 
+### Verify your install (smoke test)
+
+Before writing anything, run a quick smoke test to confirm the package is healthy. First, check it imports and reports its version — this needs no JMRI:
+
+```bash
+python -c "import pyjmri, importlib.metadata as m; print('pyjmri', m.version('pyjmri'), '— import OK')"
+```
+
+You should see something like `pyjmri 1.2.0 — import OK`.
+
+Next, confirm `pyjmri` can reach JMRI and read your layout. This is **read-only** — it discovers and counts entities across all three subsystems but changes nothing on the layout, so it's safe to run anytime. Save it as `smoke_test.py` and run `python smoke_test.py`:
+
+```python
+import asyncio
+from pyjmri import Client
+
+
+async def main() -> None:
+    async with Client() as jmri:  # defaults to localhost:12080
+        layout = await jmri.discover()
+        print(f"layout:     {len(layout.turnouts)} turnouts, {len(layout.sensors)} sensors, "
+              f"{len(layout.routes)} routes, {len(layout.blocks)} blocks")
+        ops = await jmri.discover_operations()
+        print(f"operations: {len(ops.locations)} locations, {len(ops.trains)} trains, "
+              f"{len(ops.cars)} cars, {len(ops.engines)} engines")
+        roster = await jmri.discover_roster()
+        print(f"roster:     {len(roster)} locomotives")
+
+
+asyncio.run(main())
+```
+
+Non-zero counts mean `pyjmri` installed, connected to JMRI, and read your layout — you're ready for the first script below. If it can't connect, you'll get a clear `JMRIConnectionError` naming the URL it tried; re-check that JMRI's web server is up (see [Prerequisites](#prerequisites)).
+
+> Maintainers verifying a *published release* (rather than an end-user install) can run `scripts/smoke_test_published.sh <version> [jmri-url]` from a repo checkout — it installs the wheel from PyPI into a throwaway environment and runs this same discovery sweep. See `CONTRIBUTING.md`.
+
 ### Your first script
 
 Save this as `quickstart.py` and run `python quickstart.py`:
