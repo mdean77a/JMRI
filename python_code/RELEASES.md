@@ -44,7 +44,7 @@ metadata subsystem with no throttle/DCC or physical-state dependency. The
 (sound actually plays, loco actually moves) remains an optional manual
 hardware step, not a release gate.
 
-(Published YYYY-MM-DD — Phase B: fill in at publish time)
+(Published 2026-06-18)
 
 ## v1.1.0
 
