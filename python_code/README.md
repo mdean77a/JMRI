@@ -165,3 +165,44 @@ Operations is a pure data subsystem — cars, engines, locations, and trains are
 ### Read-only in this release
 
 Operations discovery is **read-only**. There is no build-train, move/assign-car, or generate-manifest surface in `pyjmri` yet — those mutating operations are deferred to a future command increment. Today you can inspect the whole operating session as typed Python; you cannot change it.
+
+## Roster (read-only)
+
+JMRI's roster is DecoderPro's catalog of *every* locomotive you have programmed — its address, decoder, and per-function labels. `pyjmri` exposes it through a separate entry point, mirroring Operations:
+
+```python
+async with Client() as jmri:
+    roster = await jmri.discover_roster()
+    print(f"{len(roster)} roster entries")
+    for entry in roster.values():
+        print(entry.road_number or entry.name, "→ DCC", entry.dcc_address,
+              "·", entry.model or "—", "·", entry.decoder_family or "—")
+    loco = roster.by_address(1029)   # get()-style: None (with a warning) if absent
+```
+
+`discover_roster()` returns a `Roster` container — distinct from the `Layout` returned by `discover()` and the `Operations` returned by `discover_operations()`. A worked fleet-catalog report (per-loco reference sheet plus a decoder rollup) is in [`examples/roster_catalog.py`](examples/roster_catalog.py).
+
+### Roster is not Operations
+
+The roster catalogs *every* engine you have ever programmed in DecoderPro. Operations engines are the **operationally-active subset actually deployed** on the layout — you may have ~45 roster engines but only a handful running tonight. The two are intentionally separate: a roster `RosterEntry` is never an Operations `Engine`. The roster tells you a decoder's capabilities and identity; Operations tells you a layout's current deployment.
+
+### Lookup, and the unknown-loco rules
+
+A `Roster` is a read-only mapping: iterate it, take `len()`, or look an entry up by its roster ID (`roster[name]`). It adds one roster-specific find — `by_address(dcc_address)` — because JMRI's roster primary key is the entry name, not the DCC address. The two lookups behave differently on a miss, by design:
+
+- `by_address(addr)` is a **get()-style find**: an unknown address returns `None` (with a logged warning), never raises — a brand-new, un-catalogued loco is a normal case. The same philosophy reaches the throttle: `Client.throttle_for_entry(<address>)` for an address not in the roster **warns and still drives** (best-effort, motor-only assumption) so a not-yet-catalogued loco stays drivable.
+- A **name** lookup that misses **raises** `LayoutEntityNotFound` — a name cannot be turned into a DCC address without a matching entry, so `throttle_for_entry(<name>)` raises rather than guess.
+
+The roster is a **discovery-time snapshot** (FR54): a loco re-addressed in JMRI after `discover_roster()` resolves to its *prior* address until you re-run `discover_roster()`.
+
+### Capability comes from function labels, not the decoder family
+
+To decide what a loco can do (e.g. whether it is sound-equipped), read its **function labels** — `decoder_family` / `decoder_model` are decoder-definition-file names (date-stamped strings like "ESU LokSound 5"), not capability tags. `pyjmri` provides `classify_capability()` and `firable_startup_functions()` for exactly this, and a worked capability-aware startup is in [`examples/capability_aware_startup.py`](examples/capability_aware_startup.py).
+
+### Fully simulator-testable
+
+The roster is a pure data subsystem — entries are records JMRI serves over JSON regardless of hardware. Unlike throttles and sensors (see [Limitations](#limitations)), roster discovery is **not** subject to the open-loop blind spot, so it is fully exercisable on the NCE simulator with a populated roster.
+
+### Read-only in this release
+
+Roster discovery is **read-only**. There is no decoder-programming or CV-write surface in `pyjmri` — editing a locomotive's address, function labels, or decoder configuration stays in DecoderPro. Today you can inspect every locomotive's metadata as typed Python; you cannot change it.

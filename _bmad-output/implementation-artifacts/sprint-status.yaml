@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-05-07
-last_updated: 2026-06-17  # Story 9.3 code-reviewed (5 patches applied) -> done
+last_updated: 2026-06-18  # Story 9.4 code-reviewed (1 patch) -> done; Epic 9 complete
 project: JMRI
 project_key: NOKEY
 tracking_system: file-system
@@ -107,5 +107,5 @@ development_status:
   9-1-roster-wire-format-parsing-and-capability-aware-entity-classes: done
   9-2-discover-roster-standalone-by-address-graceful-degrade: done
   9-3-throttle-for-entry-capability-classification-startup-example: done
-  9-4-roster-catalog-example-read-only-boundary-docs-release: backlog
+  9-4-roster-catalog-example-read-only-boundary-docs-release: done
   epic-9-retrospective: optional

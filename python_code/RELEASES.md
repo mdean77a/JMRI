@@ -1,5 +1,51 @@
 # pyjmri release notes
 
+## v1.2.0
+
+Adds read-only discovery of JMRI's Roster (DecoderPro catalog) subsystem
+(Epic 9). No changes to existing Epic 1–8 behavior — purely additive.
+
+- New `Client.discover_roster()` returns a typed, read-only `Roster`
+  container enumerating every catalogued locomotive, looked up by roster
+  name (`roster[name]`) or DCC address (`roster.by_address(addr)`).
+- Two read-only entity classes (`RosterEntry`, `FunctionLabel`) exposing
+  each entry's identity (road number, model), addressing, decoder
+  identifiers (family/model), per-function labels, and owner/comment
+  metadata.
+- The roster is the complete DecoderPro catalog — distinct from
+  Operations (the operationally-active subset deployed on the layout) and
+  from the live `Layout`. Read-only in this release: no decoder-programming
+  or CV-write surface (deferred to a future command increment).
+- `Client.throttle_for_entry(target)` acquires a throttle straight from a
+  `RosterEntry`, roster name, or DCC address, deriving long/short
+  addressing from the matched entry. An address **not** in the roster
+  warns and still drives best-effort (FR55); an unresolvable name raises.
+- Capability classification (`classify_capability()`,
+  `firable_startup_functions()`) infers what a loco can do from its
+  function **labels**, never from decoder-family strings.
+- A roster fetch failure or an empty roster degrades to an empty `Roster`
+  rather than raising (FR57), structurally isolated from `discover()`.
+- New examples `examples/roster_catalog.py` (a fleet-catalog report) and
+  `examples/capability_aware_startup.py`, plus a README Roster section.
+
+JMRI version tested against: JMRI 5.14.0
+
+Long-run test: skipped for this release; v1.0.0 evidence reused
+(`duration=3600s disconnects=5 reconnects=5 rss_delta=-5.1MB fd_delta=0
+task_delta=0 status=PASS`). Epic 9 adds only read paths (HTTP discovery +
+parsing) plus an additive throttle convenience built on the existing
+acquire path; it does not touch the WebSocket transport, reconnect
+machinery, or supervised-task plumbing, so the v1.0.0 long-run result
+still characterizes the same code.
+
+Hardware-mode validation: not required. The roster is a pure read-only
+metadata subsystem with no throttle/DCC or physical-state dependency. The
+`capability_aware_startup.py` example's "visibly correct startup" check
+(sound actually plays, loco actually moves) remains an optional manual
+hardware step, not a release gate.
+
+(Published YYYY-MM-DD — Phase B: fill in at publish time)
+
 ## v1.1.0
 
 Adds read-only discovery of JMRI's Operations subsystem (Epic 8). No

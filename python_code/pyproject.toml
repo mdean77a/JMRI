@@ -1,6 +1,6 @@
 [project]
 name = "pyjmri"
-version = "1.1.0"
+version = "1.2.0"
 description = "Async Python client for the JMRI web server"
 readme = "README.md"
 authors = [
@@ -53,7 +53,9 @@ dev = [
 [tool.ruff]
 line-length = 100
 target-version = "py311"
-extend-exclude = ["*.ipynb"]
+# train_out_and_back.py is a personal, gitignored driving script (not a shipped
+# example); keep tooling off it so it never gates the build.
+extend-exclude = ["*.ipynb", "examples/train_out_and_back.py"]
 
 [tool.ruff.lint]
 select = ["E", "W", "F", "I", "B", "UP", "ASYNC", "RUF"]
@@ -64,6 +66,9 @@ select = ["E", "W", "F", "I", "B", "UP", "ASYNC", "RUF"]
 strict = true
 python_version = "3.11"
 mypy_path = "src"
+# Personal, gitignored driving script (not a shipped example); excluded from the
+# strict gate so `mypy --strict examples/` stays green. See .gitignore.
+exclude = ['examples/train_out_and_back\.py']
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
