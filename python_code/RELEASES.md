@@ -3,7 +3,13 @@
 ## v1.2.0
 
 Adds read-only discovery of JMRI's Roster (DecoderPro catalog) subsystem
-(Epic 9). No changes to existing Epic 1–8 behavior — purely additive.
+(Epic 9). No changes to existing Epic 1–7 behavior — purely additive.
+
+> Note: v1.1.0 was prepared but never published (see below), so this is also
+> the **first published build to include the read-only Operations subsystem**
+> (Epic 8): `Client.discover_operations()`, the `Operations` container, and the
+> `Location`/`Train`/`Car`/`Engine` entity classes. See the v1.1.0 section for
+> the Operations release notes.
 
 - New `Client.discover_roster()` returns a typed, read-only `Roster`
   container enumerating every catalogued locomotive, looked up by roster
@@ -48,6 +54,12 @@ hardware step, not a release gate.
 
 ## v1.1.0
 
+> **Never published — superseded by v1.2.0.** This version was prepared
+> (Story 8.3: version bump, notes, build) but Phase B was skipped: no PyPI
+> upload, git tag, or GitHub release was ever made. The Operations feature
+> documented here first reached PyPI inside **v1.2.0**. These notes are kept
+> as the Operations release record.
+
 Adds read-only discovery of JMRI's Operations subsystem (Epic 8). No
 changes to existing Epic 1–6 behavior — purely additive.
 
@@ -81,7 +93,7 @@ data subsystem with no throttle/DCC or physical-state dependency; the
 Operations integration tests run fully against the NCE simulator with
 Operations data loaded. No throttle code changed in this release.
 
-(Published YYYY-MM-DD — Phase B: fill in at publish time)
+(Not published — folded into v1.2.0; see the note above.)
 
 ## v1.0.1
 
