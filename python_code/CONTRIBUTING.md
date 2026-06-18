@@ -193,7 +193,7 @@ Every command uses `uv run --no-sync` for tool invocations. The exceptions are `
 
 ### After publish
 
-Confirm `https://pypi.org/project/pyjmri/` shows the new version. In a scratch directory outside the repo, run `uv add pyjmri` in a fresh venv and re-run the Quickstart from `README.md` to confirm the installed wheel works as expected. The `scripts/smoke_test_published.sh` helper automates this — it builds a throwaway uv project in a temp dir outside the repo, installs the published wheel from PyPI, and asserts the version, imports, and roster API (pass a JMRI URL as the second argument to also run a live `discover_roster()` check):
+Confirm `https://pypi.org/project/pyjmri/` shows the new version. In a scratch directory outside the repo, run `uv add pyjmri` in a fresh venv and re-run the Quickstart from `README.md` to confirm the installed wheel works as expected. The `scripts/smoke_test_published.sh` helper automates this — it builds a throwaway uv project in a temp dir outside the repo, installs the published wheel from PyPI, and asserts the version, imports, roster API, and that every discover routine is present. Pass a JMRI URL as the second argument to also run a live sweep of **all** discover routines (`discover()` + `power_state()`, `discover_operations()`, `discover_roster()`), printing the entity counts for each:
 
 ```bash
 scripts/smoke_test_published.sh 1.2.0                      # offline: version + imports
