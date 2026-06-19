@@ -20,38 +20,40 @@ JMRI/                                    (this git repository)
 │   ├── profile/
 │   │   ├── profile.xml                  (Connection config and startup actions)
 │   │   ├── profile.properties           (Preferences: roster path, web server, LogixNG)
-│   │   ├── 5e82e5b0-.../                (Machine-specific profile overrides)
-│   │   │   ├── profile.xml
-│   │   │   ├── profile.properties
-│   │   │   └── user-interface.xml
-│   │   └── d2a3bcad-.../                (Machine-specific profile overrides)
-│   │       ├── profile.xml
-│   │       ├── profile.properties
-│   │       └── user-interface.xml
-│   ├── March2026Settings.xml            (Current panel/layout configuration)
-│   ├── May2025Settings.xml              (Previous panel versions)
+│   │   ├── 5e82e5b0-.../                (Per-machine profile overrides - one dir per host)
+│   │   ├── 67cb7c83-.../
+│   │   └── d2a3bcad-.../
+│   ├── June2026Settings.xml             (Current panel/layout configuration - active)
+│   ├── March2026Settings.xml            (Previous panel versions - in-tree rollback points)
+│   ├── May2025Settings.xml
 │   ├── April2025Settings.xml
-│   ├── October2022Settings.xml
 │   ├── FebruaryPanelNewSectioning.xml
+│   ├── October2022Settings.xml
 │   ├── backupPanels/                    (Timestamped automatic backups)
-│   ├── signal/
-│   │   └── WarrantPreferences.xml
-│   ├── throttle/
-│   │   ├── ThrottlesPreferences.xml
-│   │   └── WiThrottlePreferences.xml
-│   ├── programmers/                     (Custom decoder programmer configs)
-│   ├── resources/                       (Custom icons, images)
+│   ├── operations/                      (Operations module data - locations, trains, cars)
+│   ├── signal/  throttle/  programmers/  resources/   (Per-profile preferences & assets)
 │   └── roster.xml                       (Profile-local roster reference)
 ├── Decoder_TestTrack.jmri/              (Decoder calibration testing profile)
 ├── My_NCE_Simulator.jmri/              (Simulation without hardware)
 ├── Programming_Track.jmri/              (Programming track profile)
-├── roster/                              (Shared locomotive roster)
+├── roster/                              (Shared locomotive roster, ~45 locos + photos)
 ├── jython/                              (Shared Jython scripts, ~250 files)
+├── python_code/                         (pyjmri - async Python client; published to PyPI)
+│   ├── src/pyjmri/                      (Library source)
+│   ├── tests/                           (unit/ + integration/ test suites)
+│   ├── examples/                        (Runnable example scripts)
+│   ├── scripts/                         (Maintainer tooling, e.g. release smoke test)
+│   ├── pyproject.toml  uv.lock          (Packaging + locked dependencies)
+│   ├── README.md  CONTRIBUTING.md  RELEASES.md  SECURITY.md  LICENSE
+│   └── explorepyjmri.ipynb             (Interactive quickstart notebook)
+├── _bmad-output/                        (pyjmri planning & story artifacts - PRD, architecture, epics)
+├── CLAUDE.md                            (Guidance for AI coding assistants)
+├── GIT_SETUP.md                         (Per-machine git filter setup - required after cloning)
 ├── roster.xml                           (Master roster index)
 └── roster.csv                           (CSV export of roster)
 ```
 
-Each `.jmri` profile directory follows the same structure shown above for `Basement_Revised_2024.jmri`. The machine-specific UUID subdirectories under `profile/` allow different machines to have their own UI and connection preferences while sharing the same layout configuration.
+Each `.jmri` profile directory follows the same structure shown above for `Basement_Revised_2024.jmri`. The machine-specific UUID subdirectories under `profile/` (three hosts share this repo today) let each machine keep its own UI and connection preferences while sharing the same layout configuration. Only one `*Settings.xml` is active at a time — selected in `profile/profile.xml`; the others are kept as in-tree rollback points. The `python_code/` subtree is the `pyjmri` package and has its own [README](python_code/README.md), tests, and release tooling.
 
 ## Roster
 
