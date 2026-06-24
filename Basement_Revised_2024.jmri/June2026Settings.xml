@@ -1930,9 +1930,6 @@
       <userName>EZ10</userName>
     </layoutblock>
   </layoutblocks>
-  <signalelements class="jmri.jmrit.blockboss.configurexml.BlockBossLogicProviderXml">
-    <signalelement signal="SZ6" mode="0" limitspeed1="false" limitspeed2="false" useflashyellow="false" distantsignal="false" />
-  </signalelements>
   <routes class="jmri.managers.configurexml.DefaultRouteManagerXml">
     <route userName="NW Staging Close">
       <systemName>IO:AUTO:0001</systemName>
