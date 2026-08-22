@@ -804,8 +804,11 @@ class Client:
         Raises:
             JMRIVersionUnsupported: when the running JMRI is older than
                 5.14.
-            JMRIProtocolError: when a per-type response is malformed
-                (e.g., not a list, missing required fields).
+            JMRIProtocolError: when a per-type *collection* response is
+                malformed (e.g., not a list). A single *entity* whose
+                envelope cannot be parsed (for example a signal mast in a
+                non-``basic`` signalling system) is skipped with a WARNING
+                and omitted from the Layout — it does not abort discovery.
             JMRIConnectionError, JMRIRequestTimeout: surfaced from the
                 HTTP transport.
             RuntimeError: when the Client is not open (use
@@ -848,12 +851,27 @@ class Client:
         # _Parsed<Kind> dataclass; the dict carries list[Any] because the
         # spec table is heterogeneous, and the per-variable list[...] type
         # annotations below pin the concrete element type back down.
-        results: dict[str, list[Any]] = {
-            entity_type: [
-                spec.build(spec.parser(env), self) for env in fetch_tasks[entity_type].result()
-            ]
-            for entity_type, spec in _ENTITY_SPECS.items()
-        }
+        #
+        # A single entity whose envelope we cannot parse (e.g. a signal mast
+        # in a non-"basic" signalling system, which raises JMRIProtocolError)
+        # is skipped with a WARNING rather than aborting the whole discovery —
+        # otherwise one unsupported mast would discard every turnout, sensor
+        # and route already fetched. This mirrors the resilience the WS
+        # dispatch path (_on_ws_message) already applies to the same parsers.
+        results: dict[str, list[Any]] = {}
+        for entity_type, spec in _ENTITY_SPECS.items():
+            built: list[Any] = []
+            for env in fetch_tasks[entity_type].result():
+                try:
+                    built.append(spec.build(spec.parser(env), self))
+                except JMRIProtocolError as exc:
+                    logger.warning(
+                        "discover: skipping unparseable %s entity: %s",
+                        entity_type,
+                        exc,
+                        extra={"entity_type": entity_type},
+                    )
+            results[entity_type] = built
         turnouts: list[Turnout] = results["turnout"]
         sensors: list[Sensor] = results["sensor"]
         blocks: list[Block] = results["block"]

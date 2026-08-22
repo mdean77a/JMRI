@@ -271,6 +271,83 @@ async def test_discover_populates_turnout_collection(
     assert layout.turnouts["Yard Lead"] is turnout
 
 
+def _basic_mast(name: str) -> dict[str, Any]:
+    """A signal mast in the supported ``basic`` signalling system."""
+    return {
+        "type": "signalMast",
+        "data": {"name": name, "userName": None, "aspect": "Clear", "held": False, "lit": True},
+    }
+
+
+def _non_basic_mast(name: str, aspect: str) -> dict[str, Any]:
+    """A mast whose aspect is outside the ``basic`` enum (e.g. BR-2003)."""
+    return {
+        "type": "signalMast",
+        "data": {"name": name, "userName": None, "aspect": aspect, "held": False, "lit": True},
+    }
+
+
+async def test_discover_skips_unparseable_signal_mast_and_keeps_other_entities(
+    patch_http_factory: list[Any],
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """A non-``basic`` mast must be skipped, not abort the whole discovery.
+
+    Regression for discussion #2: a layout whose masts use BR-2003
+    ('Danger', 'Off', ...) previously raised ``JMRIProtocolError`` out of
+    ``discover()``, discarding every turnout/sensor already fetched.
+    """
+
+    def respond(path: str) -> dict[str, Any] | list[dict[str, Any]]:
+        if path == _VERSION_PATH:
+            return _version_payload("5.14.0")
+        if path == "/json/v5/turnout":
+            return [{"type": "turnout", "data": {"name": "NT1", "userName": None, "state": 0}}]
+        if path == "/json/v5/signalMast":
+            return [_non_basic_mast("IF$shsm:BR-2003:2-h(SH9)", "Danger")]
+        return []
+
+    with caplog.at_level("WARNING", logger="pyjmri.client"):
+        async with Client() as jmri:
+            fake = patch_http_factory[0]
+            fake.next_response = respond
+            layout = await jmri.discover()
+
+    # Discovery succeeds and the turnout survives the bad mast.
+    assert len(layout.turnouts) == 1
+    assert layout.turnouts["NT1"].state is TurnoutState.UNKNOWN
+    # The unparseable mast is omitted, not stored.
+    assert len(layout.signal_masts) == 0
+    # ...and it is reported at WARNING so the omission is visible.
+    warnings = [r for r in caplog.records if r.levelname == "WARNING"]
+    assert any("signalMast" in r.getMessage() for r in warnings)
+    assert any("Danger" in r.getMessage() for r in warnings)
+
+
+async def test_discover_keeps_valid_masts_when_one_is_unparseable(
+    patch_http_factory: list[Any],
+) -> None:
+    """Only the unsupported mast is dropped; a valid ``basic`` mast survives."""
+
+    def respond(path: str) -> dict[str, Any] | list[dict[str, Any]]:
+        if path == _VERSION_PATH:
+            return _version_payload("5.14.0")
+        if path == "/json/v5/signalMast":
+            return [
+                _basic_mast("IM1"),
+                _non_basic_mast("IF$shsm:BR-2003:ply(Ground 1)", "Off"),
+            ]
+        return []
+
+    async with Client() as jmri:
+        fake = patch_http_factory[0]
+        fake.next_response = respond
+        layout = await jmri.discover()
+
+    assert len(layout.signal_masts) == 1
+    assert layout.signal_masts["IM1"].name == "IM1"
+
+
 async def test_discover_version_check_reset_on_client_reuse(
     patch_http_factory: list[Any],
 ) -> None:
