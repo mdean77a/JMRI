@@ -348,6 +348,42 @@ async def test_discover_keeps_valid_masts_when_one_is_unparseable(
     assert layout.signal_masts["IM1"].name == "IM1"
 
 
+async def test_discover_does_not_swallow_non_protocol_errors(
+    patch_http_factory: list[Any],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The per-entity skip must stay narrow: only ``JMRIProtocolError``.
+
+    ``discover()`` deliberately skips a single entity that raises
+    ``JMRIProtocolError`` (e.g. a non-``basic`` signal mast) and keeps the
+    rest of the layout. It must NOT swallow any other exception — an
+    unexpected error during parse/build signals a real bug and has to
+    surface, not vanish behind a WARNING with a silently truncated Layout.
+    """
+    import dataclasses
+
+    from pyjmri import client as _client
+
+    def _boom(_env: dict[str, Any]) -> Any:
+        raise ValueError("unexpected parser failure")
+
+    broken_spec = dataclasses.replace(_client._ENTITY_SPECS["turnout"], parser=_boom)
+    monkeypatch.setitem(_client._ENTITY_SPECS, "turnout", broken_spec)
+
+    def respond(path: str) -> dict[str, Any] | list[dict[str, Any]]:
+        if path == _VERSION_PATH:
+            return _version_payload("5.14.0")
+        if path == "/json/v5/turnout":
+            return [{"type": "turnout", "data": {"name": "NT1", "userName": None, "state": 0}}]
+        return []
+
+    async with Client() as jmri:
+        fake = patch_http_factory[0]
+        fake.next_response = respond
+        with pytest.raises(ValueError, match="unexpected parser failure"):
+            await jmri.discover()
+
+
 async def test_discover_version_check_reset_on_client_reuse(
     patch_http_factory: list[Any],
 ) -> None:
