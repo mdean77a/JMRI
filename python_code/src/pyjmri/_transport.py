@@ -321,7 +321,12 @@ class WSConnection:
 
         Supervised by the Client's :class:`asyncio.TaskGroup`. Cancellation
         propagates from the TaskGroup's ``__aexit__`` and exits this
-        coroutine cleanly.
+        coroutine cleanly. The ``finally`` closes the active connection on
+        the way out — without it, cancellation leaves the socket to be
+        reaped by GC at some arbitrary later time, and JMRI's delayed
+        server-side cleanup of that stale connection can interfere with
+        the next Client opened in the same process (observed as a missed
+        first subscription event).
         """
         try:
             async for connection in websockets.connect(
@@ -376,6 +381,18 @@ class WSConnection:
                     cause=type(self._give_up_cause).__name__,
                 ) from self._give_up_cause
             raise JMRIConnectionError(host=self._host, port=self._port) from e
+        finally:
+            active, self._connection = self._connection, None
+            if active is not None:
+                # websockets' close() is cancellation-safe: if the close
+                # handshake is interrupted, it aborts the connection — an
+                # abrupt TCP close is still deterministic teardown, which
+                # is all we need here. Suppress everything: teardown must
+                # never mask the exception already propagating.
+                try:
+                    await active.close()
+                except BaseException:
+                    pass
 
     def _process_exception(self, exc: Exception) -> Exception | None:
         """``websockets`` v16 retry hook.

@@ -31,7 +31,7 @@ import httpx
 import pytest
 from _entity_state import JMRI_BASE_URL, force_sensor_state
 
-from pyjmri import Client, LayoutEntityNotFound, Sensor, SensorState
+from pyjmri import Client, Sensor, SensorState
 
 NUM_TRIALS = 20
 WARMUP_TRIALS = 3
@@ -45,12 +45,14 @@ NFR1_MEDIAN_BUDGET_MS = 100.0
 # coverage run; 5.0 s survives that while still tripping on a real hang.
 _WAIT_CHANGE_TIMEOUT_S = 5.0
 
-# Pinned target: IS1 — an internal sensor reserved for this NFR1 latency
-# test. Internal sensors always echo state changes back over WS, and no
-# other non-slow integration test mutates IS1 (Story 7.1 AC2). Pinned by
-# system name, never by positional sensors[0], so suite ordering and
-# layout growth cannot silently retarget this test onto a busy entity.
-_SENSOR_SYSTEM_NAME = "IS1"
+# Target: a dedicated internal sensor provisioned by the
+# ``provisioned_internal_sensor`` fixture (see tests/integration/conftest.py).
+# We do NOT hard-pin a name like ``IS1`` — on a real panel that name is a
+# meaningful layout sensor (e.g. an occupancy/staging sensor) whose watching
+# logic can move it mid-measurement, and it may not exist at all on another
+# installation. A freshly provisioned internal sensor is fully owned by this
+# test, always echoes state changes back over WS, and cannot collide with a
+# real entity (Story 7.1 non-overlap discipline, made installation-agnostic).
 
 # Budget for forcing + confirming the known starting state before the
 # measured window. Outer context-manager 5.0 s, inner wait_state 4.5 s
@@ -62,22 +64,27 @@ _STARTING_STATE_INNER_TIMEOUT_S = 4.5
 
 @pytest.mark.integration
 async def test_sensor_wait_change_median_latency_under_100ms(
-    jmri_available: None,
+    provisioned_internal_sensor: str,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     async with Client() as jmri:
         layout = await jmri.discover()
-        try:
-            sensor: Sensor = layout.sensors.by_system_name(_SENSOR_SYSTEM_NAME)
-        except LayoutEntityNotFound:
-            pytest.skip(
-                f"sensor {_SENSOR_SYSTEM_NAME!r} not on this layout — "
-                "required for the NFR1 sensor-latency test"
-            )
+        # The fixture provisioned this internal sensor before discover(), so
+        # it is guaranteed present; a missing lookup here is a real bug, not
+        # a layout gap, and should fail rather than skip.
+        sensor: Sensor = layout.sensors.by_system_name(provisioned_internal_sensor)
+
+        # Prime the WS subscription BEFORE the measured loop. ensure_subscription
+        # returns only after JMRI acks the subscribe (echoes the entity
+        # envelope), so every trial below runs against a confirmed-attached
+        # listener. Without this, trial 0 races first-subscription arming
+        # against the HTTP POST — the POST can land before JMRI attaches the
+        # listener, and the toggle is either missed or consumed by arming.
+        await jmri.ensure_subscription("sensor", sensor.name)
 
         # AC3: always force a known starting state (INACTIVE) via raw httpx
-        # POST — never trust whatever state a prior test left on IS1 — and
-        # confirm the WS-cached state reaches it before the measured window.
+        # POST — never trust whatever state a prior step left on the sensor —
+        # and confirm the WS-cached state reaches it before the measured window.
         async with httpx.AsyncClient(base_url=JMRI_BASE_URL) as raw_http:
             await force_sensor_state(raw_http, sensor.name, SensorState.INACTIVE)
         try:

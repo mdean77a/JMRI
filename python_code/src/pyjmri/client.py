@@ -329,6 +329,15 @@ class Client:
         if entity_type == "error":
             self._dispatch_error_envelope(envelope)
             return None
+        # Any inbound entity envelope doubles as the subscription ack for
+        # its (entity_type, name) pair — release ensure() callers blocked
+        # on it BEFORE parse/dispatch, so even an envelope the dispatcher
+        # drops (unknown spec, parse failure) still confirms enrollment.
+        if self._registry is not None:
+            data = envelope.get("data")
+            raw_name = data.get("name") if isinstance(data, dict) else None
+            if isinstance(raw_name, str):
+                self._registry.notify_envelope(entity_type, raw_name)
         spec = _ENTITY_SPECS.get(entity_type)
         if spec is None or spec.primary_attr is None:
             logger_transport.debug("WS dispatch: drop", extra={"type": entity_type})

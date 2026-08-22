@@ -25,9 +25,10 @@ entities whose commands demonstrably work (always at least the sensor;
 the turnout path is skipped gracefully when commands time out).
 
 Requires JMRI on localhost:12080; skipped via the ``jmri_available``
-session fixture when unreachable.  Layout-agnostic via skip-if-missing:
-targets the pinned internal sensor ``IS2`` and turnout ``NT106`` by
-system name (Story 7.1 AC2), skipping cleanly if either is absent.
+session fixture (a transitive dependency of ``provisioned_internal_sensor``)
+when unreachable.  The sensor target is a dedicated internal sensor
+provisioned per-test, so it is always present; the turnout ``NT106`` is
+pinned by system name and skipped cleanly if that name is absent.
 """
 
 from __future__ import annotations
@@ -42,10 +43,11 @@ from _entity_state import JMRI_BASE_URL, force_sensor_state, force_turnout_state
 
 from pyjmri import Client, LayoutEntityNotFound, SensorState, TurnoutState
 
-# Pinned, non-overlapping targets (Story 7.1 AC2): IS2 (an internal
-# sensor distinct from the NFR1 latency test's IS1) and NT106 (distinct
-# from the other turnout tests' NT100/NT102/NT104).
-_SENSOR_NAME = "IS2"
+# Sensor target: a dedicated internal sensor provisioned per-test by the
+# ``provisioned_internal_sensor`` fixture — fully owned, always echoes over
+# WS, and cannot collide with a real layout sensor (previously hard-pinned
+# to ``IS2``). Turnout target: NT106, pinned by system name and distinct
+# from the other turnout tests' NT100/NT102/NT104; skipped cleanly if absent.
 _TURNOUT_NAME = "NT106"
 
 _RECONNECT_WAIT_S = 15.0
@@ -77,7 +79,7 @@ def _opposite_turnout(state: TurnoutState) -> TurnoutState:
 
 @pytest.mark.integration
 async def test_in_flight_wait_survives_forced_disconnect(
-    jmri_available: None,
+    provisioned_internal_sensor: str,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """FR7/FR33/NFR5: in-flight wait_change() calls survive a forced WS disconnect.
@@ -100,13 +102,9 @@ async def test_in_flight_wait_survives_forced_disconnect(
     """
     async with Client() as jmri:
         layout = await jmri.discover()
-        try:
-            sensor = layout.sensors.by_system_name(_SENSOR_NAME)
-        except LayoutEntityNotFound:
-            pytest.skip(
-                f"sensor {_SENSOR_NAME!r} not on this layout — "
-                "required for the reconnect-resilience test"
-            )
+        # The fixture provisioned this internal sensor before discover(), so it
+        # is guaranteed present; a missing lookup is a real bug, not a gap.
+        sensor = layout.sensors.by_system_name(provisioned_internal_sensor)
         try:
             turnout = layout.turnouts.by_system_name(_TURNOUT_NAME)
         except LayoutEntityNotFound:
@@ -117,6 +115,11 @@ async def test_in_flight_wait_survives_forced_disconnect(
 
         async with httpx.AsyncClient(base_url=JMRI_BASE_URL) as raw_http:
             # ── Step 1: Establish known starting states ──────────────────────
+            # Prime the sensor's WS subscription first — ensure_subscription
+            # returns only after JMRI's ack, so the waiters registered below
+            # are guaranteed a confirmed-attached listener (wait_state's
+            # cache early-return would otherwise skip subscribing entirely).
+            await jmri.ensure_subscription("sensor", sensor.name)
             # Sensor: force to INACTIVE (internal sensors always echo back).
             await force_sensor_state(raw_http, sensor.name, SensorState.INACTIVE)
             await sensor.wait_state(SensorState.INACTIVE, timeout=10.0)
