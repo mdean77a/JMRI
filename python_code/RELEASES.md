@@ -71,6 +71,13 @@ subscription paths — so the v1.0.1 observation stands (JMRI keeps the
 throttle held after 30 s silence; the v1 no-op keep-alive stub remains
 correct).
 
+Post-publish smoke test (`scripts/smoke_test_published.sh 1.2.1`) passed
+against the published wheel, including the live sweep: 52 turnouts / 66
+sensors / 36 blocks / 15 routes, 3 locations / 1 train / 3 cars / 4
+engines, 44 roster entries.
+
+(Published 2026-08-24)
+
 ## v1.2.0
 
 Adds read-only discovery of JMRI's Roster (DecoderPro catalog) subsystem
