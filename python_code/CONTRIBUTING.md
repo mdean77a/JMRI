@@ -40,7 +40,7 @@ uv run --no-sync mypy --strict src/pyjmri
 uv run --no-sync pytest -m "not integration"
 ```
 
-The post-Story-9.4 unit-test baseline is **756 passed, 27 deselected**. The 27 deselected tests are `@pytest.mark.integration` tests excluded from the default run; see the next section for what they cover and why they live locally.
+The current unit-test baseline (v1.2.1) is **764 passed, 27 deselected**. The 27 deselected tests are `@pytest.mark.integration` tests excluded from the default run; see the next section for what they cover and why they live locally.
 
 `uv run` without `--no-sync` re-resolves the lockfile on every invocation, which is wasteful once `uv sync` has been run. The convention in this doc is uniform — every tool invocation takes `--no-sync` so a reader does not have to memorize which commands need the flag. The exception is `uv build`, `uv sync`, `uv publish`, and `uv add` — those are `uv` commands themselves, not "run a tool inside the venv" invocations, and they do not take `--no-sync`.
 
@@ -48,7 +48,7 @@ The post-Story-9.4 unit-test baseline is **756 passed, 27 deselected**. The 27 d
 
 `pyjmri` ships two test suites:
 
-- **Unit tests** (the 756 above) — no external dependencies, run in CI on every push and PR.
+- **Unit tests** (the 764 above) — no external dependencies, run in CI on every push and PR.
 - **Integration tests** (the 27 deselected) — require a real JMRI 5.14+ instance at `localhost:12080` with a panel file loaded, and are **excluded from CI**. The roster integration tests additionally need a **populated roster** in the target profile (e.g. `Basement_Revised_2024.jmri`, which shares the repo `roster/` directory of ~45 locomotives); against an empty roster they assert only the graceful-degrade path.
 
 The CI workflow at `.github/workflows/ci.yml` runs `pytest -m "not integration"` across `[ubuntu-latest, macos-latest] × ['3.11', '3.12', '3.13']`. No CI job spins up a JMRI instance. Headless-JMRI CI is Growth-deferred — not under consideration for v1.
@@ -114,7 +114,7 @@ Every command uses `uv run --no-sync` for tool invocations. The exceptions are `
    uv run --no-sync mypy --strict examples/
    ```
 
-   Expected: `Success: no issues found in 20 source files` for the library, and `Success: no issues found in 3 source files` for the examples (post-Story-6.4 baseline). The file counts may grow as the library or examples grow, but they must never *decrease* without an explicit story changing the source surface. Failure mode: fix the type errors and re-run; do not continue with mypy red.
+   Expected: `Success: no issues found in 22 source files` for the library, and `Success: no issues found in 7 source files` for the examples (v1.2.1 baseline). The file counts may grow as the library or examples grow, but they must never *decrease* without an explicit story changing the source surface. Failure mode: fix the type errors and re-run; do not continue with mypy red.
 
 3. **Unit tests clean.**
 
@@ -122,7 +122,7 @@ Every command uses `uv run --no-sync` for tool invocations. The exceptions are `
    uv run --no-sync pytest -m "not integration"
    ```
 
-   Expected: `756 passed, 27 deselected` (post-Story-9.4 baseline). The passed count may grow as the library grows; the deselected count may grow as new `@pytest.mark.integration` tests are added. Any failure halts the release until the failing test is either fixed (regression) or explicitly de-scoped via story.
+   Expected: `764 passed, 27 deselected` (v1.2.1 baseline). The passed count may grow as the library grows; the deselected count may grow as new `@pytest.mark.integration` tests are added. Any failure halts the release until the failing test is either fixed (regression) or explicitly de-scoped via story.
 
 4. **Full integration suite passes against a real JMRI instance.** Start JMRI with `Basement_Revised_2024.jmri` (or an equivalent layout / the simulator), confirm the web server is up at `localhost:12080`, then run the integration suite minus the long-run test. Note: the Operations integration tests need Operations data loaded — `Basement_Revised_2024.jmri` has it; a bare simulator profile without Operations data is insufficient for that subset (see "Running integration tests locally" above):
 

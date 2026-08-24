@@ -1,5 +1,76 @@
 # pyjmri release notes
 
+## v1.2.1
+
+Bug-fix release. No API changes — no new public names, no changed
+signatures, no behavior changes to code that was already working.
+
+- **`discover()` no longer discards a whole layout over one bad entity.**
+  A single signal mast in a non-basic signalling system (e.g. British
+  BR-2003, aspects "Danger"/"Off") raised `JMRIProtocolError` out of
+  `discover()`, throwing away every turnout, sensor, and route already
+  fetched. The per-entity build loop now logs the offending entity at
+  WARNING and skips it, mirroring the resilience the WebSocket dispatch
+  path already applied to the same parsers. The mast is omitted from the
+  `Layout`; the rest of the layout is returned. Verified against a real
+  BR-2003 layout: 73 turnouts / 123 sensors / 49 routes returned, 24
+  masts skipped with a warning each. Reported and fixed by
+  [@honzup](https://github.com/honzup) (PR #3) — the first outside
+  contribution to pyjmri. The skip is deliberately narrow: a companion
+  regression test asserts that a non-`JMRIProtocolError` raised during
+  parse/build still propagates out of `discover()` rather than being
+  swallowed behind a warning and a silently truncated `Layout`.
+
+- **Fixed a subscription race that made a second `Client` in the same
+  process miss its first `wait_change()` event** roughly half the time.
+  Two cooperating defects:
+  - `SubscriptionRegistry.ensure()` was fire-and-forget — it sent the
+    subscribe frame and returned before JMRI had processed it and
+    attached its event listener, so a state change commanded immediately
+    after `ensure()` could go silently unobserved. `ensure()` now waits
+    (bounded, 2 s) for JMRI's ack — the entity envelope echoed back on
+    the WebSocket — released via a new `notify_envelope()` hook called
+    from the Client's WS dispatch. On timeout it warns and degrades to
+    the previous behavior rather than failing the call.
+  - `WSConnection.run()` never closed the socket on cancellation, leaving
+    it to the garbage collector. JMRI's delayed cleanup of the stale
+    connection widened the race window for the next `Client`. `run()`
+    now closes the active connection in a `finally`.
+
+- **Integration tests no longer toggle real layout sensors.** A new
+  `provisioned_internal_sensor` fixture PUTs a unique in-memory internal
+  sensor per test (never saved to the panel) instead of hard-pinning
+  `IS1` ("NW Staging Close") and `IS2`, which on the basement layout
+  drive real staging-yard routes. Both affected tests now also prime the
+  subscription before their measured loops.
+
+- **New `scripts/smoke_test_published.sh`** — builds a throwaway uv
+  project outside the repo, installs the published wheel from PyPI, and
+  asserts version, imports, the roster API, and the presence of every
+  discover routine. Passing a JMRI URL as the second argument adds a live
+  sweep of all discover routines with per-entity counts. README gains a
+  matching read-only "Verify your install" smoke test.
+
+JMRI version tested against: JMRI 5.14.0
+
+Long-run test: skipped for this release; v1.0.0 evidence reused
+(`duration=3600s disconnects=5 reconnects=5 rss_delta=-5.1MB fd_delta=0
+task_delta=0 status=PASS`). **This reuse is weaker than in v1.0.1 and
+v1.2.0**, both of which left the transport untouched: v1.2.1 does modify
+`_subscriptions.py` and `_transport.py`, the exact machinery the long-run
+test characterizes. The substituted evidence is what the fix itself was
+validated against — two-client repro 8/8 (previously ~50% failure),
+the integration suite run 5× consecutively clean, and a 5-minute
+reconnect soak green — plus a clean full integration suite (23 passed,
+2 skipped) at release time. A full one-hour long-run should be treated
+as owed against the next release that touches this code.
+
+Hardware-mode validation (release-checklist step 6): waived. v1.2.1
+changes no throttle code — the diff is confined to the discovery and
+subscription paths — so the v1.0.1 observation stands (JMRI keeps the
+throttle held after 30 s silence; the v1 no-op keep-alive stub remains
+correct).
+
 ## v1.2.0
 
 Adds read-only discovery of JMRI's Roster (DecoderPro catalog) subsystem
